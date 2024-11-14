@@ -26,4 +26,4 @@ jobs:
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
         run: |
-          node my-selenium-tests.js  # Ejecuta los tests de Selenium en BrowserStack
+          node my-selenium-tests.js  
