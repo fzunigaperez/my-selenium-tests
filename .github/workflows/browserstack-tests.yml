@@ -1,0 +1,29 @@
+name: Run Selenium Tests on BrowserStack
+
+on:
+  workflow_dispatch:    # Esto permite que los tests se ejecuten manualmente
+  schedule:
+    - cron: '0 19 * * *'  # Esto ejecuta los tests todos los días a las 7 p.m. (UTC)
+
+jobs:
+  run-selenium-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14' # Ajusta la versión de Node.js si necesitas otra
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests on BrowserStack
+        env:
+          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+        run: |
+          node my-selenium-tests.js
