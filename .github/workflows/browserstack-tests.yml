@@ -1,9 +1,9 @@
 name: Run Selenium Tests on BrowserStack
 
 on:
-  workflow_dispatch:    # Permite que los tests se ejecuten manualmente
+  workflow_dispatch:
   schedule:
-    - cron: '0 19 * * *'  # Ejecuta los tests todos los días a las 7 p.m. (UTC)
+    - cron: '0 19 * * *'
 
 jobs:
   run-selenium-tests:
@@ -11,19 +11,19 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3  # Usamos la versión más reciente de checkout
+        uses: actions/checkout@v3
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3  # Usamos la versión más reciente de setup-node
+        uses: actions/setup-node@v3
         with:
-          node-version: '20'  # Especificamos que queremos usar Node.js 20
+          node-version: '20'
 
       - name: Install dependencies
-        run: npm install  # Este paso instala todas las dependencias definidas en package.json
+        run: npm install
 
-      - name: Run tests on BrowserStack
+      - name: Run all tests on BrowserStack
         env:
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
         run: |
-          node my-selenium-tests.js  
+          node run-all-tests.js
