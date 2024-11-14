@@ -23,7 +23,7 @@ jobs:
 
       - name: Run tests on BrowserStack
         env:
-          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
-          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+          BROWSERSTACK_USERNAME: "fzuniga_kU2wfa"
+          BROWSERSTACK_ACCESS_KEY: "PDSWH3QTgRyFqVWFR1sx"
         run: |
           node my-selenium-tests.js  
