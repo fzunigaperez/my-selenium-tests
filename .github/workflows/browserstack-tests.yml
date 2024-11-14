@@ -16,7 +16,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3  # Usamos la versión más reciente de setup-node
         with:
-          node-version: '16'  # Especificamos que queremos usar Node.js 16
+          node-version: '20'  # Especificamos que queremos usar Node.js 16
 
       - name: Install dependencies
         run: npm install  # Este paso instala todas las dependencias definidas en package.json
