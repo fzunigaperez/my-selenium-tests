@@ -16,7 +16,7 @@ const capabilities = {
 };
 
 // Función asíncrona para ejecutar los tests
-async function runTest() {
+async function runTest1() {
   let driver = await new Builder()
     .usingServer('https://hub-cloud.browserstack.com/wd/hub') // URL de BrowserStack
     .forBrowser('chrome') // Especifica el navegador aquí
