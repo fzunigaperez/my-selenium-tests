@@ -8,8 +8,8 @@ const capabilities = {
     'osVersion': '10',
     'local': 'false',
     'seleniumVersion': '3.141.59',
-    'userName': 'fzuniga_kU2wfa', // Reemplázalo con tu nombre de usuario de BrowserStack
-    'accessKey': 'PDSWH3QTgRyFqVWFR1sx', // Reemplázalo con tu clave de acceso de BrowserStack
+    'userName': process.env.BROWSERSTACK_USERNAME, // Usa el nombre de usuario del entorno
+    'accessKey': process.env.BROWSERSTACK_ACCESS_KEY, // Usa la clave de acceso del entorno
   },
   'browserName': 'Chrome',
   'browserVersion': 'latest',
@@ -24,18 +24,14 @@ async function runTest() {
     .build();
 
   try {
-    // Navega a la página de ejemplo
     await driver.get('http://www.google.com');
     
-    // Encuentra el campo de búsqueda (por ejemplo, "q") y realiza una búsqueda
     let element = await driver.findElement(By.name('q'));
     await element.sendKeys('Hello World');
     await element.submit();
     
-    // Espera hasta que el título de la página contenga 'Hello World'
     await driver.wait(until.titleContains('Hello World'), 10000);
   } finally {
-    // Cierra el navegador después de completar las pruebas
     await driver.quit();
   }
 }
