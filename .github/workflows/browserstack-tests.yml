@@ -1,9 +1,9 @@
 name: Run Selenium Tests on BrowserStack
 
 on:
-  workflow_dispatch:    # Esto permite que los tests se ejecuten manualmente
+  workflow_dispatch:    # Permite que los tests se ejecuten manualmente
   schedule:
-    - cron: '0 19 * * *'  # Esto ejecuta los tests todos los días a las 7 p.m. (UTC)
+    - cron: '0 19 * * *'  # Ejecuta los tests todos los días a las 7 p.m. (UTC)
 
 jobs:
   run-selenium-tests:
@@ -11,12 +11,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3  # Actualizado a v3
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3  # Actualizado a v3
         with:
-          node-version: '14' # Ajusta la versión de Node.js si necesitas otra
+          node-version: '16'  # Especifica la versión de Node.js que quieres usar
 
       - name: Install dependencies
         run: npm install
