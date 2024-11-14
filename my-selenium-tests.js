@@ -8,7 +8,7 @@ async function runTest() {
     'bstack:options': {
       os: "Windows",
       osVersion: "10",
-      browserName: "Chrome",
+      browserName: "chrome",
       browserVersion: "latest",
       userName: process.env.BROWSERSTACK_USERNAME,  // Usa la variable de entorno
       accessKey: process.env.BROWSERSTACK_ACCESS_KEY  // Usa la variable de entorno
