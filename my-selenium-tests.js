@@ -5,7 +5,7 @@ const browserstack = require('browserstack-local');
 const capabilities = {
   'browserstack.user': 'fzuniga_kU2wfa', // Reemplázalo con tu nombre de usuario de BrowserStack
   'browserstack.key': 'PDSWH3QTgRyFqVWFR1sx', // Reemplázalo con tu clave de acceso de BrowserStack
-  'browser': 'Chrome', // El navegador que deseas usar
+  'browser': "chrome", // El navegador que deseas usar
   'browser_version': 'latest', // Versión del navegador
   'os': 'Windows', // Sistema operativo en el que se ejecuta el navegador
   'os_version': '10', // Versión del sistema operativo
