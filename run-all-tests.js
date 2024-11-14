@@ -1,7 +1,7 @@
 // run-all-tests.js
 
 const C178 = require('./C178');
-const runTest2 = require('./capoeira');
+const runTest2 = require('./google');
 
 
 async function runAllTests() {
