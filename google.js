@@ -10,13 +10,14 @@ const capabilities = {
     'seleniumVersion': '3.141.59',
     'userName': process.env.BROWSERSTACK_USERNAME, // Usa el nombre de usuario del entorno
     'accessKey': process.env.BROWSERSTACK_ACCESS_KEY, // Usa la clave de acceso del entorno
+    'sessionName': 'C180 Introducing a Dashboard name with a maximum length of 27 characters',
   },
   'browserName': 'Chrome',
   'browserVersion': 'latest',
 };
 
 // Función asíncrona para ejecutar los tests
-async function runTest1() {
+async function C180() {
   let driver = await new Builder()
     .usingServer('https://hub-cloud.browserstack.com/wd/hub') // URL de BrowserStack
     .forBrowser('chrome') // Especifica el navegador aquí
@@ -36,4 +37,4 @@ async function runTest1() {
   }
 }
 
-module.exports = runTest1;
+module.exports = C180;
