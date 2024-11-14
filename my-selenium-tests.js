@@ -1,10 +1,7 @@
 const { Builder, By, Key, until } = require('selenium-webdriver');
 
+// Definir la función asíncrona para ejecutar la prueba
 async function runTest() {
-  // Agrega la depuración de las variables de entorno antes de configurar el WebDriver
-  console.log("BROWSERSTACK_USERNAME:", process.env.BROWSERSTACK_USERNAME);
-  console.log("BROWSERSTACK_ACCESS_KEY:", process.env.BROWSERSTACK_ACCESS_KEY);
-
   // Configura las capacidades de BrowserStack
   const capabilities = {
     'bstack:options': {
@@ -12,8 +9,8 @@ async function runTest() {
       osVersion: "10",
       browserName: "chrome", // Usa minúsculas para el nombre del navegador
       browserVersion: "latest", // O especifica la versión
-      userName: process.env.BROWSERSTACK_USERNAME,
-      accessKey: process.env.BROWSERSTACK_ACCESS_KEY,
+      userName: "fzuniga_kU2wfa", // Reemplaza con tu nombre de usuario de BrowserStack
+      accessKey: "PDSWH3QTgRyFqVWFR1sx", // Reemplaza con tu clave de acceso de BrowserStack
     },
   };
 
