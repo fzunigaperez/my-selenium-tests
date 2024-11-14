@@ -6,10 +6,10 @@ async function runTest() {
   // Configura el navegador para usar BrowserStack
   let capabilities = {
     'bstack:options': {
-      os: 'Windows',
-      osVersion: '10',
-      browserName: 'Chrome',
-      browserVersion: 'latest',
+      os: "Windows",
+      osVersion: "10",
+      browserName: "Chrome",
+      browserVersion: "latest",
       userName: process.env.BROWSERSTACK_USERNAME,  // Usa la variable de entorno
       accessKey: process.env.BROWSERSTACK_ACCESS_KEY  // Usa la variable de entorno
     }
