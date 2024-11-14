@@ -37,4 +37,4 @@ async function runTest2() {
 }
 
 // Ejecuta la función asíncrona
-runTest();
+runTest2();
