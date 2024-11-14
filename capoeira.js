@@ -36,4 +36,4 @@ async function runTest2() {
   }
 }
 
-
+module.exports = runTest2;
