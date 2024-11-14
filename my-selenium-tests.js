@@ -1,21 +1,25 @@
-const { Builder, By, until } = require('selenium-webdriver');
+const { Builder, By, Key, until } = require('selenium-webdriver');
+const browserstack = require('browserstack-local');
 
-async function runTest() {
-  let driver = await new Builder()
-    .usingServer('https://hub-cloud.browserstack.com/wd/hub')
-    .withCapabilities({
-      'bstack:options' : {
-        "os" : "Windows",
-        "osVersion" : "10",
-        "local" : "false",
-        "seleniumVersion" : "4.0.0",
-      },
-      'browserName' : 'Chrome',
-      'browserVersion' : 'latest',
-      'browserstack.user' : process.env.BROWSERSTACK_USERNAME,
-      'browserstack.key' : process.env.BROWSERSTACK_ACCESS_KEY
-    })
-    .build();
+// Configura el navegador para usar BrowserStack
+let capabilities = {
+  'bstack:options': {
+    os: 'Windows',
+    osVersion: '10',
+    browserName: 'Chrome',
+    browserVersion: 'latest',
+    userName: process.env.BROWSERSTACK_USERNAME,  // Usa la variable de entorno
+    accessKey: process.env.BROWSERSTACK_ACCESS_KEY  // Usa la variable de entorno
+  }
+};
+
+let driver = new Builder()
+  .usingServer('https://hub-cloud.browserstack.com/wd/hub') // URL de BrowserStack
+  .withCapabilities(capabilities)
+  .build();
+
+// Tu código de Selenium aquí para interactuar con el navegador en BrowserStack
+
 
   try {
     await driver.get('http://www.example.com');
