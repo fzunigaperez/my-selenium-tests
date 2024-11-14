@@ -16,14 +16,14 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3  # Usamos la versión más reciente de setup-node
         with:
-          node-version: '20'  # Especificamos que queremos usar Node.js 16
+          node-version: '20'  # Especificamos que queremos usar Node.js 20
 
       - name: Install dependencies
         run: npm install  # Este paso instala todas las dependencias definidas en package.json
 
       - name: Run tests on BrowserStack
         env:
-          BROWSERSTACK_USERNAME: "fzuniga_kU2wfa"
-          BROWSERSTACK_ACCESS_KEY: "PDSWH3QTgRyFqVWFR1sx"
+          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
         run: |
           node my-selenium-tests.js  
