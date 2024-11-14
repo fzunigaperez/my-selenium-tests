@@ -1,46 +1,55 @@
 const { Builder, By, Key, until } = require('selenium-webdriver');
-const browserstack = require('browserstack-local');
 
 async function runTest() {
-  // Configura las capacidades
+  // Agrega la depuración de las variables de entorno antes de configurar el WebDriver
+  console.log("BROWSERSTACK_USERNAME:", process.env.BROWSERSTACK_USERNAME);
+  console.log("BROWSERSTACK_ACCESS_KEY:", process.env.BROWSERSTACK_ACCESS_KEY);
+
+  // Configura las capacidades de BrowserStack
   const capabilities = {
     'bstack:options': {
       os: "Windows",
       osVersion: "10",
-      browserName: "chrome", // Asegúrate de que esté escrito en minúsculas
-      browserVersion: "latest", // O una versión específica si lo prefieres
+      browserName: "chrome", // Usa minúsculas para el nombre del navegador
+      browserVersion: "latest", // O especifica la versión
       userName: process.env.BROWSERSTACK_USERNAME,
       accessKey: process.env.BROWSERSTACK_ACCESS_KEY,
     },
   };
 
-  // Imprimir las capacidades para depurar
-  console.log("Capacidades:", JSON.stringify(capabilities, null, 2));
+  // Imprimir las capacidades para verificar que todo esté bien configurado
+  console.log('Capacidades a enviar:', JSON.stringify(capabilities, null, 2));
 
   try {
-    // Inicializa el driver de Selenium con las capacidades de BrowserStack
+    // Iniciar WebDriver con las capacidades
     let driver = await new Builder()
-      .usingServer('https://hub-cloud.browserstack.com/wd/hub') // URL de BrowserStack
+      .usingServer('https://hub-cloud.browserstack.com/wd/hub') // Dirección del servidor de BrowserStack
       .withCapabilities(capabilities)
       .build();
 
-    // Navega a la página de ejemplo
-    await driver.get('http://www.google.com');
+    // Navegar a la página de Google
+    await driver.get('https://www.google.com');
 
-    // Encuentra el campo de búsqueda (por ejemplo, "q") y realiza una búsqueda
-    let element = await driver.findElement(By.name('q'));
-    await element.sendKeys('Hello World');
-    await element.submit();
+    // Esperar que el título de la página contenga "Google"
+    await driver.wait(until.titleContains('Google'), 10000);
+    console.log("Página cargada correctamente");
 
-    // Espera hasta que el título de la página contenga 'Hello World'
+    // Realizar una búsqueda
+    let searchBox = await driver.findElement(By.name('q'));
+    await searchBox.sendKeys('Hello World');
+    await searchBox.sendKeys(Key.RETURN);
+
+    // Esperar que el título contenga "Hello World"
     await driver.wait(until.titleContains('Hello World'), 10000);
+    console.log("Búsqueda completada");
+
   } catch (error) {
-    console.error("Error en la ejecución del test:", error);
+    console.error('Error en la ejecución del test:', error);
   } finally {
-    // Cierra el navegador después de completar las pruebas
+    // Cerrar el navegador al final de la prueba
     await driver.quit();
   }
 }
 
-// Ejecuta la función asíncrona
+// Ejecutar el test
 runTest();
