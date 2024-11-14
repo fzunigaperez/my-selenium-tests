@@ -11,19 +11,19 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3  # Actualizado a v3
+        uses: actions/checkout@v3  # Usamos la versión más reciente de checkout
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3  # Actualizado a v3
+        uses: actions/setup-node@v3  # Usamos la versión más reciente de setup-node
         with:
-          node-version: '16'  # Especifica la versión de Node.js que quieres usar
+          node-version: '16'  # Especificamos que queremos usar Node.js 16
 
       - name: Install dependencies
-        run: npm install
+        run: npm install  # Este paso instala todas las dependencias definidas en package.json
 
       - name: Run tests on BrowserStack
         env:
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
         run: |
-          node my-selenium-tests.js
+          node my-selenium-tests.js  
