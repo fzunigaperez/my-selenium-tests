@@ -27,13 +27,15 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-            - name: Run specified test case or all tests
+      - name: Run specified test case or all tests
         env:
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
           TEST_CASE: ${{ github.event.inputs.test_case }}
         run: |
-          echo "Test case input: $TEST_CASE"
+          echo "Testing input variable"
+          echo "RAW INPUT: '${{ github.event.inputs.test_case }}'"
+          echo "Resolved TEST_CASE: '$TEST_CASE'"
           if [ "$TEST_CASE" = "all" ]; then
             echo "Running all tests..."
             node run-all-tests.js
