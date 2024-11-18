@@ -121,12 +121,22 @@ async function C90() {
     await loginAdmin();
     await logout();
 
+    // Cambiar el nombre de la sesión a "PASSED"
+    await driver.executeScript(
+      'browserstack_executor: {"action": "setSessionName", "arguments": {"name": "C90 Log out successfully - PASSED"}}'
+    );
+
     // Marcar la sesión como exitosa en BrowserStack
     await driver.executeScript(
       'browserstack_executor: {"action": "setSessionStatus", "arguments": {"status":"passed","reason": "C90 test passed successfully"}}'
     );
   } catch (error) {
     console.error('Error during test execution:', error);
+
+    // Cambiar el nombre de la sesión a "FAILED"
+    await driver.executeScript(
+      `browserstack_executor: {"action": "setSessionName", "arguments": {"name": "C90 Log out successfully - FAILED"}}`
+    );
 
     // Marcar la sesión como fallida en BrowserStack con el mensaje de error
     await driver.executeScript(
