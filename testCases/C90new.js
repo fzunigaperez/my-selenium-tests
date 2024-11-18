@@ -43,7 +43,7 @@ async function C90() {
       await adminCredentials(driver, vars);
       await driver.sleep(1000);
       await driver.wait(until.elementLocated(By.id("username")), 50000);
-      await driver.findElement(By.id("username")).sendKeys(vars["username"]);
+      await driver.findElement(By.id("xxxusername")).sendKeys(vars["username"]);
       await driver.findElement(By.id("password")).sendKeys(vars["password"]);
       await driver.findElement(By.id("kc-login")).click();
       await driver.sleep(1000);
