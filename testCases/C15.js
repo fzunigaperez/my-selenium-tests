@@ -8,7 +8,7 @@ const {
   isTheOrganizationNameEmpty,
   rootOrganizationTest,
   logout,
-} = require('./sharedFunctions');
+} = require('../utils/sharedFunctions');
 
 async function C15() {
   let driver;
