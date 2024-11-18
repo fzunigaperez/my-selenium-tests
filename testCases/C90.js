@@ -28,6 +28,8 @@ async function C90() {
 
     async function windowConfiguration() {
       await driver.get("https://proficloud.io/testrun");
+      await driver.manage().window().maximize();
+      
     }
 
     async function loginAdmin() {
