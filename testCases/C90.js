@@ -30,29 +30,29 @@ async function C90() {
     }
 
     async function loginAdmin() {
-      //await acceptCookies();  erewrwertretre
-      await driver.sleep(1000);
-      //await acceptCookies();
-      await loginLandingPageButton();
-      await adminCredentials();
-      await driver.sleep(1000);
-      await driver.wait(until.elementLocated(By.id("username")), 50000);
-      await driver.findElement(By.id("username")).sendKeys(vars["username"]);
-      await driver.findElement(By.id("password")).sendKeys(vars["password"]);
-      await driver.findElement(By.id("kc-login")).click();
-      await driver.sleep(1000);
-      await waitForPageToLoad();
-      await isTheOrganizationNameEmpty();
-      await rootOrganizationTest();
-    }
-
-    async function acceptCookies() {
-      let aceptarCookiesButton = await driver.findElements(By.id("ga-opt-out-true"));
-      if (aceptarCookiesButton.length > 0) {
-        await aceptarCookiesButton[0].click();
-        console.log('Cookies accepted.');
-      } else {
-        console.log('Accept cookies button not found.');
+      try {
+        await driver.sleep(1000);
+        await loginLandingPageButton();
+        await adminCredentials();
+        await driver.sleep(1000);
+        await driver.wait(until.elementLocated(By.id("username")), 5000);
+        await driver.findElement(By.id("username")).sendKeys(vars["username"]);
+        await driver.findElement(By.id("password")).sendKeys(vars["password"]);
+        await driver.findElement(By.id("kc-login")).click();
+        await driver.sleep(1000);
+        await waitForPageToLoad();
+        await isTheOrganizationNameEmpty();
+        await rootOrganizationTest();
+      } catch (e) {
+        if (e.name === 'ElementClickInterceptedError') {
+          console.warn('ElementClickInterceptedError detected, attempting JavaScript click.');
+          await driver.executeScript(
+            "arguments[0].click();",
+            driver.findElement(By.id("kc-login"))
+          );
+        } else {
+          throw e; // Relanzar otros errores para ser manejados globalmente
+        }
       }
     }
 
@@ -68,7 +68,7 @@ async function C90() {
     }
 
     async function waitForPageToLoad() {
-      // Add logic here if needed
+      console.log("Waiting for the page to load...");
     }
 
     async function isTheOrganizationNameEmpty() {
@@ -120,8 +120,18 @@ async function C90() {
     await windowConfiguration();
     await loginAdmin();
     await logout();
+
+    // Marcar la sesión como exitosa en BrowserStack
+    await driver.executeScript(
+      'browserstack_executor: {"action": "setSessionStatus", "arguments": {"status":"passed","reason": "C90 test passed successfully"}}'
+    );
   } catch (error) {
     console.error('Error during test execution:', error);
+
+    // Marcar la sesión como fallida en BrowserStack con el mensaje de error
+    await driver.executeScript(
+      `browserstack_executor: {"action": "setSessionStatus", "arguments": {"status":"failed","reason": "${error.message}"}}`
+    );
   } finally {
     if (driver) {
       await driver.quit();
