@@ -30,7 +30,7 @@ async function C90() {
     }
 
     async function loginAdmin() {
-      //await acceptCookies();
+      //await acceptCookies();  erewrwe
       await driver.sleep(1000);
       //await acceptCookies();
       await loginLandingPageButton();
