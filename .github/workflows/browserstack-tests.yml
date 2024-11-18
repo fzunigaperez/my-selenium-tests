@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       test_case:
-        description: "Specify the test case to run (e.g., C90)"
+        description: "Specify the test case to run (e.g., C90 or all for all test cases)"
         required: true
         default: "all"
 
@@ -49,3 +49,4 @@ jobs:
             echo "Available test cases in testCases directory:"
             ls -l testCases/
             exit 1
+          fi
