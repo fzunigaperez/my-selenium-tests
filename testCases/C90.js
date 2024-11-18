@@ -5,7 +5,7 @@ const {
   windowConfiguration,
   loginAdmin,
   logout,
-} = require('./sharedFunctions');
+} = require('../utils/sharedFunctions');
 
 async function C90() {
   let driver;

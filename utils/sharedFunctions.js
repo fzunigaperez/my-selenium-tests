@@ -1,12 +1,13 @@
 const { By, until } = require('selenium-webdriver');
 
 async function acceptCookies(driver) {
-  const cookiesButton = await driver.findElements(By.id("ga-opt-out-true"));
-  if (cookiesButton.length > 0) {
-    await cookiesButton[0].click();
-    console.log('Cookies accepted.');
+  const cookiesBanner = await driver.findElements(By.xpath("//h2[normalize-space()='This website uses cookies']"));
+  if (cookiesBanner.length > 0) {
+    console.log("Cookies banner detected.");
+    await driver.findElement(By.xpath("//button[@id='ga-opt-out-false']")).click();
+    console.log("Cookies accepted.");
   } else {
-    console.log('Accept cookies button not found.');
+    console.log("No cookies banner found.");
   }
 }
 
@@ -17,24 +18,22 @@ async function loginLandingPageButton(driver) {
 async function adminCredentials(driver, vars) {
   vars["username"] = "testingpxc_admin@proton.me";
   vars["password"] = "Proficloud2022!";
-  console.log(vars["username"]);
-  console.log(vars["password"]);
+  console.log("Credentials set:", vars);
 }
 
 async function isTheOrganizationNameEmpty(driver, vars) {
   vars["emptyName"] = await driver.findElement(By.xpath("//h4")).getText();
-  console.log(`Orga name at the moment: ${vars["emptyName"]}`);
+  console.log(`Orga name: ${vars["emptyName"]}`);
   if (vars["emptyName"] === "" || vars["emptyName"] === undefined) {
-    console.log("ORGA NAME IS NOT PRESENT!! Reload and wait");
+    console.log("ORGA NAME IS NOT PRESENT. Reloading...");
     await driver.sleep(2000);
   }
 }
 
 async function rootOrganizationTest(driver, vars) {
-  await driver.sleep(1000);
   vars["root"] = await driver.findElements(By.xpath("//h4[contains(.,'Rooth Organization')]")).length;
   if (vars["root"] > 0) {
-    console.log("We have started in the right organization :) ");
+    console.log("We are in the right organization.");
   } else {
     await switchToOriginalOrganization(driver);
   }
@@ -67,6 +66,27 @@ async function userMenu(driver) {
   await driver.findElement(By.xpath("//div[@id='proficloud-user-icon']")).click();
 }
 
+async function windowConfiguration(driver) {
+  await driver.get("https://proficloud.io/testrun");
+  await driver.manage().window().maximize();
+}
+
+async function loginAdmin(driver, vars) {
+  await acceptCookies(driver);
+  await driver.sleep(1000);
+  await acceptCookies(driver);
+  await loginLandingPageButton(driver);
+  await adminCredentials(driver, vars);
+  await driver.sleep(1000);
+  await driver.wait(until.elementLocated(By.id("username")), 50000);
+  await driver.findElement(By.id("username")).sendKeys(vars["username"]);
+  await driver.findElement(By.id("password")).sendKeys(vars["password"]);
+  await driver.findElement(By.id("kc-login")).click();
+  await driver.sleep(1000);
+  await isTheOrganizationNameEmpty(driver, vars);
+  await rootOrganizationTest(driver, vars);
+}
+
 module.exports = {
   acceptCookies,
   loginLandingPageButton,
@@ -77,4 +97,6 @@ module.exports = {
   activeOrganization,
   logout,
   userMenu,
+  windowConfiguration,
+  loginAdmin,
 };
