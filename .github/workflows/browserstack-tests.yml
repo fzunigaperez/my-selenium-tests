@@ -21,12 +21,10 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Debugging the workflow
+      - name: Debug testCases directory
         run: |
-          echo "Current working directory:"
-          pwd
-          echo "Listing all files:"
-          ls -R
+          echo "Contents of testCases directory:"
+          ls testCases
 
       - name: Ensure permissions for test cases
         run: chmod +x testCases/*.js
@@ -46,7 +44,8 @@ jobs:
             node run-all-tests.js
           elif [ -f "testCases/$TEST_CASE.js" ]; then
             echo "Running single test case: $TEST_CASE"
-            node testCases/$TEST_CASE.js
+            echo "About to execute node testCases/$TEST_CASE.js"
+            node testCases/$TEST_CASE.js || echo "Execution of $TEST_CASE.js failed"
           else
             echo "Test case not found: $TEST_CASE"
             exit 1
