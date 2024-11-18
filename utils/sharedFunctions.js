@@ -66,6 +66,27 @@ async function userMenu(driver) {
   await driver.findElement(By.xpath("//div[@id='proficloud-user-icon']")).click();
 }
 
+async function windowConfiguration(driver) {
+  await driver.get("https://proficloud.io/testrun");
+  await driver.manage().window().maximize();
+}
+
+async function loginAdmin(driver, vars) {
+  await acceptCookies(driver);
+  await driver.sleep(1000);
+  await acceptCookies(driver);
+  await loginLandingPageButton(driver);
+  await adminCredentials(driver, vars);
+  await driver.sleep(1000);
+  await driver.wait(until.elementLocated(By.id("username")), 50000);
+  await driver.findElement(By.id("xxxusername")).sendKeys(vars["username"]);
+  await driver.findElement(By.id("password")).sendKeys(vars["password"]);
+  await driver.findElement(By.id("kc-login")).click();
+  await driver.sleep(1000);
+  await isTheOrganizationNameEmpty(driver, vars);
+  await rootOrganizationTest(driver, vars);
+}
+
 module.exports = {
   acceptCookies,
   loginLandingPageButton,
@@ -76,4 +97,6 @@ module.exports = {
   activeOrganization,
   logout,
   userMenu,
+  windowConfiguration,
+  loginAdmin,
 };
