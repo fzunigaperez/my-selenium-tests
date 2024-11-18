@@ -15,7 +15,7 @@ async function C90() {
     ...baseCapabilities,
     'bstack:options': {
       ...baseCapabilities['bstack:options'],
-      'sessionName': 'C90new Log out successfully',
+      'sessionName': 'C90 Log out successfully',
     },
   };
 
@@ -26,10 +26,16 @@ async function C90() {
       .withCapabilities(capabilities)
       .build();
 
+    // Configuración de la ventana
     await windowConfiguration(driver);
+
+    // Inicio de sesión
     await loginAdmin(driver, vars);
+
+    // Cierre de sesión
     await logout(driver);
 
+    // Marca la sesión como exitosa
     const passedStatus = JSON.stringify({
       action: "setSessionStatus",
       arguments: {
@@ -42,6 +48,7 @@ async function C90() {
   } catch (error) {
     console.error('Error during test execution:', error.message);
 
+    // Marca la sesión como fallida
     const failedStatus = JSON.stringify({
       action: "setSessionStatus",
       arguments: {
