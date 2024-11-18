@@ -111,7 +111,7 @@ async function C90() {
     }
 
     async function userMenu() {
-      await driver.wait(until.elementLocated(By.xpath("//div[@id='proficloud-user-icon']")), 30000);
+      await driver.wait(until.elementLocated(By.xpath("//div[@id='proficloud-user-iconxxx']")), 30000);
       await driver.findElement(By.xpath("//div[@id='proficloud-user-icon']")).click();
     }
 
