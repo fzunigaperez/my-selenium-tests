@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       test_case:
-        description: 'Nombre del test case a ejecutar (por ejemplo, C90)'
-        required: false
-        default: 'all'
+        description: "Specify the test case to run (or 'all' to run all)"
+        required: true
+        default: "all"
 
 jobs:
   run-selenium-tests:
@@ -21,18 +21,10 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Debug testCases directory
-        run: |
-          echo "Contents of testCases directory:"
-          ls testCases
-
-      - name: Ensure permissions for test cases
-        run: chmod +x testCases/*.js
-
       - name: Install dependencies
         run: npm install
 
-      - name: Run specified test case or all tests
+      - name: Run tests
         env:
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
@@ -43,10 +35,12 @@ jobs:
             echo "Running all tests..."
             node run-all-tests.js
           elif [ -f "testCases/$TEST_CASE.js" ]; then
-            echo "Running single test case: $TEST_CASE"
-            echo "About to execute node testCases/$TEST_CASE.js"
+            echo "Found file: testCases/$TEST_CASE.js"
+            chmod +x testCases/$TEST_CASE.js
             node testCases/$TEST_CASE.js || echo "Execution of $TEST_CASE.js failed"
           else
             echo "Test case not found: $TEST_CASE"
+            echo "Available test cases in testCases directory:"
+            ls -l testCases/
             exit 1
           fi
