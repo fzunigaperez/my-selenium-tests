@@ -1,7 +1,13 @@
 name: Run Selenium Tests on BrowserStack
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      test_case:
+        description: 'Nombre del test case a ejecutar (por ejemplo, C15 o C90)'
+        required: false
+        default: 'all'
+
   schedule:
     - cron: "00 20 * * *"
 
@@ -21,9 +27,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run all tests on BrowserStack
+      - name: Run tests on BrowserStack
         env:
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
         run: |
-          node run-all-tests.js
+          if [ "${{ github.event.inputs.test_case }}" = "all" ]; then
+            node run-all-tests.js
+          else
+            echo "Running single test case: ${{ github.event.inputs.test_case }}"
+            node testCases/${{ github.event.inputs.test_case }}.js
+          fi
