@@ -35,9 +35,16 @@ async function C90() {
 
     try {
       console.log('Marking session as failed.');
-      await driver.executeScript(
-        `browserstack_executor: {"action": "setSessionStatus", "arguments": {"status":"failed","reason": "Test failed: ${error.message}"}}`
-      );
+      // Utilizamos JSON.stringify para garantizar un formato JSON válido
+      const errorDetails = JSON.stringify({
+        action: "setSessionStatus",
+        arguments: {
+          status: "failed",
+          reason: `Test failed: ${error.message}`,
+        },
+      });
+
+      await driver.executeScript(`browserstack_executor: ${errorDetails}`);
       console.log('Session marked as failed.');
     } catch (executorError) {
       console.error('Error setting BrowserStack session status:', executorError.message);
