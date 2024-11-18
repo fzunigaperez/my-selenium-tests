@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       test_case:
-        description: "Specify the test case to run (or 'all' to run all)"
+        description: "Specify the test case to run (e.g., C90)"
         required: true
         default: "all"
 
@@ -24,12 +24,12 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run tests
+      - name: Run specified test case
         env:
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
-          TEST_CASE: ${{ github.event.inputs.test_case }}
         run: |
+          TEST_CASE=${{ github.event.inputs.test_case }}
           echo "Test case input: $TEST_CASE"
           if [ "$TEST_CASE" = "all" ]; then
             echo "Running all tests..."
@@ -37,10 +37,15 @@ jobs:
           elif [ -f "testCases/$TEST_CASE.js" ]; then
             echo "Found file: testCases/$TEST_CASE.js"
             chmod +x testCases/$TEST_CASE.js
-            node testCases/$TEST_CASE.js || echo "Execution of $TEST_CASE.js failed"
+            echo "Executing test case $TEST_CASE..."
+            node -e "require('./testCases/$TEST_CASE')();"
+            if [ $? -ne 0 ]; then
+              echo "Execution of $TEST_CASE.js failed"
+              exit 1
+            fi
+            echo "Execution of $TEST_CASE.js completed successfully"
           else
             echo "Test case not found: $TEST_CASE"
             echo "Available test cases in testCases directory:"
             ls -l testCases/
             exit 1
-          fi
