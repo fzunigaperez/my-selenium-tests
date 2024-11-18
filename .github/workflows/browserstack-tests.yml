@@ -8,9 +8,6 @@ on:
         required: false
         default: 'all'
 
-  schedule:
-    - cron: "00 20 * * *"
-
 jobs:
   run-selenium-tests:
     runs-on: ubuntu-latest
@@ -24,6 +21,16 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Debugging the workflow
+        run: |
+          echo "Current working directory:"
+          pwd
+          echo "Listing all files:"
+          ls -R
+
+      - name: Ensure permissions for test cases
+        run: chmod +x testCases/*.js
+
       - name: Install dependencies
         run: npm install
 
@@ -33,9 +40,7 @@ jobs:
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
           TEST_CASE: ${{ github.event.inputs.test_case }}
         run: |
-          echo "Testing input variable"
-          echo "RAW INPUT: '${{ github.event.inputs.test_case }}'"
-          echo "Resolved TEST_CASE: '$TEST_CASE'"
+          echo "Test case input: $TEST_CASE"
           if [ "$TEST_CASE" = "all" ]; then
             echo "Running all tests..."
             node run-all-tests.js
