@@ -1,23 +1,20 @@
 const { Builder, By, until } = require('selenium-webdriver');
 
-// Configuración de capacidades para BrowserStack
-const capabilities = {
-  'bstack:options': {
-    'os': 'Windows',
-    'osVersion': '10',
-    'local': 'false',
-    'seleniumVersion': '3.141.59',
-    'userName': process.env.BROWSERSTACK_USERNAME,
-    'accessKey': process.env.BROWSERSTACK_ACCESS_KEY,
-    'sessionName': 'C90 Log out successfully',
-  },
-  'browserName': 'Chrome',
-  'browserVersion': 'latest',
-};
+// Importa las capacidades desde capabilities.js
+const baseCapabilities = require('./capabilities/capabilities');
 
 async function C90() {
   let driver;
   let vars = {};
+
+  // Clona las capacidades y agrega el sessionName dinámicamente
+  const capabilities = {
+    ...baseCapabilities,
+    'bstack:options': {
+      ...baseCapabilities['bstack:options'],
+      'sessionName': 'C90 Log out successfully',
+    },
+  };
 
   try {
     driver = await new Builder()
@@ -29,7 +26,6 @@ async function C90() {
     async function windowConfiguration() {
       await driver.get("https://proficloud.io/testrun");
       await driver.manage().window().maximize();
-      
     }
 
     async function loginAdmin() {
