@@ -1,7 +1,8 @@
 const { Builder, By, until } = require('selenium-webdriver');
 
 // Importa las capacidades desde capabilities.js
-const baseCapabilities = require('./capabilities');
+const path = require('path');
+const baseCapabilities = require(path.resolve(__dirname, '../capabilities/capabilities'));
 
 async function C90() {
   let driver;
