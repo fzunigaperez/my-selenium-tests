@@ -19,7 +19,7 @@ async function C90() {
     ...baseCapabilities,
     'bstack:options': {
       ...baseCapabilities['bstack:options'],
-      'sessionName': 'C90 Log out successfully',
+      'sessionName': 'C90new  Log out successfully',
     },
   };
 
