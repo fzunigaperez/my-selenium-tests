@@ -1,4 +1,4 @@
-const { Builder, until } = require('selenium-webdriver');
+const { Builder, By, until } = require('selenium-webdriver'); // Se asegura que By esté importado
 const path = require('path');
 const baseCapabilities = require(path.resolve(__dirname, '../capabilities/capabilities'));
 const {
@@ -7,10 +7,7 @@ const {
   adminCredentials,
   isTheOrganizationNameEmpty,
   rootOrganizationTest,
-  switchToOriginalOrganization,
-  activeOrganization,
   logout,
-  userMenu,
 } = require('./sharedFunctions');
 
 async function C15() {
@@ -44,7 +41,7 @@ async function C15() {
       await loginLandingPageButton(driver);
       await adminCredentials(driver, vars);
       await driver.sleep(1000);
-      await driver.wait(until.elementLocated(By.id("username")), 50000);
+      await driver.wait(until.elementLocated(By.id("username")), 50000); // By se usa aquí
       await driver.findElement(By.id("username")).sendKeys(vars["username"]);
       await driver.findElement(By.id("password")).sendKeys(vars["password"]);
       await driver.findElement(By.id("kc-login")).click();
@@ -97,4 +94,3 @@ async function C15() {
 }
 
 module.exports = C15;
-
