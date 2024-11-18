@@ -7,9 +7,7 @@ const C90 = require('./testCases/C90');
 const C15 = require('./testCases/C15'); 
 
 async function runAllTests() {
-  //await C178();
-  //await C180();
- // await C90new();
+  
   await C90();
   await C15();
 }
