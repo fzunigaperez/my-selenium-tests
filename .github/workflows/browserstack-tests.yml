@@ -27,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run specified test case or all tests
+            - name: Run specified test case or all tests
         env:
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
@@ -37,7 +37,10 @@ jobs:
           if [ "$TEST_CASE" = "all" ]; then
             echo "Running all tests..."
             node run-all-tests.js
-          else
+          elif [ -f "testCases/$TEST_CASE.js" ]; then
             echo "Running single test case: $TEST_CASE"
             node testCases/$TEST_CASE.js
+          else
+            echo "Test case not found: $TEST_CASE"
+            exit 1
           fi
