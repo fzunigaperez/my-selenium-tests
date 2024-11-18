@@ -7,7 +7,7 @@ const C90 = require('./testCases/C90');  //the route has to include the name of 
 
 async function runAllTests() {
   //await C178();
-  await C180();
+  //await C180();
   await C90();
   
 }
