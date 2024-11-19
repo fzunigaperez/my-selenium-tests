@@ -12,25 +12,8 @@ async function acceptCookies(driver) {
 }
 
 async function loginLandingPageButton(driver) {
-  try {
-    // Wait until the button is visible and enabled
-    await driver.wait(until.elementLocated(By.id("login-button")), 10000);
-    const loginButton = await driver.findElement(By.id("login-button"));
-    await driver.wait(until.elementIsVisible(loginButton), 5000);
-    await driver.wait(until.elementIsEnabled(loginButton), 5000);
-
-    // Ensure it's in the viewport
-    await driver.executeScript("arguments[0].scrollIntoView(true);", loginButton);
-
-    // Click the button
-    await loginButton.click();
-    console.log("Login button clicked successfully.");
-  } catch (error) {
-    console.error("Error interacting with login button:", error);
-    throw error; // Rethrow to handle it in the calling function
-  }
+  await driver.findElement(By.id("login-button")).click();
 }
-
 
 async function adminCredentials(driver, vars) {
   vars["username"] = "testingpxc_admin@proton.me";
