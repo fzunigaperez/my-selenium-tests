@@ -7,6 +7,8 @@ const {
   logout,
 } = require('../utils/sharedFunctions');
 
+await driver.manage().setTimeouts({ implicit: 2000 }); // Espera implícita
+
 async function C90() {
   let driver;
   let vars = {};
