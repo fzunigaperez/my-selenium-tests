@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       test_case:
-        description: "Specify the test case to run (e.g., C90 or all for all test cases)"
+        description: "Specify the test case(s) to run (e.g., C90, C15 or all for all test cases)"
         required: true
         default: "all"
 
@@ -24,29 +24,36 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run specified test case
+      - name: Run specified test cases
         env:
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
         run: |
-          TEST_CASE=${{ github.event.inputs.test_case }}
-          echo "Test case input: $TEST_CASE"
-          if [ "$TEST_CASE" = "all" ]; then
+          TEST_CASES=${{ github.event.inputs.test_case }}
+          echo "Test case(s) input: $TEST_CASES"
+          
+          if [ "$TEST_CASES" = "all" ]; then
             echo "Running all tests..."
             node run-all-tests.js
-          elif [ -f "testCases/$TEST_CASE.js" ]; then
-            echo "Found file: testCases/$TEST_CASE.js"
-            chmod +x testCases/$TEST_CASE.js
-            echo "Executing test case $TEST_CASE..."
-            node -e "require('./testCases/$TEST_CASE')();"
-            if [ $? -ne 0 ]; then
-              echo "Execution of $TEST_CASE.js failed"
-              exit 1
-            fi
-            echo "Execution of $TEST_CASE.js completed successfully"
           else
-            echo "Test case not found: $TEST_CASE"
-            echo "Available test cases in testCases directory:"
-            ls -l testCases/
-            exit 1
+            IFS=',' read -ra TEST_ARRAY <<< "$TEST_CASES" # Split by comma
+            for TEST_CASE in "${TEST_ARRAY[@]}"; do
+              TEST_CASE=$(echo "$TEST_CASE" | xargs) # Trim spaces
+              if [ -f "testCases/$TEST_CASE.js" ]; then
+                echo "Found file: testCases/$TEST_CASE.js"
+                chmod +x testCases/$TEST_CASE.js
+                echo "Executing test case $TEST_CASE..."
+                node -e "require('./testCases/$TEST_CASE')();"
+                if [ $? -ne 0 ]; then
+                  echo "Execution of $TEST_CASE.js failed"
+                  exit 1
+                fi
+                echo "Execution of $TEST_CASE.js completed successfully"
+              else
+                echo "Test case not found: $TEST_CASE"
+                echo "Available test cases in testCases directory:"
+                ls -l testCases/
+                exit 1
+              fi
+            done
           fi
