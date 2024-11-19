@@ -15,7 +15,7 @@ async function C656() {
     ...baseCapabilities,
     'bstack:options': {
       ...baseCapabilities['bstack:options'],
-      'sessionName': 'C656 Log in with right credentials as VIEWR',
+      'sessionName': 'C656 Log in with right credentials as VIEWER',
     },
   };
 
