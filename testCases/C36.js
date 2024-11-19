@@ -4,7 +4,6 @@ const baseCapabilities = require(path.resolve(__dirname, '../capabilities/capabi
 const {
   windowConfiguration,
   acceptCookies,
-  loginLandingPageButton,
   logout,
 } = require('../utils/sharedFunctions'); // Importación de funciones reutilizables
 
@@ -32,6 +31,7 @@ async function C36() {
 
     // Aceptar cookies
     await acceptCookies(driver);
+    await loginLandingPageButton(driver);
 
     // Realizar 10 intentos fallidos
     const wrongCredentials = { username: "ferchoalejandro86@gmail.com", password: "wwqrewrewewr" };
@@ -109,8 +109,7 @@ async function C36() {
 }
 
 // Función para iniciar sesión con credenciales específicas
-async function loginWithCredentials(username, password) {
-  //await loginLandingPageButton(driver);
+async function loginWithCredentials(driver, username, password) {
   await driver.findElement(By.id("username")).clear();
   await driver.findElement(By.id("username")).sendKeys(username);
   await driver.findElement(By.id("password")).clear();
