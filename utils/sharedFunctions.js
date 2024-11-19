@@ -87,8 +87,6 @@ async function windowConfiguration(driver) {
 
 async function loginAdmin(driver, vars) {
   await acceptCookies(driver);
-  await driver.sleep(1000);
-  await acceptCookies(driver);
   await loginLandingPageButton(driver);
   await adminCredentials(driver, vars);
   await driver.sleep(1000);
