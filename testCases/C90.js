@@ -28,6 +28,8 @@ async function C90() {
       .withCapabilities(capabilities)
       .build();
 
+    await driver.manage().setTimeouts({ implicit: 2000 }); // Espera implícita
+
     // Configuración de la ventana
     await windowConfiguration(driver);
 
