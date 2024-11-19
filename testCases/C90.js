@@ -7,8 +7,6 @@ const {
   logout,
 } = require('../utils/sharedFunctions');
 
-await driver.manage().setTimeouts({ implicit: 2000 }); // Espera implícita
-
 async function C90() {
   let driver;
   let vars = {};
@@ -28,6 +26,7 @@ async function C90() {
       .withCapabilities(capabilities)
       .build();
 
+    // Configurar tiempo de espera implícito
     await driver.manage().setTimeouts({ implicit: 2000 }); // Espera implícita
 
     // Configuración de la ventana
