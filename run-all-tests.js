@@ -26,4 +26,4 @@ async function runAllTests() {
   console.log('All tests have been executed.');
 }
 
-runAllTests();
+runAllTests();  
