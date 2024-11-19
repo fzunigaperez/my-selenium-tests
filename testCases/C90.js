@@ -27,7 +27,7 @@ async function C90() {
       .build();
 
     // Configurar tiempo de espera implícito
-    await driver.manage().setTimeouts({ implicit: 2000 }); // Espera implícita
+    //await driver.manage().setTimeouts({ implicit: 2000 }); // Espera implícita
 
     // Configuración de la ventana
     await windowConfiguration(driver);
