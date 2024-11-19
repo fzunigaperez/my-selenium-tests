@@ -95,6 +95,31 @@ async function loginAdmin(driver, vars) {
   await rootOrganizationTest(driver, vars);
 }
 
+async function loginEditor(driver, vars) {
+  await acceptCookies(driver);
+  await loginLandingPageButton(driver);
+  vars["username"] = "testingpxc_editor@proton.me";
+  vars["password"] = "Proficloud2022!";
+  console.log("Credentials set for EDITOR:", vars);
+
+  // Log in
+  await driver.wait(until.elementLocated(By.id("username")), 5000);
+  await driver.findElement(By.id("username")).sendKeys(vars["username"]);
+  await driver.findElement(By.id("password")).sendKeys(vars["password"]);
+  await driver.findElement(By.id("kc-login")).click();
+
+  // Wait for page to load
+  await driver.sleep(10000);
+  await isTheOrganizationNameEmpty(driver, vars);
+
+  // Assert the correct page is loaded
+  const pageTitle = await driver.findElement(By.xpath("//div[@id='routeTitle']")).getText();
+  assert.strictEqual(pageTitle, "Device Management Service");
+
+  // Check if in the right organization
+  await rootOrganizationTest(driver, vars);
+}
+
 module.exports = {
   acceptCookies,
   loginLandingPageButton,
@@ -107,4 +132,5 @@ module.exports = {
   userMenu,
   windowConfiguration,
   loginAdmin,
+  loginEditor,
 };
