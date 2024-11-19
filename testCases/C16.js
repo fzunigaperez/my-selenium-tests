@@ -1,11 +1,11 @@
-const { Builder, By, until } = require('selenium-webdriver'); // Importación completa
+const { Builder, By, until } = require('selenium-webdriver');
 const path = require('path');
 const baseCapabilities = require(path.resolve(__dirname, '../capabilities/capabilities'));
 const {
   windowConfiguration,
   acceptCookies,
   loginLandingPageButton,
-} = require('../utils/sharedFunctions'); // Importación de funciones reutilizables
+} = require('../utils/sharedFunctions');
 
 async function C16() {
   let driver;
@@ -37,24 +37,30 @@ async function C16() {
     await passwordField.sendKeys("1234554");
     await driver.findElement(By.id("kc-login")).click();
 
+    // Validar el mensaje de error
     await driver.wait(until.elementLocated(By.css(".kc-feedback-text")), 5000);
-    let feedbackText = await driver.findElement(By.css(".kc-feedback-text")).getText();
+    let feedbackTextElement = await driver.findElement(By.css(".kc-feedback-text"));
+    let feedbackText = await feedbackTextElement.getText();
     if (feedbackText !== "Invalid username or password.") {
       throw new Error(`Unexpected error message for invalid credentials: '${feedbackText}'`);
     }
     console.log("Validation passed for invalid credentials.");
 
-    // Escenario 2 C18: Email válido pero contraseña incorrecta
+    // Escenario 2: Email válido pero contraseña incorrecta
     console.log("Logging in with valid email but incorrect password...");
+    usernameField = await driver.findElement(By.id("username"));
+    passwordField = await driver.findElement(By.id("password"));
+
     await usernameField.clear();
     await passwordField.clear();
-
     await usernameField.sendKeys("testingpxc_admin@proton.me");
     await passwordField.sendKeys("1234554");
     await driver.findElement(By.id("kc-login")).click();
 
+    // Validar el mensaje de error
     await driver.wait(until.elementLocated(By.css(".kc-feedback-text")), 5000);
-    feedbackText = await driver.findElement(By.css(".kc-feedback-text")).getText();
+    feedbackTextElement = await driver.findElement(By.css(".kc-feedback-text"));
+    feedbackText = await feedbackTextElement.getText();
     if (feedbackText !== "Invalid username or password.") {
       throw new Error(`Unexpected error message for valid email and invalid password: '${feedbackText}'`);
     }
