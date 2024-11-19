@@ -14,7 +14,7 @@ async function C16() {
     ...baseCapabilities,
     'bstack:options': {
       ...baseCapabilities['bstack:options'],
-      'sessionName': 'C16 Login with wrong credentials',
+      'sessionName': 'C16_C18 Login with wrong credentials_Login with valid email but wrong password',
     },
   };
 
