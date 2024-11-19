@@ -109,8 +109,8 @@ async function C36() {
 }
 
 // Función para iniciar sesión con credenciales específicas
-async function loginWithCredentials(driver, username, password) {
-  await loginLandingPageButton(driver);
+async function loginWithCredentials(username, password) {
+  //await loginLandingPageButton(driver);
   await driver.findElement(By.id("username")).clear();
   await driver.findElement(By.id("username")).sendKeys(username);
   await driver.findElement(By.id("password")).clear();
