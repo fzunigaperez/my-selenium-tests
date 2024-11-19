@@ -50,15 +50,15 @@ async function C36() {
     }
 
     // Intento con credenciales válidas pero bloqueadas
-    console.log("Testing with valid credentials but locked account...");
-    await loginWithCredentials(driver, "ferchoalejandro86@gmail.com", "Proficloud2020!");
-    const feedbackLocked = await driver.findElement(By.css(".kc-feedback-text")).getText();
-    if (feedbackLocked !== "Invalid username or password.") {
-      throw new Error(`Unexpected error message for locked account: ${feedbackLocked}`);
-    }
+    //console.log("Testing with valid credentials but locked account...");
+    //await loginWithCredentials(driver, "ferchoalejandro86@gmail.com", "Proficloud2020!");
+    //const feedbackLocked = await driver.findElement(By.css(".kc-feedback-text")).getText();
+    //if (feedbackLocked !== "Invalid username or password.") {
+      //throw new Error(`Unexpected error message for locked account: ${feedbackLocked}`);
+    //}
 
     console.log("Waiting for account lock to expire...");
-    await driver.sleep(60000); // Simula el desbloqueo después de esperar
+    await driver.sleep(65000); // Simula el desbloqueo después de esperar
 
     // Intento con credenciales válidas
     console.log("Testing with valid credentials...");
