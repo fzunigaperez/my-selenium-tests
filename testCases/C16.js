@@ -19,40 +19,52 @@ async function C16() {
   };
 
   try {
-    // Inicializa el driver
     driver = await new Builder()
       .usingServer('https://hub-cloud.browserstack.com/wd/hub')
       .withCapabilities(capabilities)
       .build();
 
-    // Configuración de la ventana
     await windowConfiguration(driver);
-
-    // Aceptar cookies
     await acceptCookies(driver);
-
-    // Ir al botón de inicio de sesión
     await loginLandingPageButton(driver);
 
-    // Ingresar credenciales incorrectas
-    await driver.findElement(By.id("username")).sendKeys("xxx@phoenixcontact-sb.io");
-    await driver.findElement(By.id("password")).sendKeys("1234554");
+    // Escenario 1: Credenciales completamente incorrectas
+    console.log("Logging in with completely incorrect credentials...");
+    let usernameField = await driver.findElement(By.id("username"));
+    let passwordField = await driver.findElement(By.id("password"));
+
+    await usernameField.sendKeys("xxx@phoenixcontact-sb.io");
+    await passwordField.sendKeys("1234554");
     await driver.findElement(By.id("kc-login")).click();
 
-    // Validar el mensaje de error
-    const feedbackText = await driver.findElement(By.css(".kc-feedback-text")).getText();
+    await driver.wait(until.elementLocated(By.css(".kc-feedback-text")), 5000);
+    let feedbackText = await driver.findElement(By.css(".kc-feedback-text")).getText();
     if (feedbackText !== "Invalid username or password.") {
-      throw new Error("Unexpected error message: " + feedbackText);
+      throw new Error(`Unexpected error message for invalid credentials: '${feedbackText}'`);
     }
+    console.log("Validation passed for invalid credentials.");
 
-    console.log("C16 Login with wrong credentials completed successfully.");
+    // Escenario 2 C18: Email válido pero contraseña incorrecta
+    console.log("Logging in with valid email but incorrect password...");
+    await usernameField.clear();
+    await passwordField.clear();
 
-    // Marca la sesión como exitosa
+    await usernameField.sendKeys("testingpxc_admin@proton.me");
+    await passwordField.sendKeys("1234554");
+    await driver.findElement(By.id("kc-login")).click();
+
+    await driver.wait(until.elementLocated(By.css(".kc-feedback-text")), 5000);
+    feedbackText = await driver.findElement(By.css(".kc-feedback-text")).getText();
+    if (feedbackText !== "Invalid username or password.") {
+      throw new Error(`Unexpected error message for valid email and invalid password: '${feedbackText}'`);
+    }
+    console.log("Validation passed for valid email and invalid password.");
+
     const passedStatus = JSON.stringify({
       action: "setSessionStatus",
       arguments: {
         status: "passed",
-        reason: "C16 test passed successfully",
+        reason: "C16_C18 tests passed successfully",
       },
     });
     await driver.executeScript(`browserstack_executor: ${passedStatus}`);
@@ -60,7 +72,6 @@ async function C16() {
   } catch (error) {
     console.error('Error during test execution:', error.message);
 
-    // Marca la sesión como fallida
     const failedStatus = JSON.stringify({
       action: "setSessionStatus",
       arguments: {
