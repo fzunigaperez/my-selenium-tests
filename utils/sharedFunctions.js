@@ -2,27 +2,23 @@ const { By, until } = require('selenium-webdriver');
 
 async function acceptCookies(driver) {
   try {
-    let attempt = 0;
-    while (attempt < 2) { // Check for up to 2 banners
-      const cookiesBanner = await driver.findElements(By.xpath("//h2[normalize-space()='This website uses cookies']"));
-      
-      if (cookiesBanner.length > 0) {
-        console.log("Cookies banner detected.");
-        await driver.findElement(By.xpath("//button[@id='ga-opt-out-false']")).click();
-        console.log(`Cookies accepted. Attempt ${attempt + 1}`);
-        // Allow time for the banner to disappear
-        await driver.sleep(500); 
-      } else {
-        console.log("No cookies banner found.");
-        break; // Exit the loop if no banner is detected
-      }
-      attempt++;
+    const cookiesXPath = "//h2[normalize-space()='This website uses cookies']";
+    const acceptButtonXPath = "//button[@id='ga-opt-out-false']";
+
+    // Esperar un máximo de 3 segundos para el banner de cookies
+    const cookiesBanner = await driver.wait(until.elementLocated(By.xpath(cookiesXPath)), 3000);
+
+    if (cookiesBanner) {
+      console.log("Cookies banner detected.");
+      const acceptButton = await driver.wait(until.elementLocated(By.xpath(acceptButtonXPath)), 3000);
+      await acceptButton.click();
+      console.log("Cookies accepted.");
     }
   } catch (error) {
-    console.error("Error while accepting cookies:", error.message);
-    throw error;
+    console.error("Cookies banner not found or timed out:", error.message);
   }
 }
+
 
 
 async function loginLandingPageButton(driver) {
