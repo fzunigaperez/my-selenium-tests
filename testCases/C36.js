@@ -4,6 +4,7 @@ const baseCapabilities = require(path.resolve(__dirname, '../capabilities/capabi
 const {
   windowConfiguration,
   acceptCookies,
+  loginLandingPageButton,
   logout,
 } = require('../utils/sharedFunctions'); // Importación de funciones reutilizables
 
