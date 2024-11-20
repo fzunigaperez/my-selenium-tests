@@ -206,14 +206,14 @@ async function loginViewer(driver, vars) {
     const lessElements = await driver.findElements(By.xpath("//span[normalize-space()='Less']"));
     if (lessElements.length > 0) {
         // Esperar que el elemento "Less" sea visible (si es necesario interactuar con él en el futuro)
-        await driver.wait(until.elementIsVisible(lessElements[0]), 3000);
+        await driver.wait(until.elementIsEnabled(lessElements[0]), 3000);
     } else {
         // Hacer clic en "More" si "Less" no está visible
         const moreButton = await driver.wait(
             until.elementLocated(By.xpath("//span[normalize-space()='More']")),
             30000
         );
-        await driver.wait(until.elementIsVisible(moreButton), 30000);
+        await driver.wait(until.elementIsEnabled(moreButton), 30000);
         await moreButton.click();
     }
 
@@ -222,7 +222,7 @@ async function loginViewer(driver, vars) {
         until.elementLocated(By.xpath("//span[contains(text(),'All mail')]")),
         30000
     );
-    await driver.wait(until.elementIsVisible(allMailButton), 30000);
+    await driver.wait(until.elementIsEnabled(allMailButton), 30000);
     await allMailButton.click();
 
     // Seleccionar todos los correos
@@ -230,7 +230,7 @@ async function loginViewer(driver, vars) {
         until.elementLocated(By.id("idSelectAll")),
         30000
     );
-    await driver.wait(until.elementIsVisible(selectAllButton), 30000);
+    await driver.wait(until.elementIsEnabled(selectAllButton), 30000);
     await selectAllButton.click();
 
     // Mover a la papelera
@@ -238,7 +238,7 @@ async function loginViewer(driver, vars) {
         until.elementLocated(By.xpath("//button[contains(.,'Move to trash')]")),
         30000
     );
-    await driver.wait(until.elementIsVisible(moveToTrashButton), 30000);
+    await driver.wait(until.elementIsEnabled(moveToTrashButton), 30000);
     await moveToTrashButton.click();
 
     // Navegar a la papelera
@@ -246,7 +246,7 @@ async function loginViewer(driver, vars) {
         until.elementLocated(By.xpath("//span[@class='text-ellipsis'][contains(.,'Trash')]")),
         30000
     );
-    await driver.wait(until.elementIsVisible(trashButton), 30000);
+    await driver.wait(until.elementIsEnabled(trashButton), 30000);
     await trashButton.click();
 
     // Seleccionar todo en la papelera
@@ -254,7 +254,7 @@ async function loginViewer(driver, vars) {
         until.elementLocated(By.id("idSelectAll")),
         30000
     );
-    await driver.wait(until.elementIsVisible(selectAllTrashButton), 30000);
+    await driver.wait(until.elementIsEnabled(selectAllTrashButton), 30000);
     await selectAllTrashButton.click();
 
     // Eliminar permanentemente
