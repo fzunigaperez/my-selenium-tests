@@ -168,7 +168,7 @@ async function loginViewer(driver, vars) {
 
 
     const xpathToWaitFor = "//*[contains(text(),'Choose an app to get started')]";
-    const elementToClickXpath = "//div[@class='text-ellipsis'][contains(text(),'Proton Mail Plus')]";
+    const elementToClickXpath = "//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]";
     const timeout = 60000; // 60 seconds in milliseconds
 
     // Esperar hasta que aparezca el elemento o agotar el tiempo (60 segundos)
