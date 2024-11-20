@@ -183,9 +183,11 @@ async function loginViewer(driver, vars) {
   }
   
   async function checkFailedLoginEmail(driver) {
-    const firstMail = await driver.findElement(By.css(".item-subject > .inline-block"));
+    const elementLocator = By.css(".item-subject > .inline-block");
+    const firstMail = await driver.wait(until.elementLocated(elementLocator),60000);
     await driver.wait(until.elementIsVisible(firstMail), 60000);
     await firstMail.click();
+
     await driver.wait(until.elementLocated(By.css(".message-conversation-summary-header > span")), 10000);
     const emailSubject = await driver.findElement(By.css(".message-conversation-summary-header > span")).getText();
     if (emailSubject !== "Failed login attempt detected") {
