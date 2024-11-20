@@ -205,50 +205,73 @@ async function loginViewer(driver, vars) {
     // Comprobar si existe "Less"
     const lessElements = await driver.findElements(By.xpath("//span[normalize-space()='Less']"));
     if (lessElements.length > 0) {
-        await driver.sleep(2000);
+        // Esperar que el elemento "Less" sea visible (si es necesario interactuar con él en el futuro)
+        await driver.wait(until.elementIsVisible(lessElements[0]), 3000);
     } else {
         // Hacer clic en "More" si "Less" no está visible
-        const moreButton = await driver.findElement(By.xpath("//span[normalize-space()='More']"));
+        const moreButton = await driver.wait(
+            until.elementLocated(By.xpath("//span[normalize-space()='More']")),
+            30000
+        );
+        await driver.wait(until.elementIsVisible(moreButton), 30000);
         await moreButton.click();
-        await driver.sleep(2000);
     }
 
     // Hacer clic en "All mail"
-    const allMailButton = await driver.findElement(By.xpath("//span[contains(text(),'All mail')]"));
+    const allMailButton = await driver.wait(
+        until.elementLocated(By.xpath("//span[contains(text(),'All mail')]")),
+        30000
+    );
+    await driver.wait(until.elementIsVisible(allMailButton), 30000);
     await allMailButton.click();
-    await driver.sleep(2000);
 
-    
     // Seleccionar todos los correos
-    await driver.wait(until.elementLocated(By.id("idSelectAll")), 30000);
-    const selectAllButton = await driver.findElement(By.id("idSelectAll"));
+    const selectAllButton = await driver.wait(
+        until.elementLocated(By.id("idSelectAll")),
+        30000
+    );
+    await driver.wait(until.elementIsVisible(selectAllButton), 30000);
     await selectAllButton.click();
-    //await driver.sleep(2000);
 
     // Mover a la papelera
-    await driver.wait(until.elementLocated(By.xpath("//button[contains(.,'Move to trash')]")), 30000);
-    const moveToTrashButton = await driver.findElement(By.xpath("//button[contains(.,'Move to trash')]"));
+    const moveToTrashButton = await driver.wait(
+        until.elementLocated(By.xpath("//button[contains(.,'Move to trash')]")),
+        30000
+    );
+    await driver.wait(until.elementIsVisible(moveToTrashButton), 30000);
     await moveToTrashButton.click();
-    //await driver.sleep(2000);
 
     // Navegar a la papelera
-    const trashButton = await driver.findElement(By.xpath("//span[@class='text-ellipsis'][contains(.,'Trash')]"));
+    const trashButton = await driver.wait(
+        until.elementLocated(By.xpath("//span[@class='text-ellipsis'][contains(.,'Trash')]")),
+        30000
+    );
+    await driver.wait(until.elementIsVisible(trashButton), 30000);
     await trashButton.click();
-    //await driver.sleep(2000);
 
     // Seleccionar todo en la papelera
-    await driver.findElement(By.id("idSelectAll")).click();
-    //await driver.sleep(2000);
+    const selectAllTrashButton = await driver.wait(
+        until.elementLocated(By.id("idSelectAll")),
+        30000
+    );
+    await driver.wait(until.elementIsVisible(selectAllTrashButton), 30000);
+    await selectAllTrashButton.click();
 
     // Eliminar permanentemente
-    const deletePermanentlyButton = await driver.findElement(By.xpath("//button[contains(.,'Delete permanently')]"));
+    const deletePermanentlyButton = await driver.wait(
+        until.elementLocated(By.xpath("//button[contains(.,'Delete permanently')]")),
+        30000
+    );
+    await driver.wait(until.elementIsVisible(deletePermanentlyButton), 30000);
     await deletePermanentlyButton.click();
-    //await driver.sleep(2000);
 
     // Confirmar eliminación
-    const confirmDeleteButton = await driver.findElement(By.xpath("//button[contains(text(),'Delete')]"));
+    const confirmDeleteButton = await driver.wait(
+        until.elementLocated(By.xpath("//button[contains(text(),'Delete')]")),
+        30000
+    );
+    await driver.wait(until.elementIsVisible(confirmDeleteButton), 30000);
     await confirmDeleteButton.click();
-    //await driver.sleep(2000);
    
   }
   
