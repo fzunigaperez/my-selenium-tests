@@ -153,6 +153,7 @@ async function loginViewer(driver, vars) {
     const loggedIn = (await driver.findElements(By.xpath("//button[contains(text(),'New message')]"))).length > 0;
     if (!loggedIn) {
       console.log("Logging into Proton Mail...");
+      await driver.sleep(5000);
       await driver.findElement(By.id("username")).sendKeys(username);
       await driver.findElement(By.id("password")).sendKeys(password);
       await driver.findElement(By.xpath("//button[contains(text(),'Sign in')]")).click();
