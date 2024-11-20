@@ -183,6 +183,7 @@ async function loginViewer(driver, vars) {
   }
   
   async function checkFailedLoginEmail(driver) {
+    await driver.sleep(10000);  
     const elementLocator = By.css(".item-subject > .inline-block");
     const firstMail = await driver.wait(until.elementLocated(elementLocator),60000);
     await driver.wait(until.elementIsVisible(firstMail), 60000);
