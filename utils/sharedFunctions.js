@@ -147,15 +147,15 @@ async function loginViewer(driver, vars) {
 }
   
 
-  async function loginToProtonMail(driver, vars, username, password) {
+  async function loginToProtonMail(driver, vars, mailUsername, mailPassword) {
     await driver.get("https://account.proton.me/login");
   
     const loggedIn = (await driver.findElements(By.xpath("//button[contains(text(),'New message')]"))).length > 0;
     if (!loggedIn) {
       console.log("Logging into Proton Mail...");
       await driver.sleep(5000);
-      await driver.findElement(By.id("username")).sendKeys(username);
-      await driver.findElement(By.id("password")).sendKeys(password);
+      await driver.findElement(By.id("username")).sendKeys(mailUsername);
+      await driver.findElement(By.id("password")).sendKeys(mailPassword);
       await driver.findElement(By.xpath("//button[contains(text(),'Sign in')]")).click();
       await driver.sleep(5000);
     } else {

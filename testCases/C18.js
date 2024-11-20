@@ -51,6 +51,7 @@ async function C18() {
     console.log("Login failed as expected with invalid credentials.");
 
     // Verificar correo sobre intento fallido en Proton Mail
+    
     const mailUsername = "testingpxc_admin@proton.me";
     const mailPassword = "Proficloud2022!";
     await loginToProtonMail(driver, mailUsername, mailPassword); // Iniciar sesión en Proton Mail
