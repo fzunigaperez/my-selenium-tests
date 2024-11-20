@@ -167,30 +167,19 @@ async function loginViewer(driver, vars) {
     }
 
 
-    // Check if the "New window of proton is there" 
     const xpathToWaitFor = "//*[contains(text(),'Choose an app to get started')]";
     const elementToClickXpath = "//div[@class='text-ellipsis'][contains(text(),'Proton Mail Plus')]";
     const timeout = 60000; // 60 seconds in milliseconds
 
-    try {
-        // Esperar hasta que aparezca el elemento o agotar el tiempo (60 segundos)
-        const element = await driver.findElement(By.xpath(xpathToWaitFor));
-        await driver.wait(async () => {
-            try {
-                return await element.isDisplayed();
-            } catch {
-                return false;
-            }
-        }, timeout);
+    // Esperar hasta que aparezca el elemento o agotar el tiempo (60 segundos)
+    const element = await driver.findElement(By.xpath(xpathToWaitFor));
+    await driver.wait(async () => {
+        return await element.isDisplayed().catch(() => false);
+    }, timeout);
 
-        // Si el elemento aparece, da clic
-        await driver.findElement(By.xpath(elementToClickXpath)).click();
-        console.log("El elemento 'Proton Mail Plus' fue encontrado y clicado exitosamente.");
-    } catch (error) {
-        console.log("El elemento no apareció en los 60 segundos especificados.");
-    }
-
-
+    // Si el elemento aparece, da clic
+    await driver.findElement(By.xpath(elementToClickXpath)).click();
+    console.log("El elemento 'Proton Mail Plus' fue encontrado y clicado exitosamente.");
   }
   
   async function checkFailedLoginEmail(driver) {
