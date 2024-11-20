@@ -143,7 +143,45 @@ async function loginViewer(driver, vars) {
 
   // Check if in the right organization
   await rootOrganizationTest(driver, vars);
+
 }
+  
+
+  async function loginToProtonMail(driver, vars, username, password) {
+    await driver.get("https://account.proton.me/login");
+  
+    const loggedIn = (await driver.findElements(By.xpath("//button[contains(text(),'New message')]"))).length > 0;
+    if (!loggedIn) {
+      console.log("Logging into Proton Mail...");
+      await driver.findElement(By.id("username")).sendKeys(username);
+      await driver.findElement(By.id("password")).sendKeys(password);
+      await driver.findElement(By.xpath("//button[contains(text(),'Sign in')]")).click();
+      await driver.sleep(5000);
+    } else {
+      console.log("Already logged into Proton Mail.");
+    }
+  }
+  
+  async function checkFailedLoginEmail(driver) {
+    await driver.wait(until.elementLocated(By.css(".message-conversation-summary-header > span")), 10000);
+    const emailSubject = await driver.findElement(By.css(".message-conversation-summary-header > span")).getText();
+    if (emailSubject !== "Failed login attempt detected") {
+      throw new Error("Failed login email not found in Proton Mail.");
+    }
+    console.log("Failed login email detected as expected.");
+  }
+  
+  async function deleteAllEmails(driver) {
+    console.log("Deleting all mails...");
+    await driver.findElement(By.xpath("//span[contains(text(),'All mail')]")).click();
+    await driver.sleep(2000);
+    await driver.findElement(By.id("idSelectAll")).click();
+    await driver.findElement(By.xpath("//button[contains(text(),'Move to trash')]")).click();
+    await driver.sleep(2000);
+    console.log("All mails moved to trash.");
+  }
+  
+
 
 
 module.exports = {
@@ -160,4 +198,7 @@ module.exports = {
   loginAdmin,
   loginEditor,
   loginViewer,
+  loginToProtonMail,
+  checkFailedLoginEmail,
+  deleteAllEmails,
 };
