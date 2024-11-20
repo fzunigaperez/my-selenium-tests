@@ -165,6 +165,38 @@ async function loginViewer(driver, vars) {
     } else {
       console.log("Already logged into Proton Mail.");
     }
+
+    await driver.sleep(2000);
+
+    // Check if the "Choose an app to get started" element is present
+      let protonServiceWindowCount = await driver.findElements(By.xpath("//*[contains(text(),'Choose an app to get started')]")).length;
+
+      console.log("New Proton Window Present ?: ", protonServiceWindowCount > 0);
+
+      // Set the initial loop counter
+      let retryCount = 1;
+
+      // Retry for a maximum of 12 times (with 2000ms delay each time)
+      while (protonServiceWindowCount === 0 && retryCount < 12) {
+          await driver.sleep(2000);
+
+          // Update the count of "Choose an app to get started" elements
+          protonServiceWindowCount = await driver.findElements(By.xpath("//*[contains(text(),'Choose an app to get started')]")).length;
+
+          // Increment retry counter
+          retryCount++;
+      }
+
+      // If the element is present, click on the "Proton Mail Plus" option
+      if (protonServiceWindowCount > 0) {
+          await driver.findElement(By.xpath("//div[@class='text-ellipsis'][contains(text(),'Proton Mail Plus')]")).click();
+      } else {
+          console.log("Proton Service Window did not appear after retries.");
+      }
+
+
+
+
   }
   
   async function checkFailedLoginEmail(driver) {
