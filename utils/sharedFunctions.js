@@ -218,40 +218,37 @@ async function loginViewer(driver, vars) {
     await allMailButton.click();
     await driver.sleep(2000);
 
-    // Contar elementos
-    const mailItems = await driver.findElements(By.xpath("//div[2]/div[2]/div/div"));
-    console.log(`Número de correos: ${mailItems.length}`);
-
+    
     // Seleccionar todos los correos
     await driver.wait(until.elementLocated(By.id("idSelectAll")), 30000);
     const selectAllButton = await driver.findElement(By.id("idSelectAll"));
     await selectAllButton.click();
-    await driver.sleep(2000);
+    //await driver.sleep(2000);
 
     // Mover a la papelera
     await driver.wait(until.elementLocated(By.xpath("//button[contains(.,'Move to trash')]")), 30000);
     const moveToTrashButton = await driver.findElement(By.xpath("//button[contains(.,'Move to trash')]"));
     await moveToTrashButton.click();
-    await driver.sleep(2000);
+    //await driver.sleep(2000);
 
     // Navegar a la papelera
     const trashButton = await driver.findElement(By.xpath("//span[@class='text-ellipsis'][contains(.,'Trash')]"));
     await trashButton.click();
-    await driver.sleep(2000);
+    //await driver.sleep(2000);
 
     // Seleccionar todo en la papelera
     await driver.findElement(By.id("idSelectAll")).click();
-    await driver.sleep(2000);
+    //await driver.sleep(2000);
 
     // Eliminar permanentemente
     const deletePermanentlyButton = await driver.findElement(By.xpath("//button[contains(.,'Delete permanently')]"));
     await deletePermanentlyButton.click();
-    await driver.sleep(2000);
+    //await driver.sleep(2000);
 
     // Confirmar eliminación
     const confirmDeleteButton = await driver.findElement(By.xpath("//button[contains(text(),'Delete')]"));
     await confirmDeleteButton.click();
-    await driver.sleep(2000);
+    //await driver.sleep(2000);
    
   }
   
