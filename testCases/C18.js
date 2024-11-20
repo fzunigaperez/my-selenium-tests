@@ -53,7 +53,7 @@ async function C18() {
     // Verificar correo sobre intento fallido en Proton Mail
     
     
-    await loginToProtonMail(driver, mailUsername, mailPassword); // Iniciar sesión en Proton Mail
+    await loginToProtonMail(driver, vars); // Iniciar sesión en Proton Mail
     await checkFailedLoginEmail(driver); // Verificar correo de intento fallido
 
     // Eliminar todos los correos (opcional)
