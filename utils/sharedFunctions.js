@@ -147,15 +147,19 @@ async function loginViewer(driver, vars) {
 }
   
 
-  async function loginToProtonMail(driver, vars, mailUsername, mailPassword) {
+  async function loginToProtonMail(driver, vars) {
     await driver.get("https://account.proton.me/login");
+       
+    vars["mailUsername"] = "testingpxc_viewer@proton.me";
+    vars["mailPassword"] = "Proficloud2022!";
   
     const loggedIn = (await driver.findElements(By.xpath("//button[contains(text(),'New message')]"))).length > 0;
     if (!loggedIn) {
       console.log("Logging into Proton Mail...");
-      await driver.sleep(5000);
-      await driver.findElement(By.id("username")).sendKeys(mailUsername);
-      await driver.findElement(By.id("password")).sendKeys(mailPassword);
+      
+      await driver.wait(until.elementLocated(By.id("username")), 50000);
+      await driver.findElement(By.id("username")).sendKeys(vars["mailUsername"]);
+      await driver.findElement(By.id("password")).sendKeys(vars["mailPassword"]);
       await driver.findElement(By.xpath("//button[contains(text(),'Sign in')]")).click();
       await driver.sleep(5000);
     } else {
