@@ -262,7 +262,7 @@ async function loginToProtonMail(driver, vars = {}) {
         until.elementLocated(By.xpath("//button[contains(.,'Delete permanently')]")),
         30000
     );
-    await driver.wait(until.elementIsVisible(deletePermanentlyButton), 30000);
+    await driver.wait(until.elementIsEnabled(deletePermanentlyButton), 30000);
     await deletePermanentlyButton.click();
 
     // Confirmar eliminación
