@@ -7,7 +7,7 @@ async function C90() {
     await windowConfiguration(driver);
 
     // Inicio de sesión
-    await loginAdmin(driver);
+    await loginAdmin(driver,vars);
 
     // Cierre de sesión
     await logout(driver);
