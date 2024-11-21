@@ -38,6 +38,7 @@ async function C18() {
     console.log("Login failed as expected with invalid credentials.");
   
     // Check email for failed login attempt
+    let vars = {}; // Initialize vars
     await loginToProtonMail(driver, vars); // Log into Proton Mail
     await checkFailedLoginEmail(driver); // Verify email notification about failed login attempt
   

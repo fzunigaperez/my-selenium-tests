@@ -147,7 +147,7 @@ async function loginViewer(driver, vars) {
 }
   
 
-  async function loginToProtonMail(driver, vars) {
+async function loginToProtonMail(driver, vars = {}) {
     await driver.get("https://account.proton.me/login");
        
     vars["mailUsername"] = "testingpxc_viewer@proton.me";
