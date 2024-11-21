@@ -18,11 +18,7 @@ async function C18() {
   let vars = {};
   await testBase('C18 Login with valid email but wrong password'), async (driver) => {
   
-    // Inicializar el navegador con capacidades
-    driver = await new Builder()
-      .usingServer('https://hub-cloud.browserstack.com/wd/hub') // Configuración del servidor remoto (BrowserStack)
-      .withCapabilities(capabilities) // Aplicar capacidades
-      .build();
+    
 
     // Configuración inicial de la ventana y cookies
     await windowConfiguration(driver); // Configurar la URL inicial y maximizar la ventana
