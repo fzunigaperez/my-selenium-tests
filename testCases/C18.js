@@ -50,3 +50,18 @@ async function C18() {
 
 // Exportar la función para ser utilizada como test case
 module.exports = C18;
+
+
+
+if (require.main === module) {
+  (async () => {
+    try {
+      console.log(`'🚀 Ejecutando el test `);
+      await C18();   // Change here the test name
+      
+      console.log('✅ Test completado con éxito.');
+    } catch (error) {
+      console.error('❌ Error al ejecutar el test:', error.message);
+    }
+  })();
+}

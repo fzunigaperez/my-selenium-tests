@@ -74,3 +74,17 @@ async function C656() {
 
 // Exportar la función para reutilizarla
 module.exports = C656;
+
+
+if (require.main === module) {
+  (async () => {
+    try {
+      console.log(`'🚀 Ejecutando el test `);
+      await C656();   // Change here the test name
+      
+      console.log('✅ Test completado con éxito.');
+    } catch (error) {
+      console.error('❌ Error al ejecutar el test:', error.message);
+    }
+  })();
+}

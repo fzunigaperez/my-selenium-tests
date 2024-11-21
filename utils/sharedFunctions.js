@@ -156,6 +156,15 @@ async function loginToProtonMail(driver, vars = {}) {
     const loggedIn = (await driver.findElements(By.xpath("//button[contains(text(),'New message')]"))).length > 0;
     if (!loggedIn) {
       console.log("Logging into Proton Mail...");
+      await driver.sleep(10000); 
+
+      // Hacer clic en "All mail"
+    const mailCredentialsPage = await driver.wait(until.elementLocated(By.id("username")), 10000);
+      
+  
+  await driver.wait(until.elementIsEnabled(mailCredentialsPage), 30000);
+  //await allMailButton.click();
+
 
       await driver.wait(until.elementLocated(By.id("username")), 5000);
       await driver.findElement(By.id("username")).sendKeys(vars["mailUsername"]);
@@ -166,6 +175,7 @@ async function loginToProtonMail(driver, vars = {}) {
       console.log("Already logged into Proton Mail.");
     }
 
+    await driver.sleep(10000); 
 
     const xpathToWaitFor = "//*[contains(text(),'Choose an app to get started')]";
     const elementToClickXpath = "//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]";
@@ -270,8 +280,15 @@ async function loginToProtonMail(driver, vars = {}) {
         until.elementLocated(By.xpath("//button[contains(text(),'Delete')]")),
         30000
     );
+
     await driver.wait(until.elementIsVisible(confirmDeleteButton), 30000);
     await confirmDeleteButton.click();
+
+    const noMessagesFound = await driver.wait(
+      until.elementLocated(By.xpath("//h3[contains(@data-testid,'empty-view-placeholder--empty-title')]")),
+      30000
+    );
+    await driver.wait(until.elementIsVisible(noMessagesFound), 30000);
    
   }
   
