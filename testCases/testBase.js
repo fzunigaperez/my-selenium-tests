@@ -3,42 +3,62 @@ const path = require('path');
 const baseCapabilities = require(path.resolve(__dirname, '../capabilities/capabilities'));
 
 async function testBase(sessionName, testSteps) {
-    let driver;
-  
+  let driver;
+
+  const capabilities = {
+    ...baseCapabilities,
+    'bstack:options': {
+      ...baseCapabilities['bstack:options'],
+      sessionName,
+    },
+  };
+
+  try {
+    driver = await new Builder()
+      .usingServer('https://hub-cloud.browserstack.com/wd/hub')
+      .forBrowser('chrome')
+      .withCapabilities(capabilities)
+      .build();
+
+    // Ejecutar los pasos específicos del test
+    await testSteps(driver);
+
+    // Marcar la sesión como exitosa
+    const passedStatus = JSON.stringify({
+      action: 'setSessionStatus',
+      arguments: {
+        status: 'passed',
+        reason: `${sessionName} test passed successfully`,
+      },
+    });
+    await driver.executeScript(`browserstack_executor: ${passedStatus}`);
+    console.log(`✅ ${sessionName} test passed successfully.`);
+  } catch (error) {
+    console.error(`❌ Error during ${sessionName} test:`, error.message);
+    console.error('🔍 Stack trace:', error.stack);
+
+    // Marcar la sesión como fallida
+    const failedStatus = JSON.stringify({
+      action: 'setSessionStatus',
+      arguments: {
+        status: 'failed',
+        reason: `Test failed: ${error.message}`,
+      },
+    });
+
     try {
-      if (process.env.RUN_ENV === 'browserstack') {
-        // Configuración para ejecutar en BrowserStack
-        const capabilities = {
-          ...baseCapabilities,
-          'bstack:options': {
-            ...baseCapabilities['bstack:options'],
-            sessionName,
-          },
-        };
-  
-        driver = await new Builder()
-          .usingServer('https://hub-cloud.browserstack.com/wd/hub')
-          .withCapabilities(capabilities)
-          .build();
-      } else {
-        // Configuración para ejecutar localmente
-        driver = await new Builder().forBrowser('chrome').build();
-      }
-  
-      // Ejecutar los pasos de prueba
-      await testSteps(driver);
-  
-      console.log(`✅ La prueba '${sessionName}' se ejecutó correctamente.`);
-    } catch (error) {
-      console.error(`❌ Error durante la prueba '${sessionName}':`, error.message);
-      console.error('🔍 Rastreo del error:', error.stack);
-      throw error;
-    } finally {
-      if (driver) {
-        await driver.quit();
-        console.log('🚪 Sesión del driver cerrada.');
-      }
+      await driver.executeScript(`browserstack_executor: ${failedStatus}`);
+    } catch (executorError) {
+      console.error('❌ Failed to update BrowserStack session status:', executorError.message);
+    }
+
+    throw error;
+  } finally {
+    if (driver) {
+      await driver.quit();
+      console.log('🚪 Driver session closed.');
     }
   }
-  
-  module.exports = testBase;
+}
+
+module.exports = testBase;
