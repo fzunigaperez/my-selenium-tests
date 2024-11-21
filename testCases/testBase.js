@@ -43,7 +43,7 @@ async function testBase(sessionName, testSteps) {
     };
 
     try {
-      // Configura el driver para usar BrowserStack
+      // Configura el driver para usar BrowserStack wewe
       driver = await new Builder()
         .usingServer('https://hub-cloud.browserstack.com/wd/hub')
         .forBrowser('chrome')
