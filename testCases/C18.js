@@ -22,7 +22,7 @@ async function C18() {
     await acceptCookies(driver); // Accept cookies if the banner appears
     await loginLandingPageButton(driver); // Navigate to the login button
   
-    // Attempt to login with invalid credentials
+    // Attempt to login with invalid credentials in Proficloud
     const username = "testingpxc_admin@proton.me";
     const wrongPassword = "1234554";
     await driver.wait(until.elementLocated(By.id("username")), 5000);
@@ -38,7 +38,7 @@ async function C18() {
     console.log("Login failed as expected with invalid credentials.");
   
     // Check email for failed login attempt
-    await loginToProtonMail(driver); // Log into Proton Mail
+    await loginToProtonMail(driver, vars); // Log into Proton Mail
     await checkFailedLoginEmail(driver); // Verify email notification about failed login attempt
   
     // Optionally, delete all emails
