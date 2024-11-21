@@ -1,4 +1,5 @@
 const { By, until } = require('selenium-webdriver');
+const assert = require('assert'); // Importa el módulo assert
 
 async function acceptCookies(driver) {
   try {
@@ -32,13 +33,40 @@ async function adminCredentials(driver, vars = {}) {
 }
 
 async function isTheOrganizationNameEmpty(driver, vars) {
-  vars["emptyName"] = await driver.findElement(By.xpath("//h4")).getText();
-  console.log(`Orga name: ${vars["emptyName"]}`);
-  if (vars["emptyName"] === "" || vars["emptyName"] === undefined) {
-    console.log("ORGA NAME IS NOT PRESENT. Reloading...");
-    await driver.sleep(2000);
+  let attempts = 0; // Contador de intentos
+  const maxAttempts = 10; // Número máximo de intentos
+  const waitTime = 2000; // Tiempo de espera entre intentos (2 segundos)
+
+  while (attempts < maxAttempts) {
+    console.log(`Intento ${attempts + 1} de ${maxAttempts}`);
+
+    try {
+      // Espera hasta que el elemento esté visible en la página
+      const element = await driver.wait(until.elementLocated(By.xpath("//h4")), waitTime);
+      vars["emptyName"] = await element.getText();
+      console.log(`Organización encontrada: ${vars["emptyName"]}`);
+
+      // Si el texto no está vacío, termina la función
+      if (vars["emptyName"] && vars["emptyName"] !== "") {
+        console.log("Nombre de la organización encontrado.");
+        return vars["emptyName"];
+      }
+    } catch (error) {
+      console.log("El elemento no está disponible en este intento. Intentando nuevamente...");
+    }
+
+    // Incrementa el contador de intentos y espera antes del siguiente intento
+    attempts++;
+    if (attempts < maxAttempts) {
+      await driver.sleep(waitTime);
+    }
   }
+
+  // Si no se encuentra un texto válido después de 10 intentos, devuelve un mensaje
+  console.log("No se pudo encontrar el nombre de la organización después de 10 intentos.");
+  return null; // Retorna null si no encuentra un valor válido
 }
+
 
 async function rootOrganizationTest(driver, vars) {
   vars["root"] = await driver.findElements(By.xpath("//h4[contains(.,'Rooth Organization')]")).length;
@@ -109,7 +137,7 @@ async function loginEditor(driver, vars) {
   await driver.findElement(By.id("kc-login")).click();
 
   // Wait for page to load
-  await driver.sleep(10000);
+  
   await isTheOrganizationNameEmpty(driver, vars);
 
   // Assert the correct page is loaded
@@ -123,6 +151,7 @@ async function loginEditor(driver, vars) {
 async function loginViewer(driver, vars) {
   await acceptCookies(driver);
   await loginLandingPageButton(driver);
+
   vars["username"] = "testingpxc_viewer@proton.me";
   vars["password"] = "Proficloud2022!";
   console.log("Credentials set for VIEWER:", vars);
@@ -133,19 +162,24 @@ async function loginViewer(driver, vars) {
   await driver.findElement(By.id("password")).sendKeys(vars["password"]);
   await driver.findElement(By.id("kc-login")).click();
 
-  // Wait for page to load
-  await driver.sleep(10000);
+  // Espera hasta que el nombre de la organización esté disponible
+  console.log("Esperando el nombre de la organización...");
+  await driver.wait(until.elementLocated(By.xpath("//h4")), 10000); // Máximo 10 segundos para encontrar el elemento
   await isTheOrganizationNameEmpty(driver, vars);
 
-  // Assert the correct page is loaded
-  const pageTitle = await driver.findElement(By.xpath("//div[@id='routeTitle']")).getText();
-  assert.strictEqual(pageTitle, "Device Management Service");
+  // Verifica que la página correcta se cargó
+  console.log("Validando el título de la página...");
+  const pageTitleElement = await driver.wait(
+    until.elementLocated(By.xpath("//div[@id='routeTitle']")),
+    10000
+  );
+  const pageTitle = await pageTitleElement.getText();
+  assert.strictEqual(pageTitle, "Device Management Service", "El título de la página no coincide.");
 
-  // Check if in the right organization
+  // Verifica la organización correcta
+  console.log("Validando la organización...");
   await rootOrganizationTest(driver, vars);
-
 }
-  
 
 async function loginToProtonMail(driver, vars = {}) {
     await driver.get("https://account.proton.me/login");

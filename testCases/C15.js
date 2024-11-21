@@ -1,6 +1,7 @@
 const { Builder } = require('selenium-webdriver'); // Importación completa y precisa
 const path = require('path');
 const baseCapabilities = require(path.resolve(__dirname, '../capabilities/capabilities'));
+const testBase = require('./testBase');  //Common
 const {
   windowConfiguration,
   loginAdmin,
@@ -8,71 +9,35 @@ const {
 } = require('../utils/sharedFunctions'); // Importación de funciones reutilizables
 
 async function C15() {
-  let driver;
-  let vars = {};
+  await testBase('C15 Log in with right credentials as ADMIN', async (driver) => {
+    let vars = {}; // Inicializa vars como un objeto vacío
 
-  const capabilities = {
-    ...baseCapabilities,
-    'bstack:options': {
-      ...baseCapabilities['bstack:options'],
-      'sessionName': 'C15 Log in with right credentials as ADMIN',
-    },
-  };
-
-  try {
-    // Inicializa el driver
-    driver = await new Builder()
-      .usingServer('https://hub-cloud.browserstack.com/wd/hub')
-      .withCapabilities(capabilities)
-      .build();
-
-    // Configuración de la ventana
+    console.log("Configurando la ventana...");
     await windowConfiguration(driver);
 
-    // Inicio de sesión
+    console.log("Iniciando sesión como ADMIN...");
     await loginAdmin(driver, vars);
 
     // Lógica específica de C15 (si corresponde)
     console.log("C15 Log in with right credentials as ADMIN completed.");
 
-    // Cierre de sesión
+    console.log("Cerrando sesión...");
     await logout(driver);
+  });
+}
 
-    // Marca la sesión como exitosa
-    const passedStatus = JSON.stringify({
-      action: "setSessionStatus",
-      arguments: {
-        status: "passed",
-        reason: "C15 test passed successfully",
-      },
-    });
-    await driver.executeScript(`browserstack_executor: ${passedStatus}`);
-
-  } catch (error) {
-    console.error('Error during test execution:', error.message);
-
-    // Marca la sesión como fallida
-    const failedStatus = JSON.stringify({
-      action: "setSessionStatus",
-      arguments: {
-        status: "failed",
-        reason: `Test failed: ${error.message}`,
-      },
-    });
-
+// Permite ejecutar este archivo directamente
+if (require.main === module) {
+  (async () => {
     try {
-      await driver.executeScript(`browserstack_executor: ${failedStatus}`);
-    } catch (executorError) {
-      console.error('Error setting BrowserStack session status:', executorError.message);
+      console.log('🚀 Ejecutando el test C15...');
+      await C15(); // Cambia aquí el nombre del test si tienes varios
+      console.log('✅ Test completado con éxito.');
+    } catch (error) {
+      console.error('❌ Error al ejecutar el test:', error.message);
+      console.error(error.stack);
     }
-
-    throw error;
-
-  } finally {
-    if (driver) {
-      await driver.quit();
-    }
-  }
+  })();
 }
 
 module.exports = C15;

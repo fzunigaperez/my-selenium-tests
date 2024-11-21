@@ -1,6 +1,7 @@
 const { Builder, By, until } = require('selenium-webdriver'); // Importación completa
 const path = require('path');
 const baseCapabilities = require(path.resolve(__dirname, '../capabilities/capabilities'));
+const testBase = require('./testBase'); 
 const {
   windowConfiguration,
   logout,
@@ -8,83 +9,34 @@ const {
 } = require('../utils/sharedFunctions');
 
 async function C656() {
-  let driver;
-  let vars = {};
+  await testBase(
+    'C656 Log in with right credentials as VIEWER',
+    async (driver) => {
+      let vars = {}; // Inicializa vars como un objeto vacío
 
-  const capabilities = {
-    ...baseCapabilities,
-    'bstack:options': {
-      ...baseCapabilities['bstack:options'],
-      'sessionName': 'C656 Log in with right credentials as VIEWER',
-    },
-  };
+      console.log("Configurando la ventana...");
+      await windowConfiguration(driver);
 
-  try {
-    driver = await new Builder()
-      .usingServer('https://hub-cloud.browserstack.com/wd/hub')
-      .forBrowser('chrome')
-      .withCapabilities(capabilities)
-      .build();
+      console.log("Iniciando sesión como Viewer...");
+      await loginViewer(driver, vars);
 
-    // Configuración de la ventana
-    await windowConfiguration(driver);
-
-    // Inicio de sesión como Viewer
-    await loginViewer(driver, vars);
-
-    // Cierre de sesión
-    await logout(driver);
-
-    // Marca la sesión como exitosa
-    const passedStatus = JSON.stringify({
-      action: "setSessionStatus",
-      arguments: {
-        status: "passed",
-        reason: "C656 test passed successfully",
-      },
-    });
-    await driver.executeScript(`browserstack_executor: ${passedStatus}`);
-
-  } catch (error) {
-    console.error('Error during test execution:', error.message);
-
-    // Marca la sesión como fallida
-    const failedStatus = JSON.stringify({
-      action: "setSessionStatus",
-      arguments: {
-        status: "failed",
-        reason: `Test failed: ${error.message}`,
-      },
-    });
-
-    try {
-      await driver.executeScript(`browserstack_executor: ${failedStatus}`);
-    } catch (executorError) {
-      console.error('Error setting BrowserStack session status:', executorError.message);
+      console.log("Cerrando sesión...");
+      await logout(driver);
     }
-
-    throw error;
-
-  } finally {
-    if (driver) {
-      await driver.quit();
-    }
-  }
+  );
 }
 
-// Exportar la función para reutilizarla
-module.exports = C656;
-
-
+// Permite ejecutar este archivo directamente
 if (require.main === module) {
   (async () => {
     try {
-      console.log(`'🚀 Ejecutando el test `);
-      await C656();   // Change here the test name
-      
+      console.log('🚀 Ejecutando el test C656...');
+      await C656(); // Cambia aquí el nombre del test si tienes varios
       console.log('✅ Test completado con éxito.');
     } catch (error) {
       console.error('❌ Error al ejecutar el test:', error.message);
     }
   })();
 }
+
+module.exports = C656;
