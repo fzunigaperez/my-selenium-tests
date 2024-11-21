@@ -1,3 +1,4 @@
+const { Builder, By, until } = require('selenium-webdriver');
 const testBase = require('./testBase');
 const {
   acceptCookies,
@@ -16,7 +17,7 @@ async function C18() {
 
   await testBase('C18 Login with valid email but wrong password', async (driver) => {
   
-    
+
     await windowConfiguration(driver); // Configure the initial URL and maximize window
     await acceptCookies(driver); // Accept cookies if the banner appears
     await loginLandingPageButton(driver); // Navigate to the login button
