@@ -25,7 +25,7 @@ async function loginLandingPageButton(driver) {
   await driver.findElement(By.id("login-button")).click();
 }
 
-async function adminCredentials(driver, vars) {
+async function adminCredentials(driver, vars = {}) {
   vars["username"] = "testingpxc_admin@proton.me";
   vars["password"] = "Proficloud2022!";
   console.log("Credentials set:", vars);
