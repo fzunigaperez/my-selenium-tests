@@ -19,17 +19,16 @@ async function C90() {
   };
 
   try {
-    // Construir el driver
     driver = await new Builder()
       .usingServer('https://hub-cloud.browserstack.com/wd/hub')
       .forBrowser('chrome')
       .withCapabilities(capabilities)
       .build();
 
-    // Ejecución general de los pasos del test
-    await windowConfiguration(driver); // Configuración de ventana
-    await loginAdmin(driver);         // Inicio de sesión
-    await logout(driver);             // Cierre de sesión
+    // Ejecución general del test
+    await executeWithDetailedError(async () => await windowConfiguration(driver), 'windowConfiguration');
+    await executeWithDetailedError(async () => await loginAdmin(driver), 'loginAdmin');
+    await executeWithDetailedError(async () => await logout(driver), 'logout');
 
     // Marcar la sesión como exitosa
     const passedStatus = JSON.stringify({
@@ -43,11 +42,10 @@ async function C90() {
     console.log('✅ Test passed successfully.');
 
   } catch (error) {
-    // Captura de errores generales
     console.error('❌ Test failed with error:', error.message);
     console.error('🔍 Stack trace:', error.stack);
 
-    // Marcar la sesión como fallida en BrowserStack
+    // Marca la sesión como fallida
     const failedStatus = JSON.stringify({
       action: 'setSessionStatus',
       arguments: {
@@ -62,14 +60,23 @@ async function C90() {
       console.error('❌ Failed to update BrowserStack session status:', executorError.message);
     }
 
-    throw error; // Relanzar el error para que sea manejado por el sistema de CI/CD si es necesario
+    throw error;
 
   } finally {
-    // Cierre del driver
     if (driver) {
       await driver.quit();
       console.log('🚪 Driver session closed.');
     }
+  }
+}
+
+async function executeWithDetailedError(fn, fnName) {
+  try {
+    await fn();
+  } catch (error) {
+    const enhancedError = new Error(`Error in function ${fnName}: ${error.message}`);
+    enhancedError.stack = error.stack; // Asegura que el stack trace se preserve
+    throw enhancedError;
   }
 }
 
