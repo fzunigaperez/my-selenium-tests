@@ -27,19 +27,24 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Log execution type
+      - name: Determine execution type
+        id: execution-type
         run: |
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            echo "Execution Type: Manual"
-            echo "::set-output name=execution_type::Manual"
+            echo "manual" > execution_type.txt
           else
-            echo "Execution Type: Automated"
-            echo "::set-output name=execution_type::Automated"
-          fi
-        id: execution-type
+            echo "automated" > execution_type.txt
+
+      - name: Read execution type
+        id: read-execution-type
+        run: |
+          EXECUTION_TYPE=$(cat execution_type.txt)
+          echo "Execution Type: $EXECUTION_TYPE"
+          echo "::set-output name=execution_type::$EXECUTION_TYPE"
 
       - name: Annotate execution type
-        run: echo "This job is running as: ${{ steps.execution-type.outputs.execution_type }} execution."
+        run: |
+          echo "This job is running as: ${{ steps.read-execution-type.outputs.execution_type }} execution."
 
       - name: Run specified test cases
         env:
@@ -48,7 +53,7 @@ jobs:
         run: |
           TEST_CASES="${{ github.event.inputs.test_case }}"
           echo "Test case(s) input: $TEST_CASES"
-          echo "Execution Type: ${{ steps.execution-type.outputs.execution_type }}"
+          echo "Execution Type: ${{ steps.read-execution-type.outputs.execution_type }}"
           
           if [ "$TEST_CASES" = "all" ]; then
             echo "Running all tests..."
@@ -75,3 +80,4 @@ jobs:
               fi
             done
           fi
+
