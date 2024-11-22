@@ -1,6 +1,9 @@
-name: Run Selenium Tests on BrowserStack
+name: Automated Selenium Test
 
 on:
+  schedule:
+    # Ejecutar diariamente a las 19:00 GMT+1
+    - cron: '0 18 * * *' # Hora UTC (GMT+1 es UTC+1, por eso usamos 18 aquí)
   workflow_dispatch:
     inputs:
       test_case:
@@ -23,6 +26,18 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      - name: Determine job name
+        id: job-name
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "::set-output name=job_name::Manual Selenium Test"
+          else
+            echo "::set-output name=job_name::Automated Selenium Test"
+
+      - name: Display job name
+        run: |
+          echo "Job Name: ${{ steps.job-name.outputs.job_name }}"
 
       - name: Run specified test cases
         env:
