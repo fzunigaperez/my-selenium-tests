@@ -27,18 +27,19 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Determine job name
-        id: job-name
+      - name: Log execution type
         run: |
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            echo "::set-output name=job_name::Manual Selenium Test"
+            echo "Execution Type: Manual"
+            echo "::set-output name=execution_type::Manual"
           else
-            echo "::set-output name=job_name::Automated Selenium Test"
+            echo "Execution Type: Automated"
+            echo "::set-output name=execution_type::Automated"
           fi
+        id: execution-type
 
-      - name: Display job name
-        run: |
-          echo "Job Name: ${{ steps.job-name.outputs.job_name }}"
+      - name: Annotate execution type
+        run: echo "This job is running as: ${{ steps.execution-type.outputs.execution_type }} execution."
 
       - name: Run specified test cases
         env:
@@ -47,6 +48,7 @@ jobs:
         run: |
           TEST_CASES="${{ github.event.inputs.test_case }}"
           echo "Test case(s) input: $TEST_CASES"
+          echo "Execution Type: ${{ steps.execution-type.outputs.execution_type }}"
           
           if [ "$TEST_CASES" = "all" ]; then
             echo "Running all tests..."
