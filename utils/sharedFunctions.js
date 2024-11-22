@@ -186,44 +186,29 @@ async function loginToProtonMail(driver, vars = {}) {
        
     vars["mailUsername"] = "testingpxc_viewer@proton.me";
     vars["mailPassword"] = "Proficloud2022!";
-  
-    const loggedIn = (await driver.findElements(By.xpath("//button[contains(text(),'New message')]"))).length > 0;
-    if (!loggedIn) {
-      console.log("Logging into Proton Mail...");
-      await driver.sleep(10000); 
 
-      // Hacer clic en "All mail"
-    const mailCredentialsPage = await driver.wait(until.elementLocated(By.id("username")), 10000);
+
+    // Esperar que el campo de nombre de usuario esté disponible
+  const usernameField = await driver.wait(until.elementLocated(By.id("username")), 10000);
+  await driver.wait(until.elementIsVisible(usernameField), 10000); // Esperar visibilidad
       
   
-  await driver.wait(until.elementIsEnabled(mailCredentialsPage), 30000);
-  //await allMailButton.click();
-
-
-      await driver.wait(until.elementLocated(By.id("username")), 5000);
+      await driver.wait(until.elementLocated(By.id("username")), 10000);
       await driver.findElement(By.id("username")).sendKeys(vars["mailUsername"]);
       await driver.findElement(By.id("password")).sendKeys(vars["mailPassword"]);
-      await driver.findElement(By.xpath("//button[contains(text(),'Sign in')]")).click();
-      
-    } else {
-      console.log("Already logged into Proton Mail.");
-    }
+      await driver.findElement(By.css('button[type="submit"]')).click();
 
-    await driver.sleep(10000); 
+  //const elementToClickXpath = "//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]";   
+  const elementToClick = await driver.wait(until.elementLocated(By.xpath("//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]")), 30000);
+  
+  // Esperar a que el elemento esté visible y habilitado
+  await driver.wait(until.elementIsVisible(elementToClick), 30000);
+  await driver.wait(until.elementIsEnabled(elementToClick), 30000);
 
-    const xpathToWaitFor = "//*[contains(text(),'Choose an app to get started')]";
-    const elementToClickXpath = "//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]";
-    const timeout = 60000; // 60 seconds in milliseconds
-
-    // Esperar hasta que aparezca el elemento o agotar el tiempo (60 segundos)
-    const element = await driver.findElement(By.xpath(xpathToWaitFor));
-    await driver.wait(async () => {
-        return await element.isDisplayed().catch(() => false);
-    }, timeout);
-
-    // Si el elemento aparece, da clic
-    await driver.findElement(By.xpath(elementToClickXpath)).click();
-    console.log("El elemento 'Proton Mail Plus' fue encontrado y clicado exitosamente.");
+  // Hacer clic en el elemento
+  await elementToClick.click();
+  console.log("El elemento 'Proton Mail Plus' fue encontrado y clicado exitosamente.");
+          
   }
   
   async function checkFailedLoginEmail(driver) {

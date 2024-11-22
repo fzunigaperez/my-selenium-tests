@@ -7,6 +7,7 @@ const {
   acceptCookies,
   loginLandingPageButton,
   logout,
+  loginToProtonMail,
 } = require('../utils/sharedFunctions'); // Importación de funciones reutilizables
 
 
@@ -67,8 +68,44 @@ async function forgottenPassword(driver, vars) {
   await waitForPasswordResetMessage(driver);
 
   // Acceder al correo electrónico
-  console.log('Accediendo al correo electrónico para restablecer la contraseña...');
-  await accessResetEmail(driver, vars);
+  
+  await loginToProtonMail(driver, vars);
+  // Seleccionar el correo de restablecimiento de contraseña
+  console.log('Seleccionando correo de restablecimiento de contraseña...');
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'You have requested a password reset for Proficloud.io')]")), 30000);
+  await driver.findElement(By.xpath("//span[contains(.,'You have requested a password reset for Proficloud.io')]")).click();
+
+  // Interactuar con el contenido del correo
+  console.log('Accediendo al enlace de restablecimiento...');
+  // Localizar el iframe
+
+await driver.sleep(3000);
+  const iframe = await driver.wait(until.elementLocated(By.css('iframe')), 10000);
+
+// Cambiar el contexto al iframe
+await driver.switchTo().frame(iframe);
+
+// Esperar y localizar el botón "Reset password"
+const resetButton = await driver.wait(until.elementLocated(By.xpath("//div[contains(text(),'Reset password')]")), 10000);
+await resetButton.click();
+console.log("El botón 'Reset password' fue clicado exitosamente.");
+
+// Volver al contexto principal
+await driver.switchTo().defaultContent();
+
+
+// Obtener todas las pestañas abiertas
+const handles = await driver.getAllWindowHandles();
+
+// Cambiar el control a la nueva pestaña
+await driver.switchTo().window(handles[1]); // Cambiar a la segunda pestaña (índice 1)
+await driver.wait(until.titleIs('Proficloud.io | NAV.RESET_PASSWORD'), 10000); // Esperar hasta que el título coincida
+
+await driver.findElement(By.id('mat-input-1')).sendKeys(vars.newPassword);
+await driver.findElement(By.id('mat-input-2')).sendKeys(vars.newPassword);
+await driver.findElement(By.xpath("//span[contains(.,'Reset Password')]")).click();
+
+
 }
 
 // Esperar el mensaje de confirmación de restablecimiento
@@ -78,24 +115,10 @@ async function waitForPasswordResetMessage(driver) {
   console.log('Mensaje de confirmación recibido.');
 }
 
-// Acceder al correo de restablecimiento de contraseña
-async function accessResetEmail(driver, vars) {
-  await driver.get('https://account.proton.me/login');
-  console.log('Iniciando sesión en Proton Mail...');
-  await loginToProtonMail(driver, vars);
 
-  // Seleccionar el correo de restablecimiento de contraseña
-  console.log('Seleccionando correo de restablecimiento de contraseña...');
-  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'You have requested a password reset for Proficloud.io')]")), 30000);
-  await driver.findElement(By.xpath("//span[contains(.,'You have requested a password reset for Proficloud.io')]")).click();
 
-  // Interactuar con el contenido del correo
-  console.log('Accediendo al enlace de restablecimiento...');
-  await driver.switchTo().frame(0);
-  await driver.wait(until.elementLocated(By.css('a > div')), 30000);
-  await driver.findElement(By.css('a > div')).click();
-  await driver.switchTo().defaultContent();
-}
+
+
 
 // Iniciar sesión con la nueva contraseña
 async function loginWithNewPassword(driver, vars) {
@@ -110,16 +133,7 @@ async function loginWithNewPassword(driver, vars) {
   assert.strictEqual(routeTitle, 'Device Management Service', 'No se accedió correctamente a la página principal.');
 }
 
-// Iniciar sesión en Proton Mail
-async function loginToProtonMail(driver, vars) {
-  await driver.wait(until.elementLocated(By.id('username')), 30000);
-  await driver.findElement(By.id('username')).sendKeys(vars.mailUsername);
-  await driver.findElement(By.id('password')).sendKeys(vars.mailPassword);
-  await driver.findElement(By.xpath("//button[contains(.,'Sign in')]")).click();
 
-  console.log('Esperando a que la bandeja de entrada esté lista...');
-  await driver.wait(until.elementLocated(By.xpath("//button[contains(.,'New message')]")), 60000);
-}
 
 module.exports = C580;
 
