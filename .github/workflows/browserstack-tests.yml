@@ -30,10 +30,11 @@ jobs:
       - name: Determine job name
         id: job-name
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             echo "::set-output name=job_name::Manual Selenium Test"
           else
             echo "::set-output name=job_name::Automated Selenium Test"
+          fi
 
       - name: Display job name
         run: |
