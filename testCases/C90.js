@@ -6,7 +6,7 @@
 
   async function C90() {
     try {
-      await testBase('C90 Log out successfully', async (driver) => {
+      await testBase('C90_Log out successfully', async (driver) => {
         let vars = {};
         await windowConfiguration(driver);
         await loginAdmin(driver, vars);
