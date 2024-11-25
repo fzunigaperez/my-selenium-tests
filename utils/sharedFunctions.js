@@ -7,7 +7,7 @@ const axios = require('axios'); // Necesary to send test results
 
 // Función para enviar resultados a TestRail
 async function sendResultToTestRail(testCaseId, status, comment = '') {
-  const url = `https://testingpxc.testrail.io/index.php?/api/v2/add_result_for_case/<run-id>/${testCaseId}`;
+  const url = `https://testingpxc.testrail.io/index.php?/api/v2/add_result_for_case/37/${testCaseId}`;
   const auth = {
     username: process.env.TESTRAIL_USERNAME,  // Accede a las variables de entorno
     password: process.env.TESTRAIL_API_KEY
