@@ -37,9 +37,12 @@ jobs:
           TEST_CASES="${{ github.event.inputs.test_case }}"
           echo "Test case(s) input: $TEST_CASES"
           
+          # Variable para contar errores
+          ERRORS=0
+          
           if [ "$TEST_CASES" = "all" ]; then
             echo "Running all tests..."
-            node run-all-tests.js
+            node run-all-tests.js || ERRORS=$((ERRORS+1))
           else
             IFS=',' read -ra TEST_ARRAY <<< "$TEST_CASES" # Split by comma
             for TEST_CASE in "${TEST_ARRAY[@]}"; do
@@ -48,17 +51,19 @@ jobs:
                 echo "Found file: testCases/$TEST_CASE.js"
                 chmod +x testCases/$TEST_CASE.js
                 echo "Executing test case $TEST_CASE..."
-                node -e "require('./testCases/$TEST_CASE')();"
-                if [ $? -ne 0 ]; then
-                  echo "Execution of $TEST_CASE.js failed"
-                  exit 1
-                fi
-                echo "Execution of $TEST_CASE.js completed successfully"
+                node -e "require('./testCases/$TEST_CASE')();" || ERRORS=$((ERRORS+1))
+                echo "Execution of $TEST_CASE.js completed with status $?"
               else
                 echo "Test case not found: $TEST_CASE"
-                echo "Available test cases in testCases directory:"
-                ls -l testCases/
-                exit 1
+                ERRORS=$((ERRORS+1))
               fi
             done
+          fi
+
+          # Verificar si hubo errores
+          if [ $ERRORS -ne 0 ]; then
+            echo "$ERRORS test(s) failed."
+            exit 1
+          else
+            echo "All tests passed successfully."
           fi

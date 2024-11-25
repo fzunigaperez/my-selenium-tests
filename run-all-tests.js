@@ -40,11 +40,26 @@ async function runTest(testFunction, testName, testCaseId) {
 
 // Función para ejecutar todas las pruebas
 async function runAllTests() {
+  let errors = 0; // Contador de errores para rastrear fallos
+
   for (const test of tests) {
-    await runTest(test.func, test.name, test.testCaseId);
+    try {
+      await runTest(test.func, test.name, test.testCaseId);
+    } catch (error) {
+      console.error(`Error in test ${test.name}:`, error.message);
+      errors++; // Incrementa el contador de errores
+    }
   }
 
   console.log('All tests have been executed.');
+
+  // Si hubo errores, salimos con un código de error
+  if (errors > 0) {
+    console.log(`${errors} test(s) failed.`);
+    process.exit(1); // Código de salida indicando fallo
+  } else {
+    console.log('All tests passed successfully.');
+  }
 }
 
 // Ejecutar todas las pruebas
