@@ -3,10 +3,31 @@ const C90 = require('./testCases/C90');
 const C15 = require('./testCases/C15');
 // Agrega aquí más tests según sea necesario.
 
+// Función para extraer el testCaseId de sessionName
+function extractTestCaseId(sessionName) {
+  const match = sessionName.match(/^C(\d+)_/); // Busca el número después de 'C' y antes de '_'
+  return match ? parseInt(match[1], 10) : null;
+}
+
+// Base para definir las pruebas con sessionNames completos
+const sessionNames = [
+  { name: 'C90_Log out successfully', func: C90 },
+  { name: 'C15_Log out successfully', func: C15 },
+  // Agrega aquí más tests con sus nombres y funciones correspondientes
+];
+
+// Construcción del array tests con el formato original
+const tests = sessionNames.map(({ name, func }) => ({
+  name: name.split('_')[0], // Extraemos 'C90' o 'C15' para el campo name
+  func,
+  testCaseId: extractTestCaseId(name), // Derivamos testCaseId usando la función
+}));
+
+// Función para ejecutar una prueba
 async function runTest(testFunction, testName, testCaseId) {
   try {
     console.log(`Running test: ${testName}`);
-    await testFunction();  // Ejecuta la función del test
+    await testFunction(); // Ejecuta la función del test
     console.log(`${testName} completed successfully.`);
     // Enviar resultado a TestRail (pasado)
     await sendResultToTestRail(testCaseId, 1, 'Test passed successfully.');
@@ -17,13 +38,8 @@ async function runTest(testFunction, testName, testCaseId) {
   }
 }
 
+// Función para ejecutar todas las pruebas
 async function runAllTests() {
-  const tests = [
-    { name: 'C90', func: C90, testCaseId: 90 }, // Reemplaza con el ID correcto de TestRail
-    { name: 'C15', func: C15, testCaseId: 15 }, // Reemplaza con el ID correcto de TestRail
-    // Agrega aquí más tests según sea necesario, asegurándote de incluir los testCaseId
-  ];
-
   for (const test of tests) {
     await runTest(test.func, test.name, test.testCaseId);
   }
@@ -31,4 +47,5 @@ async function runAllTests() {
   console.log('All tests have been executed.');
 }
 
+// Ejecutar todas las pruebas
 runAllTests();
