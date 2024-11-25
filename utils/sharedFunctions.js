@@ -1,5 +1,29 @@
 const { By, until } = require('selenium-webdriver');
 const assert = require('assert'); // Importa el módulo assert
+const axios = require('axios'); // Necesary to send test results
+
+
+
+// Función para enviar resultados a TestRail
+async function sendResultToTestRail(testCaseId, status, comment = '') {
+  const url = 'https://<your-testrail-instance>/index.php?/api/v2/add_result_for_case/<run-id>/<testcase-id>';
+  const auth = {
+    username: 'your_testrail_user',
+    password: 'your_testrail_api_key'
+  };
+
+  const data = {
+    status_id: status,  // 1: Passed, 5: Failed, etc.
+    comment: comment
+  };
+
+  try {
+    const response = await axios.post(url, data, { auth });
+    console.log('Test result sent successfully:', response.data);
+  } catch (error) {
+    console.error('Error sending test result to TestRail:', error.message);
+  }
+}
 
 async function acceptCookies(driver) {
   try {
@@ -315,6 +339,7 @@ async function loginToProtonMail(driver, vars = {}) {
 
 
 module.exports = {
+  sendResultToTestRail,
   acceptCookies,
   loginLandingPageButton,
   adminCredentials,
