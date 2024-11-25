@@ -1,7 +1,7 @@
 const { By, until } = require('selenium-webdriver');
 const assert = require('assert'); // Importa el módulo assert
 const axios = require('axios'); // Necesary to send test results
-const { sendResultToTestRail } = require('../utils/sharedFunctions');
+//const { sendResultToTestRail } = require('../utils/sharedFunctions');
 
 
 
