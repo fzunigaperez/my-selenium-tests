@@ -31,6 +31,8 @@ jobs:
         env:
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+          TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USERNAME }}  # Agregar el username de TestRail
+          TESTRAIL_API_KEY: ${{ secrets.TESTRAIL_API_KEY }}    # Agregar la clave API de TestRail
         run: |
           TEST_CASES="${{ github.event.inputs.test_case }}"
           echo "Test case(s) input: $TEST_CASES"
