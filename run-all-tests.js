@@ -1,4 +1,4 @@
-const { sendResultToTestRail } = require('../utils/sharedFunctions'); // Importa la función de envío a TestRail
+const { sendResultToTestRail } = require('./utils/sharedFunctions'); // Importa la función de envío a TestRail
 const C90 = require('./testCases/C90');
 const C15 = require('./testCases/C15');
 // Agrega aquí más tests según sea necesario.
