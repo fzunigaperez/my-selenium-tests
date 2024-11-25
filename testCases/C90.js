@@ -1,7 +1,7 @@
 const { Builder, By, until } = require('selenium-webdriver');  // Localrun
 const testBase = require('./testBase');  //Common
-const { windowConfiguration, loginAdmin, logout } = require('../utils/sharedFunctions'); // BS
-const { sendResultToTestRail } = require('../utils/sharedFunctions'); 
+const { windowConfiguration, loginAdmin, logout, sendResultToTestRail } = require('../utils/sharedFunctions'); // BS
+
 
 async function C90() {
   try {
@@ -10,7 +10,7 @@ async function C90() {
       let vars = {}; // Inicializa vars como un objeto vacío
 
       // Configuración de la ventana
-      await windowConfiguration(driver);
+      //await windowConfiguration(driver);
 
       // Inicio de sesión
       await loginAdmin(driver, vars);
@@ -23,7 +23,7 @@ async function C90() {
     await sendResultToTestRail(90, 1, 'Test passed successfully.'); // Reemplaza 101 con el ID real
   } catch (error) {
     // Si la prueba falla, enviamos el resultado a TestRail con el error
-    await sendResultToTestRail('C90-testcase-id', 5, `Test failed: ${error.message}`);
+    await sendResultToTestRail(90, 5, `Test failed: ${error.message}`);
   }
 }
 
@@ -32,6 +32,10 @@ async function C90() {
 
 module.exports = C90;
 
+// Verificar las variables de entorno
+console.log('TESTRAIL_USERNAME:', process.env.TESTRAIL_USERNAME);
+console.log('TESTRAIL_API_KEY:', process.env.TESTRAIL_API_KEY);
+console.log('TESTRAIL_ENABLED:', process.env.TESTRAIL_ENABLED);
 
 if (require.main === module) {
   (async () => {
