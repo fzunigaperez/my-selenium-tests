@@ -1,13 +1,15 @@
+
 name: Run Selenium Tests on BrowserStack
 
 on:
   schedule:
-    - cron: '0 18 * * *' # Ejecutar diariamente a las 18:00 UTC
+    # Ejecutar diariamente a las 19:00 GMT+1 (18:00 UTC)
+    - cron: '0 18 * * *'
   workflow_dispatch:
     inputs:
       test_case:
         description: "Specify the test case(s) to run (e.g., C90, C15 or all for all test cases)"
-        required: false
+        required: true
         default: "all"
 
 jobs:
@@ -30,26 +32,31 @@ jobs:
         env:
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
-          TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USERNAME }}
-          TESTRAIL_API_KEY: ${{ secrets.TESTRAIL_API_KEY }}
+          TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USERNAME }}  # Agregar el username de TestRail
+          TESTRAIL_API_KEY: ${{ secrets.TESTRAIL_API_KEY }}    # Agregar la clave API de TestRail
         run: |
-          TEST_CASES="${{ github.event.inputs.test_case || 'all' }}"
+          TEST_CASES="${{ github.event.inputs.test_case }}"
           echo "Test case(s) input: $TEST_CASES"
+          
+          # Variable para contar errores
           ERRORS=0
           
           if [ "$TEST_CASES" = "all" ]; then
             echo "Running all tests..."
-            node run-all-tests.js || ERRORS=$((ERRORS + 1))
+            node run-all-tests.js || ERRORS=$((ERRORS+1))
           else
             IFS=',' read -ra TEST_ARRAY <<< "$TEST_CASES" # Split by comma
             for TEST_CASE in "${TEST_ARRAY[@]}"; do
               TEST_CASE=$(echo "$TEST_CASE" | xargs) # Trim spaces
               if [ -f "testCases/$TEST_CASE.js" ]; then
+                echo "Found file: testCases/$TEST_CASE.js"
+                chmod +x testCases/$TEST_CASE.js
                 echo "Executing test case $TEST_CASE..."
-                node -e "require('./testCases/$TEST_CASE')();" || ERRORS=$((ERRORS + 1))
+                node -e "require('./testCases/$TEST_CASE')();" || ERRORS=$((ERRORS+1))
+                echo "Execution of $TEST_CASE.js completed with status $?"
               else
-                echo "Test case $TEST_CASE not found."
-                ERRORS=$((ERRORS + 1))
+                echo "Test case not found: $TEST_CASE"
+                ERRORS=$((ERRORS+1))
               fi
             done
           fi
