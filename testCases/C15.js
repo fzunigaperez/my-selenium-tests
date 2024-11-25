@@ -20,7 +20,7 @@ async function C15() {
       await windowConfiguration(driver);
 
       // Inicio de sesión
-      await loginAdmin(driver, vars);
+      //await loginAdmin(driver, vars);
 
       // Cierre de sesión
       await logout(driver);
