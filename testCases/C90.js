@@ -3,18 +3,27 @@ const testBase = require('./testBase');  //Common
 const { windowConfiguration, loginAdmin, logout } = require('../utils/sharedFunctions'); // BS
 
 async function C90() {
-  await testBase('C90 Log out successfully', async (driver) => {
+  try {
+    // Aquí va el código de la prueba
+    await testBase('C90 Log out successfully', async (driver) => {
+      let vars = {}; // Inicializa vars como un objeto vacío
 
-    let vars = {}; // Inicializa vars como un objeto vacío
-    // Configuración de la ventana
-    await windowConfiguration(driver);
+      // Configuración de la ventana
+      await windowConfiguration(driver);
 
-    // Inicio de sesión
-    await loginAdmin(driver,vars);
+      // Inicio de sesión
+      await loginAdmin(driver, vars);
 
-    // Cierre de sesión
-    await logout(driver);
-  });
+      // Cierre de sesión
+      await logout(driver);
+    });
+
+    // Si la prueba pasa, enviamos el resultado a TestRail
+    await sendResultToTestRail('C90-testcase-id', 1, 'Test passed successfully.');
+  } catch (error) {
+    // Si la prueba falla, enviamos el resultado a TestRail con el error
+    await sendResultToTestRail('C90-testcase-id', 5, `Test failed: ${error.message}`);
+  }
 }
 
 
