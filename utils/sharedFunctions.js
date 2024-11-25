@@ -8,8 +8,8 @@ const axios = require('axios'); // Necesary to send test results
 async function sendResultToTestRail(testCaseId, status, comment = '') {
   const url = 'https://<your-testrail-instance>/index.php?/api/v2/add_result_for_case/<run-id>/<testcase-id>';
   const auth = {
-    username: 'your_testrail_user',
-    password: 'your_testrail_api_key'
+    username: process.env.TESTRAIL_USERNAME,  // Accede a las variables de entorno
+    password: process.env.TESTRAIL_API_KEY
   };
 
   const data = {
