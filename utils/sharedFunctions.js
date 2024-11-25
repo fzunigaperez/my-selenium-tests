@@ -1,21 +1,29 @@
 const { By, until } = require('selenium-webdriver');
 const assert = require('assert'); // Importa el módulo assert
 const axios = require('axios'); // Necesary to send test results
+require('dotenv').config();
 //const { sendResultToTestRail } = require('../utils/sharedFunctions');
 
 
 
 // Función para enviar resultados a TestRail
+const TESTRAIL_ENABLED = process.env.TESTRAIL_ENABLED === 'true';
+
 async function sendResultToTestRail(testCaseId, status, comment = '') {
+  if (!TESTRAIL_ENABLED) {
+    console.log(`[Mock] TestRail disabled. Result for ${testCaseId}: Status ${status}, Comment: ${comment}`);
+    return;
+  }
+
   const url = `https://testingpxc.testrail.io/index.php?/api/v2/add_result_for_case/37/${testCaseId}`;
   const auth = {
-    username: process.env.TESTRAIL_USERNAME,  // Accede a las variables de entorno
-    password: process.env.TESTRAIL_API_KEY
+    username: process.env.TESTRAIL_USERNAME,
+    password: process.env.TESTRAIL_API_KEY,
   };
 
   const data = {
-    status_id: status,  // 1: Passed, 5: Failed, etc.
-    comment: comment
+    status_id: status,
+    comment: comment,
   };
 
   try {
@@ -23,6 +31,9 @@ async function sendResultToTestRail(testCaseId, status, comment = '') {
     console.log('Test result sent successfully:', response.data);
   } catch (error) {
     console.error('Error sending test result to TestRail:', error.message);
+    if (error.response) {
+      console.error('Response data:', error.response.data);
+    }
   }
 }
 
