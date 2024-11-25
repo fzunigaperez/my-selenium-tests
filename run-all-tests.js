@@ -19,8 +19,8 @@ async function runTest(testFunction, testName, testCaseId) {
 
 async function runAllTests() {
   const tests = [
-    { name: 'C90', func: C90, testCaseId: C90 }, // Reemplaza con el ID correcto de TestRail
-    { name: 'C15', func: C15, testCaseId: C15 }, // Reemplaza con el ID correcto de TestRail
+    { name: 'C90', func: C90, testCaseId: 90 }, // Reemplaza con el ID correcto de TestRail
+    { name: 'C15', func: C15, testCaseId: 15 }, // Reemplaza con el ID correcto de TestRail
     // Agrega aquí más tests según sea necesario, asegurándote de incluir los testCaseId
   ];
 

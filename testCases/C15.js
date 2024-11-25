@@ -2,7 +2,7 @@ const { Builder } = require('selenium-webdriver'); // Importación completa y pr
 const path = require('path');
 const baseCapabilities = require(path.resolve(__dirname, '../capabilities/capabilities'));
 const testBase = require('./testBase');  //Common
-//const { sendResultToTestRail } = require('../utils/sharedFunctions');
+const { sendResultToTestRail } = require('../utils/sharedFunctions');
 const {
   windowConfiguration,
   loginAdmin,

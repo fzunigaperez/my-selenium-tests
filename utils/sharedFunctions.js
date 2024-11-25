@@ -1,95 +1,360 @@
-const axios = require('axios');
 const { By, until } = require('selenium-webdriver');
-require('dotenv').config({ path: '../.env' });
-const TESTRAIL_ENABLED = process.env.TESTRAIL_ENABLED === 'true';
+const assert = require('assert'); // Importa el módulo assert
+const axios = require('axios'); // Necesary to send test results
+//const { sendResultToTestRail } = require('../utils/sharedFunctions');
+
+
 
 // Función para enviar resultados a TestRail
 async function sendResultToTestRail(testCaseId, status, comment = '') {
-  if (!TESTRAIL_ENABLED) {
-    console.log(`[Mock] TestRail disabled. Result for ${testCaseId}: Status ${status}, Comment: ${comment}`);
-    return;
-  }
-
   const url = `https://testingpxc.testrail.io/index.php?/api/v2/add_result_for_case/37/${testCaseId}`;
   const auth = {
-    username: process.env.TESTRAIL_USERNAME,
-    password: process.env.TESTRAIL_API_KEY,
+    username: process.env.TESTRAIL_USERNAME,  // Accede a las variables de entorno
+    password: process.env.TESTRAIL_API_KEY
   };
 
   const data = {
-    status_id: status, // 1: Passed, 5: Failed
-    comment: comment,
+    status_id: status,  // 1: Passed, 5: Failed, etc.
+    comment: comment
   };
 
   try {
     const response = await axios.post(url, data, { auth });
-    console.log('✅ Test result sent successfully:', response.data);
+    console.log('Test result sent successfully:', response.data);
   } catch (error) {
-    console.error('❌ Error sending test result to TestRail:', error.message);
-    if (error.response) {
-      console.error('Response data:', error.response.data);
-    }
+    console.error('Error sending test result to TestRail:', error.message);
   }
 }
 
-// Función para aceptar cookies en la página
 async function acceptCookies(driver) {
   try {
     const cookiesXPath = "//h2[normalize-space()='This website uses cookies']";
     const acceptButtonXPath = "//button[@id='ga-opt-out-false']";
 
+    // Esperar un máximo de 3 segundos para el banner de cookies
     const cookiesBanner = await driver.wait(until.elementLocated(By.xpath(cookiesXPath)), 3000);
 
     if (cookiesBanner) {
-      console.log('Cookies banner detected.');
-      const acceptButton = await driver.findElement(By.xpath(acceptButtonXPath));
+      console.log("Cookies banner detected.");
+      const acceptButton = await driver.wait(until.elementLocated(By.xpath(acceptButtonXPath)), 3000);
       await acceptButton.click();
-      console.log('Cookies accepted.');
+      console.log("Cookies accepted.");
     }
   } catch (error) {
-    console.log('No cookies banner found or it timed out.');
+    console.error("Cookies banner not found or timed out:", error.message);
   }
 }
 
-// Función para configurar la ventana del navegador
-async function windowConfiguration(driver) {
-  await driver.get('https://proficloud.io/testrun');
-  await driver.manage().window().maximize();
-  console.log('✅ Browser window configured.');
+
+
+async function loginLandingPageButton(driver) {
+  await driver.findElement(By.id("login-button")).click();
 }
 
-// Función para iniciar sesión como administrador
-async function loginAdmin(driver, vars) {
-  vars.username = 'testingpxc_admin@proton.me';
-  vars.password = 'Proficloud2022!';
-
-  await acceptCookies(driver);
-  await driver.findElement(By.id('login-button')).click();
-
-  await driver.wait(until.elementLocated(By.id('username')), 10000);
-  await driver.findElement(By.id('username')).sendKeys(vars.username);
-  await driver.findElement(By.id('password')).sendKeys(vars.password);
-  await driver.findElement(By.id('kc-login')).click();
-  console.log('✅ Admin logged in.');
+async function adminCredentials(driver, vars = {}) {
+  vars["username"] = "testingpxc_admin@proton.me";
+  vars["password"] = "Proficloud2022!";
+  console.log("Credentials set:", vars);
 }
 
-// Función para cerrar sesión
-async function logout(driver) {
-  await driver.wait(until.elementLocated(By.xpath("//div[@id='proficloud-user-icon']")), 10000);
-  await driver.findElement(By.xpath("//div[@id='proficloud-user-icon']")).click();
+async function isTheOrganizationNameEmpty(driver, vars) {
+  let attempts = 0; // Contador de intentos
+  const maxAttempts = 10; // Número máximo de intentos
+  const waitTime = 2000; // Tiempo de espera entre intentos (2 segundos)
 
-  await driver.wait(until.elementLocated(By.xpath("//div[contains(text(),'Logout')]")), 10000);
-  await driver.findElement(By.xpath("//div[contains(text(),'Logout')]")).click();
+  while (attempts < maxAttempts) {
+    console.log(`Intento ${attempts + 1} de ${maxAttempts}`);
 
+    try {
+      // Espera hasta que el elemento esté visible en la página
+      const element = await driver.wait(until.elementLocated(By.xpath("//h4")), waitTime);
+      vars["emptyName"] = await element.getText();
+      console.log(`Organización encontrada: ${vars["emptyName"]}`);
+
+      // Si el texto no está vacío, termina la función
+      if (vars["emptyName"] && vars["emptyName"] !== "") {
+        console.log("Nombre de la organización encontrado.");
+        return vars["emptyName"];
+      }
+    } catch (error) {
+      console.log("El elemento no está disponible en este intento. Intentando nuevamente...");
+    }
+
+    // Incrementa el contador de intentos y espera antes del siguiente intento
+    attempts++;
+    if (attempts < maxAttempts) {
+      await driver.sleep(waitTime);
+    }
+  }
+
+  // Si no se encuentra un texto válido después de 10 intentos, devuelve un mensaje
+  console.log("No se pudo encontrar el nombre de la organización después de 10 intentos.");
+  return null; // Retorna null si no encuentra un valor válido
+}
+
+
+async function rootOrganizationTest(driver, vars) {
+  vars["root"] = await driver.findElements(By.xpath("//h4[contains(.,'Rooth Organization')]")).length;
+  if (vars["root"] > 0) {
+    console.log("We are in the right organization.");
+  } else {
+    await switchToOriginalOrganization(driver);
+  }
+}
+
+async function switchToOriginalOrganization(driver) {
+  await activeOrganization(driver);
   await driver.sleep(1000);
-  console.log('✅ Logged out successfully.');
+  await driver
+    .findElement(By.xpath("//div[@class='profile-menu_icon-text__text'][contains(.,'Rooth Organization')]"))
+    .click();
+  await driver.sleep(1000);
+  await driver.wait(until.elementLocated(By.id("routeTitle")), 30000);
 }
 
-// Exportar todas las funciones
+async function activeOrganization(driver) {
+  await driver.findElement(By.xpath("//div[@id='active-organization']/h4")).click();
+}
+
+async function logout(driver) {
+  await userMenu(driver);
+  await driver
+    .findElement(By.xpath("//div[@class='profile-menu_icon-text__text'][contains(.,'Logout')]"))
+    .click();
+  await driver.sleep(1000);
+}
+
+async function userMenu(driver) {
+  await driver.wait(until.elementLocated(By.xpath("//div[@id='proficloud-user-icon']")), 30000);
+  await driver.findElement(By.xpath("//div[@id='proficloud-user-icon']")).click();
+}
+
+async function windowConfiguration(driver) {
+  await driver.get("https://proficloud.io/testrun");
+  await driver.manage().window().maximize();
+}
+
+async function loginAdmin(driver, vars) {
+  await acceptCookies(driver);
+  await loginLandingPageButton(driver);
+  await adminCredentials(driver, vars);
+  await driver.sleep(1000);
+  await driver.wait(until.elementLocated(By.id("username")), 50000);
+  await driver.findElement(By.id("username")).sendKeys(vars["username"]);
+  await driver.findElement(By.id("password")).sendKeys(vars["password"]);
+  await driver.findElement(By.id("kc-login")).click();
+  await driver.sleep(1000);
+  await isTheOrganizationNameEmpty(driver, vars);
+  await rootOrganizationTest(driver, vars);
+}
+
+async function loginEditor(driver, vars) {
+  await acceptCookies(driver);
+  await loginLandingPageButton(driver);
+  vars["username"] = "testingpxc_editor@proton.me";
+  vars["password"] = "Proficloud2022!";
+  console.log("Credentials set for EDITOR:", vars);
+
+  // Log in
+  await driver.wait(until.elementLocated(By.id("username")), 5000);
+  await driver.findElement(By.id("username")).sendKeys(vars["username"]);
+  await driver.findElement(By.id("password")).sendKeys(vars["password"]);
+  await driver.findElement(By.id("kc-login")).click();
+
+  // Wait for page to load
+  
+  await isTheOrganizationNameEmpty(driver, vars);
+
+  // Assert the correct page is loaded
+  const pageTitle = await driver.findElement(By.xpath("//div[@id='routeTitle']")).getText();
+  assert.strictEqual(pageTitle, "Device Management Service");
+
+  // Check if in the right organization
+  await rootOrganizationTest(driver, vars);
+}
+
+async function loginViewer(driver, vars) {
+  await acceptCookies(driver);
+  await loginLandingPageButton(driver);
+
+  vars["username"] = "testingpxc_viewer@proton.me";
+  vars["password"] = "Proficloud2022!";
+  console.log("Credentials set for VIEWER:", vars);
+
+  // Log in
+  await driver.wait(until.elementLocated(By.id("username")), 5000);
+  await driver.findElement(By.id("username")).sendKeys(vars["username"]);
+  await driver.findElement(By.id("password")).sendKeys(vars["password"]);
+  await driver.findElement(By.id("kc-login")).click();
+
+  // Espera hasta que el nombre de la organización esté disponible
+  console.log("Esperando el nombre de la organización...");
+  await driver.wait(until.elementLocated(By.xpath("//h4")), 10000); // Máximo 10 segundos para encontrar el elemento
+  await isTheOrganizationNameEmpty(driver, vars);
+
+  // Verifica que la página correcta se cargó
+  console.log("Validando el título de la página...");
+  const pageTitleElement = await driver.wait(
+    until.elementLocated(By.xpath("//div[@id='routeTitle']")),
+    10000
+  );
+  const pageTitle = await pageTitleElement.getText();
+  assert.strictEqual(pageTitle, "Device Management Service", "El título de la página no coincide.");
+
+  // Verifica la organización correcta
+  console.log("Validando la organización...");
+  await rootOrganizationTest(driver, vars);
+}
+
+async function loginToProtonMail(driver, vars = {}) {
+    await driver.get("https://account.proton.me/login");
+       
+    vars["mailUsername"] = "testingpxc_viewer@proton.me";
+    vars["mailPassword"] = "Proficloud2022!";
+
+
+    // Esperar que el campo de nombre de usuario esté disponible
+  const usernameField = await driver.wait(until.elementLocated(By.id("username")), 10000);
+  await driver.wait(until.elementIsVisible(usernameField), 10000); // Esperar visibilidad
+      
+  
+      await driver.wait(until.elementLocated(By.id("username")), 10000);
+      await driver.findElement(By.id("username")).sendKeys(vars["mailUsername"]);
+      await driver.findElement(By.id("password")).sendKeys(vars["mailPassword"]);
+      await driver.findElement(By.css('button[type="submit"]')).click();
+
+  //const elementToClickXpath = "//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]";   
+  const elementToClick = await driver.wait(until.elementLocated(By.xpath("//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]")), 30000);
+  
+  // Esperar a que el elemento esté visible y habilitado
+  await driver.wait(until.elementIsVisible(elementToClick), 30000);
+  await driver.wait(until.elementIsEnabled(elementToClick), 30000);
+
+  // Hacer clic en el elemento
+  await elementToClick.click();
+  console.log("El elemento 'Proton Mail Plus' fue encontrado y clicado exitosamente.");
+          
+  }
+  
+  async function checkFailedLoginEmail(driver) {
+    await driver.sleep(10000);  
+    const elementLocator = By.css(".item-subject > .inline-block");
+    const firstMail = await driver.wait(until.elementLocated(elementLocator),60000);
+    await driver.wait(until.elementIsVisible(firstMail), 60000);
+    await firstMail.click();
+
+    await driver.wait(until.elementLocated(By.css(".message-conversation-summary-header > span")), 10000);
+    const emailSubject = await driver.findElement(By.css(".message-conversation-summary-header > span")).getText();
+    if (emailSubject !== "Failed login attempt detected") {
+      throw new Error("Failed login email not found in Proton Mail.");
+    }
+    console.log("Failed login email detected as expected.");
+  }
+  
+  async function deleteAllEmails(driver) {
+    console.log("Deleting all mails...");
+    // Esperar que se localice "Inbox"
+    await driver.wait(until.elementLocated(By.xpath("//span[contains(text(),'Inbox')]")), 60000);
+
+    // Comprobar si existe "Less"
+    const lessElements = await driver.findElements(By.xpath("//span[normalize-space()='Less']"));
+    if (lessElements.length > 0) {
+        // Esperar que el elemento "Less" sea visible (si es necesario interactuar con él en el futuro)
+        await driver.wait(until.elementIsEnabled(lessElements[0]), 3000);
+    } else {
+        // Hacer clic en "More" si "Less" no está visible
+        const moreButton = await driver.wait(
+            until.elementLocated(By.xpath("//span[normalize-space()='More']")),
+            30000
+        );
+        await driver.wait(until.elementIsEnabled(moreButton), 30000);
+        await moreButton.click();
+    }
+
+    // Hacer clic en "All mail"
+    const allMailButton = await driver.wait(
+        until.elementLocated(By.xpath("//span[contains(text(),'All mail')]")),
+        30000
+    );
+    await driver.wait(until.elementIsEnabled(allMailButton), 30000);
+    await allMailButton.click();
+
+    // Seleccionar todos los correos
+    const selectAllButton = await driver.wait(
+        until.elementLocated(By.id("idSelectAll")),
+        30000
+    );
+    await driver.wait(until.elementIsEnabled(selectAllButton), 30000);
+    await selectAllButton.click();
+
+    // Mover a la papelera
+    const moveToTrashButton = await driver.wait(
+        until.elementLocated(By.xpath("//button[contains(.,'Move to trash')]")),
+        30000
+    );
+    await driver.wait(until.elementIsEnabled(moveToTrashButton), 30000);
+    await moveToTrashButton.click();
+
+    // Navegar a la papelera
+    const trashButton = await driver.wait(
+        until.elementLocated(By.xpath("//span[@class='text-ellipsis'][contains(.,'Trash')]")),
+        30000
+    );
+    await driver.wait(until.elementIsEnabled(trashButton), 30000);
+    await trashButton.click();
+
+    // Seleccionar todo en la papelera
+    const selectAllTrashButton = await driver.wait(
+        until.elementLocated(By.id("idSelectAll")),
+        30000
+    );
+    await driver.wait(until.elementIsEnabled(selectAllTrashButton), 30000);
+    await selectAllTrashButton.click();
+
+    // Eliminar permanentemente
+    const deletePermanentlyButton = await driver.wait(
+        until.elementLocated(By.xpath("//button[contains(.,'Delete permanently')]")),
+        30000
+    );
+    await driver.wait(until.elementIsEnabled(deletePermanentlyButton), 30000);
+    await deletePermanentlyButton.click();
+
+    // Confirmar eliminación
+    const confirmDeleteButton = await driver.wait(
+        until.elementLocated(By.xpath("//button[contains(text(),'Delete')]")),
+        30000
+    );
+
+    await driver.wait(until.elementIsVisible(confirmDeleteButton), 30000);
+    await confirmDeleteButton.click();
+
+    const noMessagesFound = await driver.wait(
+      until.elementLocated(By.xpath("//h3[contains(@data-testid,'empty-view-placeholder--empty-title')]")),
+      30000
+    );
+    await driver.wait(until.elementIsVisible(noMessagesFound), 30000);
+   
+  }
+  
+
+
+
 module.exports = {
   sendResultToTestRail,
   acceptCookies,
+  loginLandingPageButton,
+  adminCredentials,
+  isTheOrganizationNameEmpty,
+  rootOrganizationTest,
+  switchToOriginalOrganization,
+  activeOrganization,
+  logout,
+  userMenu,
   windowConfiguration,
   loginAdmin,
-  logout,
+  loginEditor,
+  loginViewer,
+  loginToProtonMail,
+  checkFailedLoginEmail,
+  deleteAllEmails,
 };
