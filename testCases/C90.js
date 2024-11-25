@@ -18,13 +18,17 @@ async function C90() {
 
       // Cierre de sesión
       await logout(driver);
+
+
+
+      
     });
 
     // Si la prueba pasa, enviamos el resultado a TestRail
-    await sendResultToTestRail('C90-testcase-id', 1, 'Test passed successfully.');
+    await sendResultToTestRail(90, 1, 'Test passed successfully.');
   } catch (error) {
     // Si la prueba falla, enviamos el resultado a TestRail con el error
-    await sendResultToTestRail('C90-testcase-id', 5, `Test failed: ${error.message}`);
+    await sendResultToTestRail(90, 5, `Test failed: ${error.message}`);
   }
 }
 

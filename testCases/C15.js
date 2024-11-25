@@ -20,17 +20,17 @@ async function C15() {
       await windowConfiguration(driver);
 
       // Inicio de sesión
-      //await loginAdmin(driver, vars);
+      await loginAdmin(driver, vars);
 
       // Cierre de sesión
       await logout(driver);
     });
 
     // Si la prueba pasa, enviamos el resultado a TestRail
-    await sendResultToTestRail('C15-testcase-id', 1, 'Test passed successfully.');
+    await sendResultToTestRail(15, 1, 'Test passed successfully.');
   } catch (error) {
     // Si la prueba falla, enviamos el resultado a TestRail con el error
-    await sendResultToTestRail('C15-testcase-id', 5, `Test failed: ${error.message}`);
+    await sendResultToTestRail(15, 5, `Test failed: ${error.message}`);
   }
 }
 
