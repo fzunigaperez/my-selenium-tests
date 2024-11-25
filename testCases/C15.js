@@ -12,27 +12,17 @@ const {
 
 async function C15() {
   try {
-    // Aquí va el código de la prueba
     await testBase('C15 Log out successfully', async (driver) => {
-      let vars = {};  // Inicializa vars como un objeto vacío
-
-      // Configuración de la ventana
+      let vars = {};
       await windowConfiguration(driver);
-
-      // Inicio de sesión
       await loginAdmin(driver, vars);
-
-      // Cierre de sesión
       await logout(driver);
     });
-
-    // Si la prueba pasa, enviamos el resultado a TestRail
-    await sendResultToTestRail(15, 1, 'Test passed successfully.');
   } catch (error) {
-    // Si la prueba falla, enviamos el resultado a TestRail con el error
-    await sendResultToTestRail(15, 5, `Test failed: ${error.message}`);
+    throw new Error(`C15 failed: ${error.message}`);
   }
 }
+
 
 // Permite ejecutar este archivo directamente
 if (require.main === module) {
