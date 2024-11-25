@@ -11,7 +11,7 @@ async function C90() {
       let vars = {}; // Inicializa vars como un objeto vacío
 
       // Configuración de la ventana
-      //await windowConfiguration(driver);
+      await windowConfiguration(driver);
 
       // Inicio de sesión
       await loginAdmin(driver, vars);
