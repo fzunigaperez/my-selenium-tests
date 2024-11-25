@@ -10,7 +10,7 @@ async function C90() {
     await testBase('C90_Log out successfully', async (driver) => {
       let vars = {};
       await windowConfiguration(driver);
-      await loginAdmin(driver, vars);
+      //await loginAdmin(driver, vars);
       await logout(driver);
     });
   } catch (error) {
