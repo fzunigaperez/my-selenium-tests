@@ -2,12 +2,10 @@ const { Builder } = require('selenium-webdriver'); // Importación completa y pr
 const path = require('path');
 const baseCapabilities = require(path.resolve(__dirname, '../capabilities/capabilities'));
 const testBase = require('./testBase');  //Common
-//const { sendResultToTestRail } = require('../utils/sharedFunctions');
 const {
   windowConfiguration,
   loginAdmin,
   logout,
-  sendResultToTestRail
 } = require('../utils/sharedFunctions'); // Importación de funciones reutilizables
 
 async function C15() {

@@ -1,8 +1,8 @@
 
   const { Builder, By, until } = require('selenium-webdriver');  // Localrun
   const testBase = require('./testBase');  //Common
-  const { windowConfiguration, loginAdmin, logout, sendResultToTestRail } = require('../utils/sharedFunctions');// BS
-  //const { sendResultToTestRail } = require('../utils/sharedFunctions'); 
+  const { windowConfiguration, loginAdmin, logout, } = require('../utils/sharedFunctions');// BS
+  
 
   async function C90() {
     try {
