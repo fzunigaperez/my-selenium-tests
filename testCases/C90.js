@@ -1,7 +1,7 @@
 const { Builder, By, until } = require('selenium-webdriver');  // Localrun
 const testBase = require('./testBase');  //Common
 const { windowConfiguration, loginAdmin, logout } = require('../utils/sharedFunctions'); // BS
-//const { sendResultToTestRail } = require('../utils/sharedFunctions'); 
+const { sendResultToTestRail } = require('../utils/sharedFunctions'); 
 
 async function C90() {
   try {
@@ -20,7 +20,7 @@ async function C90() {
     });
 
     // Si la prueba pasa, enviamos el resultado a TestRail
-    await sendResultToTestRail('C90-testcase-id', 1, 'Test passed successfully.');
+    await sendResultToTestRail(90, 1, 'Test passed successfully.'); // Reemplaza 101 con el ID real
   } catch (error) {
     // Si la prueba falla, enviamos el resultado a TestRail con el error
     await sendResultToTestRail('C90-testcase-id', 5, `Test failed: ${error.message}`);
