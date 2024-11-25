@@ -20,7 +20,7 @@ async function sendResultToTestRail(testCaseId, status, comment = '') {
 
   try {
     const response = await axios.post(url, data, { auth });
-    console.log('Test result sent successfully:', response.data);
+    console.log('TestRail result sent successfully:', response.data);
   } catch (error) {
     console.error('Error sending test result to TestRail:', error.message);
   }
