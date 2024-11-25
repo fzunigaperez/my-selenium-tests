@@ -8,7 +8,7 @@ on:
     inputs:
       test_case:
         description: "Specify the test case(s) to run (e.g., C90, C15 or all for all test cases)"
-        required: true
+        required: false
         default: "all"
 
 jobs:
@@ -31,18 +31,15 @@ jobs:
         env:
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
-          TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USERNAME }}  # Agregar el username de TestRail
-          TESTRAIL_API_KEY: ${{ secrets.TESTRAIL_API_KEY }}    # Agregar la clave API de TestRail
+          TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USERNAME }}
+          TESTRAIL_API_KEY: ${{ secrets.TESTRAIL_API_KEY }}
         run: |
-          TEST_CASES="${{ github.event.inputs.test_case }}"
+          TEST_CASES="${{ github.event.inputs.test_case || 'all' }}"
           echo "Test case(s) input: $TEST_CASES"
-          
-          # Variable para contar errores
-          ERRORS=0
           
           if [ "$TEST_CASES" = "all" ]; then
             echo "Running all tests..."
-            node run-all-tests.js || ERRORS=$((ERRORS+1))
+            node run-all-tests.js || exit 1
           else
             IFS=',' read -ra TEST_ARRAY <<< "$TEST_CASES" # Split by comma
             for TEST_CASE in "${TEST_ARRAY[@]}"; do

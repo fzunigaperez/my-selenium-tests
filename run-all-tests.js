@@ -1,7 +1,6 @@
 const { sendResultToTestRail } = require('./utils/sharedFunctions'); // Importa la función de envío a TestRail
 const C90 = require('./testCases/C90');
 const C15 = require('./testCases/C15');
-// Agrega aquí más tests según sea necesario.
 
 // Función para extraer el testCaseId de sessionName
 function extractTestCaseId(sessionName) {
@@ -12,8 +11,7 @@ function extractTestCaseId(sessionName) {
 // Base para definir las pruebas con sessionNames completos
 const sessionNames = [
   { name: 'C90_Log out successfully', func: C90 },
-  { name: 'C15_Log out successfully', func: C15 },
-  // Agrega aquí más tests con sus nombres y funciones correspondientes
+  { name: 'C15_Login with right credentials as ADMIN', func: C15 },
 ];
 
 // Construcción del array tests con el formato original
@@ -35,6 +33,7 @@ async function runTest(testFunction, testName, testCaseId) {
     console.error(`${testName} failed:`, error.message);
     // Enviar resultado a TestRail (fallido)
     await sendResultToTestRail(testCaseId, 5, `Test failed: ${error.message}`);
+    throw error; // Importante: lanzar el error para propagarlo
   }
 }
 
@@ -53,7 +52,7 @@ async function runAllTests() {
 
   console.log('All tests have been executed.');
 
-  // Si hubo errores, salimos con un código de error
+  // Si hubo errores, mostramos un mensaje y salimos con código de error
   if (errors > 0) {
     console.log(`${errors} test(s) failed.`);
     process.exit(1); // Código de salida indicando fallo
