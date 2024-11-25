@@ -23,18 +23,24 @@ const tests = sessionNames.map(({ name, func }) => ({
 
 // Función para ejecutar una prueba
 async function runTest(testFunction, testName, testCaseId) {
+  let passed = true;
   try {
     console.log(`Running test: ${testName}`);
     await testFunction(); // Ejecuta la función del test
     console.log(`${testName} completed successfully.`);
-    // Enviar resultado a TestRail (pasado)
-    await sendResultToTestRail(testCaseId, 1, 'Test passed successfully.');
   } catch (error) {
+    passed = false;
     console.error(`${testName} failed:`, error.message);
-    // Enviar resultado a TestRail (fallido)
-    await sendResultToTestRail(testCaseId, 5, `Test failed: ${error.message}`);
-    throw error; // Importante: lanzar el error para propagarlo
   }
+
+  // Determinar el estado para TestRail
+  const statusId = passed ? 1 : 5;
+  const comment = passed
+    ? 'Test passed successfully.'
+    : `Test failed: ${testName} encountered an error.`;
+  await sendResultToTestRail(testCaseId, statusId, comment);
+
+  if (!passed) throw new Error(`Test ${testName} failed.`);
 }
 
 // Función para ejecutar todas las pruebas
