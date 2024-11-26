@@ -259,6 +259,9 @@ async function loginToProtonMail(driver, vars = {}) {
   // Hacer clic en el elemento
   await elementToClick.click();
   console.log("El elemento 'Proton Mail Plus' fue encontrado y clicado exitosamente.");
+  //Esperamos a la pagina principal
+  await driver.sleep(1000);
+  await driver.wait(until.elementLocated(By.xpath("//button[normalize-space()='New message']")), 30000);
           
   }
   
@@ -362,7 +365,58 @@ async function loginToProtonMail(driver, vars = {}) {
    
   }
   
-
+  async function confirmLinkURLsOn(driver, vars) {
+    const settingsLinkXPath = "//a[contains(text(), 'All settings')]";
+    const toggleButtonXPath = "//button[contains(., 'Toggle settings')]";
+  
+    // Verificar y hacer clic en el enlace de configuración o botón de alternar
+    const settingsLink = await driver.findElements(By.xpath(settingsLinkXPath));
+  
+    if (settingsLink.length > 0) {
+      await driver.findElement(By.xpath(settingsLinkXPath)).click();
+    } else {
+      await driver.findElement(By.xpath(toggleButtonXPath)).click();
+      await driver.findElement(By.xpath(settingsLinkXPath)).click();
+    }
+  
+    // Esperar a que el dashboard esté cargado
+    await driver.wait(
+      until.elementLocated(By.xpath("//h1[contains(.,'Dashboard')]")),
+      30000
+    );
+  
+    // Navegar a la configuración de mensajes
+    await driver.findElement(By.xpath("//span[@title='Messages and composing']")).click();
+  
+    // Esperar el elemento "Confirm link URLs"
+    await driver.wait(
+      until.elementLocated(By.xpath("//span[contains(.,'Confirm link URLs')]")),
+      30000
+    );
+    await driver.sleep(4000);
+  
+    // Comprobar el estado del toggle
+    vars["toggleOn"] = await driver.findElements(
+      By.xpath("//*[@class='toggle-container toggle-container--checked']")
+    ).length;
+  
+    if (await driver.executeScript("return (arguments[0] == 6)", vars["toggleOn"])) {
+      console.log("All good, the settings are as DEFAULT for link confirmation");
+    } else {
+      console.log("It is necessary to change to DEFAULT CONFIGURATION");
+      await driver.findElement(By.xpath("//span[normalize-space()='Confirm link URLs']")).click();
+    }
+  
+    // Navegar a la bandeja de entrada
+    await driver.findElement(By.xpath("//span[contains(.,'Inbox')]")).click();
+  
+    // Esperar al botón de "Nuevo mensaje"
+    await driver.wait(
+      until.elementLocated(By.xpath("//button[normalize-space()='New message']")),
+      30000
+    );
+  }
+  
 
 
 module.exports = {
@@ -384,4 +438,5 @@ module.exports = {
   loginToProtonMail,
   checkFailedLoginEmail,
   deleteAllEmails,
+  confirmLinkURLsOn,
 };
