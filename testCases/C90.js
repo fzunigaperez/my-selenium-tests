@@ -1,6 +1,6 @@
-const { Builder, By, until } = require('selenium-webdriver');  // Localrun
+const { Builder, By, until } = require('selenium-webdriver');  // Localrun 
 const testBase = require('./testBase');  //Common
-const { windowConfiguration, loginAdmin, logout, } = require('../utils/sharedFunctions');// BS
+const { windowConfiguration, loginAdmin, logout, } = require('../utils/sharedFunctions');// BS.
 
 
 async function C90() {
