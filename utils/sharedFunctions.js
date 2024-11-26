@@ -4,17 +4,41 @@ const axios = require('axios'); // Necesary to send test results
 //const { sendResultToTestRail } = require('../utils/sharedFunctions');
 
 
-
-// Función para enviar resultados a TestRail
-async function sendResultToTestRail(testCaseId, status, comment = '') {
-  const url = `https://testingpxc.testrail.io/index.php?/api/v2/add_result_for_case/37/${testCaseId}`;
+// Función para crear un Test Run en TestRail
+async function createTestRun(projectId, testRunName, testCaseIds = []) {
+  const url = `https://testingpxc.testrail.io/index.php?/api/v2/add_run/${projectId}`;
   const auth = {
-    username: process.env.TESTRAIL_USERNAME,  // Accede a las variables de entorno
+    username: process.env.TESTRAIL_USERNAME, // Configura tus variables de entorno
     password: process.env.TESTRAIL_API_KEY
   };
 
   const data = {
-    status_id: status,  // 1: Passed, 5: Failed, etc.
+    name: testRunName,
+    include_all: testCaseIds.length === 0, // Incluye todos los casos si la lista está vacía
+    case_ids: testCaseIds // Lista de IDs de casos, opcional
+  };
+
+  try {
+    const response = await axios.post(url, data, { auth });
+    console.log('Test run created successfully:', response.data);
+    return response.data; // Retorna los detalles del Test Run (como su ID)
+  } catch (error) {
+    console.error('Error creating test run:', error.message);
+    throw error;
+  }
+}
+
+
+// Función para enviar resultados a TestRail
+async function sendResultToTestRail(testCaseId, status, comment = '', testRunId) {
+  const url = `https://testingpxc.testrail.io/index.php?/api/v2/add_result_for_case/${testRunId}/${testCaseId}`;
+  const auth = {
+    username: process.env.TESTRAIL_USERNAME,
+    password: process.env.TESTRAIL_API_KEY
+  };
+
+  const data = {
+    status_id: status,
     comment: comment
   };
 
@@ -23,8 +47,10 @@ async function sendResultToTestRail(testCaseId, status, comment = '') {
     console.log('TestRail result sent successfully:', response.data);
   } catch (error) {
     console.error('Error sending test result to TestRail:', error.message);
+    throw error;
   }
 }
+
 
 async function acceptCookies(driver) {
   try {
@@ -340,6 +366,7 @@ async function loginToProtonMail(driver, vars = {}) {
 
 
 module.exports = {
+  createTestRun,
   sendResultToTestRail,
   acceptCookies,
   loginLandingPageButton,

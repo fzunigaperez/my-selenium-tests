@@ -1,5 +1,3 @@
-
-
 const { Builder, By, until } = require('selenium-webdriver');  // Localrun
 const testBase = require('./testBase');  //Common
 const { windowConfiguration, loginAdmin, logout, } = require('../utils/sharedFunctions');// BS
