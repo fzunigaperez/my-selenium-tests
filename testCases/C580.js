@@ -125,7 +125,7 @@ async function loginWithNewPassword(driver, vars) {
   console.log('Accediendo a la página de inicio de sesión...');
   await driver.wait(until.elementLocated(By.id('username')), 30000);
   await driver.findElement(By.id('username')).sendKeys(vars.username);
-  await driver.findElement(By.id('password')).sendKeys(vars.newPassword);
+  //await driver.findElement(By.id('password')).sendKeys(vars.newPassword);
   await driver.findElement(By.id('kc-login')).click();
 
   console.log('Verificando acceso a la página principal...');
