@@ -125,10 +125,13 @@ async function loginWithNewPassword(driver, vars) {
   console.log('Accediendo a la página de inicio de sesión...');
   await driver.wait(until.elementLocated(By.id('username')), 30000);
   await driver.findElement(By.id('username')).sendKeys(vars.username);
-  //await driver.findElement(By.id('password')).sendKeys(vars.newPassword);
+  await driver.findElement(By.id('password')).sendKeys(vars.newPassword);
   await driver.findElement(By.id('kc-login')).click();
 
   console.log('Verificando acceso a la página principal...');
+
+  await driver.sleep(1000);
+  await driver.wait(until.elementLocated(By.id("routeTitle")), 50000);
   const routeTitle = await driver.findElement(By.id('routeTitle')).getText();
   assert.strictEqual(routeTitle, 'Device Management Service', 'No se accedió correctamente a la página principal.');
 }
