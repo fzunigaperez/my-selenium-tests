@@ -1,4 +1,4 @@
-const { Builder } = require('selenium-webdriver'); // Importación de Selenium WebDriver
+const { Builder } = require('selenium-webdriver'); // Importación de Selenium WebDrivers
 const path = require('path');
 const baseCapabilities = require(path.resolve(__dirname, '../capabilities/capabilities'));
 
