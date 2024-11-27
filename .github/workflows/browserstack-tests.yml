@@ -2,7 +2,7 @@ name: Run Selenium Tests on BrowserStack
 
 on:
   schedule:
-    - cron: '59 11 * * *'
+    - cron: '0 18 * * *'
   workflow_dispatch:
     inputs:
       test_case:
