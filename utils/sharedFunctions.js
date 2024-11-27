@@ -83,6 +83,19 @@ async function adminCredentials(driver, vars = {}) {
   console.log("Credentials set:", vars);
 }
 
+async function registeredUserCredentials(driver, vars = {}) {
+  vars["username"] = "testingpxc@proton.me";
+  vars["password"] = "Proficloud2022!";
+  console.log("Credentials set:", vars);
+}
+
+async function unregisteredUserCredentials(driver, vars = {}) {
+  vars["username"] = "noregistered_user@proton.me";
+  vars["password"] = "Proficloud2022!";
+  console.log("Credentials set:", vars);
+}
+
+
 async function isTheOrganizationNameEmpty(driver, vars) {
   let attempts = 0; // Contador de intentos
   const maxAttempts = 10; // Número máximo de intentos
@@ -232,6 +245,83 @@ async function loginViewer(driver, vars) {
   await rootOrganizationTest(driver, vars);
 }
 
+async function loginRegisteredUser(driver, vars) {
+  await acceptCookies(driver);
+  await loginLandingPageButton(driver);
+  await registeredUserCredentials(driver, vars);
+  await driver.sleep(1000);
+  await driver.wait(until.elementLocated(By.id("username")), 50000);
+  await driver.findElement(By.id("username")).sendKeys(vars["username"]);
+  await driver.findElement(By.id("password")).sendKeys(vars["password"]);
+  await driver.findElement(By.id("kc-login")).click();
+  await driver.sleep(1000);
+  await isTheOrganizationNameEmpty(driver, vars);
+  await rootOrganizationTest(driver, vars);
+}
+
+
+async function loginUnregisteredUser(driver, vars) {
+  await acceptCookies(driver);
+  await loginLandingPageButton(driver);
+  await unregisteredUserCredentials(driver, vars);
+  await driver.sleep(1000);
+  await driver.wait(until.elementLocated(By.id("username")), 50000);
+  await driver.findElement(By.id("username")).sendKeys(vars["username"]);
+  await driver.findElement(By.id("password")).sendKeys(vars["password"]);
+  await driver.findElement(By.id("kc-login")).click();
+}
+
+
+  
+
+  async function deleteUnregisteredUserInCaseOfExistence(driver, vars) {
+  await loginUnregisteredUser(driver); 
+  await driver.sleep(5000);
+  const invalidUser = await driver.findElements(By.xpath("//span[@class='kc-feedback-text'][contains(.,'Invalid username or password.')]"));
+  const emailVerificationNeeded = await driver.findElements(By.xpath("//span[contains(.,'You need to verify your email address to activate your account.')]"));
+
+  // Obtener la cantidad de elementos encontrados
+  console.log('Cantidad de elementos encontrados para "Invalid username or password":', invalidUser.length);
+  console.log('Cantidad de elementos encontrados para "Email verification needed":', emailVerificationNeeded.length);
+
+  // Verificar si el error es de usuario inválido
+  if (invalidUser.length > 0) {
+    console.log("The user does not exist, no other measures have to be taken.");
+    return;
+  }
+
+  // Verificar si es necesario verificar el correo electrónico
+  if (emailVerificationNeeded.length > 0) {
+    console.log("You need to verify your email address.");
+    await loginToProtonMail(driver, vars);
+    await driver.wait(until.elementLocated(By.css(".active .text-ellipsis")), 30000)
+    await driver.findElement(By.css(".active .text-ellipsis")).click()
+    await driver.wait(until.elementLocated(By.css(".item-subject > .inline-block")), 60000)
+    await driver.findElement(By.css(".item-subject > .inline-block")).click()
+    await driver.switchTo().frame(iframe);
+    await driver.findElement(By.linkText("Verify E-Mail")).click()
+     ///// here observe the window changes after clicking
+    
+
+    return; 
+  }
+
+  // Si el usuario existe, se procede con la eliminación de la cuenta
+  console.log("The user exists, therefore the account has to be deleted.");
+}
+
+
+
+
+
+
+
+
+  //await isTheOrganizationNameEmpty(driver, vars);
+  //await rootOrganizationTest(driver, vars);
+
+
+
 async function loginToProtonMail(driver, vars = {}) {
     await driver.get("https://account.proton.me/login");
        
@@ -263,6 +353,15 @@ async function loginToProtonMail(driver, vars = {}) {
   await driver.sleep(1000);
   await driver.wait(until.elementLocated(By.xpath("//button[normalize-space()='New message']")), 30000);
           
+  }
+
+
+  async function logOutFromProtonMail(driver) {
+    await driver.findElement(By.css(".my-auto > .m-auto")).click()
+    await driver.sleep(1000)
+    await driver.findElement(By.xpath("//button[contains(.,\'Sign out\')]")).click()
+    await driver.sleep(1000)
+    await driver.wait(until.elementLocated(By.css(".sign-layout-title")), 30000)
   }
   
   async function checkFailedLoginEmail(driver) {
@@ -393,19 +492,19 @@ async function loginToProtonMail(driver, vars = {}) {
       until.elementLocated(By.xpath("//span[contains(.,'Confirm link URLs')]")),
       30000
     );
-    await driver.sleep(4000);
+    //await driver.sleep(4000);
   
-    // Comprobar el estado del toggle
-    vars["toggleOn"] = await driver.findElements(
-      By.xpath("//*[@class='toggle-container toggle-container--checked']")
-    ).length;
-  
-    if (await driver.executeScript("return (arguments[0] == 6)", vars["toggleOn"])) {
-      console.log("All good, the settings are as DEFAULT for link confirmation");
-    } else {
-      console.log("It is necessary to change to DEFAULT CONFIGURATION");
-      await driver.findElement(By.xpath("//span[normalize-space()='Confirm link URLs']")).click();
-    }
+      // Comprobar el estado del toggle
+      vars["toggleOn"] = await driver.findElements(
+        By.xpath("//*[@class='toggle-container toggle-container--checked']")
+      ).length;
+    
+      if (await driver.executeScript("return (arguments[0] == 6)", vars["toggleOn"])) {
+        console.log("All good, the settings are as DEFAULT for link confirmation");
+      } else {
+        console.log("It is necessary to change to DEFAULT CONFIGURATION");
+        await driver.findElement(By.xpath("//span[normalize-space()='Confirm link URLs']")).click();
+      }
   
     // Navegar a la bandeja de entrada
     await driver.findElement(By.xpath("//span[contains(.,'Inbox')]")).click();
@@ -425,6 +524,8 @@ module.exports = {
   acceptCookies,
   loginLandingPageButton,
   adminCredentials,
+  unregisteredUserCredentials,
+  registeredUserCredentials,
   isTheOrganizationNameEmpty,
   rootOrganizationTest,
   switchToOriginalOrganization,
@@ -435,8 +536,12 @@ module.exports = {
   loginAdmin,
   loginEditor,
   loginViewer,
+  loginRegisteredUser,
+  loginUnregisteredUser,
   loginToProtonMail,
+  logOutFromProtonMail,
   checkFailedLoginEmail,
   deleteAllEmails,
   confirmLinkURLsOn,
+  deleteUnregisteredUserInCaseOfExistence,
 };

@@ -6,7 +6,9 @@ const {
   windowConfiguration,
   logout,
   loginToProtonMail,
+  logOutFromProtonMail,
   confirmLinkURLsOn,
+  loginUnregisteredUser,
 } = require('../utils/sharedFunctions'); // Importación de funciones reutilizables
 
 async function C13() {
@@ -17,8 +19,12 @@ async function C13() {
         let vars = {};
 
         await windowConfiguration(driver);
-        await loginToProtonMail(driver, vars);
+        /*await loginToProtonMail(driver, vars);
         await confirmLinkURLsOn(driver, vars);
+        await logOutFromProtonMail(driver);*/
+        await windowConfiguration(driver);
+        await loginUnregisteredUser(driver,vars);
+        
 
        
 
