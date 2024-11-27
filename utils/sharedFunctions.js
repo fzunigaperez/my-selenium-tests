@@ -65,16 +65,33 @@ async function acceptCookies(driver) {
       const acceptButton = await driver.wait(until.elementLocated(By.xpath(acceptButtonXPath)), 3000);
       await acceptButton.click();
       console.log("Cookies accepted.");
+    } else {
+      console.log("Cookies banner not found.");
     }
   } catch (error) {
-    console.error("Cookies banner not found or timed out:", error.message);
+    console.warn("Error while handling cookies banner, continuing execution:", error.message);
   }
 }
 
 
 
 async function loginLandingPageButton(driver) {
-  await driver.findElement(By.id("login-button")).click();
+  try {
+    // Wait for the button to be located and visible (max wait time: 5 seconds)
+    const loginButton = await driver.wait(
+      until.elementLocated(By.id("login-button")),
+      5000 // Maximum wait time in milliseconds
+    );
+
+    // Check if the button is displayed
+    if (await loginButton.isDisplayed()) {
+      // Click the button
+      await loginButton.click();
+      console.log("The 'Land page login-button' was clicked successfully.");
+    }
+  } catch (error) {
+    console.error("The Lang Page login-button' does not exist or is not visible:", error.message);
+  }
 }
 
 async function adminCredentials(driver, vars = {}) {
@@ -92,6 +109,8 @@ async function registeredUserCredentials(driver, vars = {}) {
 async function unregisteredUserCredentials(driver, vars = {}) {
   vars["username"] = "noregistered_user@proton.me";
   vars["password"] = "Proficloud2022!";
+  vars["firstName"] = "Unregistered"
+  vars["lastName"] = "User"
   console.log("Credentials set:", vars);
 }
 
@@ -153,6 +172,15 @@ async function switchToOriginalOrganization(driver) {
 
 async function activeOrganization(driver) {
   await driver.findElement(By.xpath("//div[@id='active-organization']/h4")).click();
+}
+
+async function accountSettingsMainMenu(driver) {
+
+  const settingsButton = await driver.wait(until.elementLocated(By.xpath("//div[@class='profile-menu_icon-text__text'][contains(.,'Account Settings')]")),30000);
+
+  // Click the 'Settings' element
+  await settingsButton.click();
+  
 }
 
 async function logout(driver) {
@@ -260,11 +288,11 @@ async function loginRegisteredUser(driver, vars) {
 }
 
 
-async function loginUnregisteredUser(driver, vars) {
+async function loginUnregisteredUser(driver,vars) {
   await acceptCookies(driver);
   await loginLandingPageButton(driver);
-  await unregisteredUserCredentials(driver, vars);
-  await driver.sleep(1000);
+  await unregisteredUserCredentials(driver,vars);
+  //await driver.sleep(5000);
   await driver.wait(until.elementLocated(By.id("username")), 50000);
   await driver.findElement(By.id("username")).sendKeys(vars["username"]);
   await driver.findElement(By.id("password")).sendKeys(vars["password"]);
@@ -275,8 +303,9 @@ async function loginUnregisteredUser(driver, vars) {
   
 
   async function deleteUnregisteredUserInCaseOfExistence(driver, vars) {
-  await loginUnregisteredUser(driver); 
-  await driver.sleep(5000);
+  await windowConfiguration(driver);  
+  await loginUnregisteredUser(driver, vars); 
+  await driver.sleep(2000);
   const invalidUser = await driver.findElements(By.xpath("//span[@class='kc-feedback-text'][contains(.,'Invalid username or password.')]"));
   const emailVerificationNeeded = await driver.findElements(By.xpath("//span[contains(.,'You need to verify your email address to activate your account.')]"));
 
@@ -294,12 +323,21 @@ async function loginUnregisteredUser(driver, vars) {
   if (emailVerificationNeeded.length > 0) {
     console.log("You need to verify your email address.");
     await loginToProtonMail(driver, vars);
-    await driver.wait(until.elementLocated(By.css(".active .text-ellipsis")), 30000)
-    await driver.findElement(By.css(".active .text-ellipsis")).click()
-    await driver.wait(until.elementLocated(By.css(".item-subject > .inline-block")), 60000)
-    await driver.findElement(By.css(".item-subject > .inline-block")).click()
+    await driver.wait(until.elementLocated(By.css(".active .text-ellipsis")), 30000);
+    await driver.findElement(By.css(".active .text-ellipsis")).click();
+    await driver.wait(until.elementLocated(By.css(".item-subject > .inline-block")), 60000);
+    await driver.findElement(By.css(".item-subject > .inline-block")).click();
+    await driver.sleep(3000);
+    const iframe = await driver.wait(until.elementLocated(By.css('iframe')), 10000);
     await driver.switchTo().frame(iframe);
-    await driver.findElement(By.linkText("Verify E-Mail")).click()
+    await driver.findElement(By.linkText("Verify E-Mail")).click();
+    await driver.sleep(10000);
+    const windowHandles = await driver.getAllWindowHandles();
+    console.log('Manejadores de ventanas:', windowHandles);
+    await driver.switchTo().window(windowHandles[1]);
+    await logout(driver);
+
+
      ///// here observe the window changes after clicking
     
 
@@ -308,6 +346,31 @@ async function loginUnregisteredUser(driver, vars) {
 
   // Si el usuario existe, se procede con la eliminación de la cuenta
   console.log("The user exists, therefore the account has to be deleted.");
+  await driver.sleep(2000);
+  await logout(driver);
+  await driver.sleep(2000);
+
+  //HERE FUNCTION TO DELETE THE UNREGSTERED USER
+  await loginUnregisteredUser(driver,vars);
+  await isTheOrganizationNameEmpty(driver);
+  await userMenu(driver);
+  await accountSettingsMainMenu(driver);
+  //Click on delete button 1
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Delete Account')]")), 30000);
+  await driver.findElement(By.xpath("//span[contains(.,'Delete Account')]")).click();
+  //Click on delete button 2
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Delete account')]")), 30000);
+  await driver.findElement(By.xpath("//span[contains(.,'Delete account')]")).click();
+  //Enter Mail 
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,\'Delete account\')]")), 30000)
+  await driver.sleep(1000)
+  await driver.findElement(By.xpath("//input[contains(@placeholder,\'Email\')]")).sendKeys(vars["username"])
+  //Click on delete button 3
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Delete account')]")), 30000);
+  await driver.findElement(By.xpath("//span[contains(.,'Delete account')]")).click();
+  await waitUntilXpathNotPresent(driver, "//div[contains(@class,'pc-status-overlay__icon-container')]");
+
+
 }
 
 
@@ -325,7 +388,7 @@ async function loginUnregisteredUser(driver, vars) {
 async function loginToProtonMail(driver, vars = {}) {
     await driver.get("https://account.proton.me/login");
        
-    vars["mailUsername"] = "testingpxc_viewer@proton.me";
+    vars["mailUsername"] = "testingpxc_admin@proton.me";
     vars["mailPassword"] = "Proficloud2022!";
 
 
@@ -492,7 +555,7 @@ async function loginToProtonMail(driver, vars = {}) {
       until.elementLocated(By.xpath("//span[contains(.,'Confirm link URLs')]")),
       30000
     );
-    //await driver.sleep(4000);
+    await driver.sleep(2000);
   
       // Comprobar el estado del toggle
       vars["toggleOn"] = await driver.findElements(
@@ -516,6 +579,19 @@ async function loginToProtonMail(driver, vars = {}) {
     );
   }
   
+  async function agreeTerms(driver) {
+    await driver.findElement(By.id("mat-mdc-checkbox-1-input")).click();
+    await driver.sleep(1000);
+  }
+
+  async function waitUntilXpathNotPresent(driver, xpathName) {
+    // Espera hasta que el elemento no esté presente
+    await driver.wait(async () => {
+      const desiredXpath = await driver.findElements(By.xpath(xpathName)); // Busca el elemento usando el xpath proporcionado
+      return desiredXpath.length === 0; // Si el número de elementos es 0, entonces no está presente
+    }, 15000); // Esperar hasta 15 segundos
+    console.log(`El elemento con XPath "${xpathName}" ya no está presente en la página.`);
+  }
 
 
 module.exports = {
@@ -532,6 +608,7 @@ module.exports = {
   activeOrganization,
   logout,
   userMenu,
+  accountSettingsMainMenu,
   windowConfiguration,
   loginAdmin,
   loginEditor,
@@ -544,4 +621,6 @@ module.exports = {
   deleteAllEmails,
   confirmLinkURLsOn,
   deleteUnregisteredUserInCaseOfExistence,
+  agreeTerms,
+  waitUntilXpathNotPresent
 };
