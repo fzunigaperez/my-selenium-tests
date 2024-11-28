@@ -6,7 +6,7 @@ async function testBase(sessionName, testSteps) {
   let driver;
 
   // Selector para decidir ejecución local o en BrowserStack
-  let selectLocal = "ON";
+  let selectLocal = "OFF";
 
   if (selectLocal === "ON") {
     console.log("Ejecución local activada.");
