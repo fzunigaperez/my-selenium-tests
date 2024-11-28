@@ -1,12 +1,13 @@
 const { Builder, By, until } = require('selenium-webdriver');  // Localrun 
 const testBase = require('./testBase');  //Common
-const { windowConfiguration, loginAdmin, logout, } = require('../utils/sharedFunctions');// BS.
+const { windowConfiguration, loginAdmin, logout, loginToProtonMail, } = require('../utils/sharedFunctions');// BS.
 
 
 async function C90() {
   try {
     await testBase('C90_Log out successfully', async (driver) => {
       let vars = {};
+            
       await windowConfiguration(driver);
       await loginAdmin(driver, vars);
       await logout(driver);

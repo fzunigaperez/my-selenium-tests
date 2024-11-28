@@ -35,6 +35,25 @@ const invalidUser = await driver.findElements(By.xpath("//span[@class='kc-feedba
   // Si el usuario existe, se procede con la eliminación de la cuenta
   console.log("The user exists, therefore the account has to be deleted.");
 
+
+
+
+
+  async function confirmLinkURLsOn(driver, vars) {
+    const settingsLinkXPath = "//a[contains(text(), 'All settings')]";
+    const toggleButtonXPath = "//button[contains(., 'Toggle settings')]";
+  
+    // Verificar y hacer clic en el enlace de configuración o botón de alternar
+    const settingsLink = await driver.findElements(By.xpath(settingsLinkXPath));
+  
+    if (settingsLink.length > 0) {
+      await driver.findElement(By.xpath(settingsLinkXPath)).click();
+    } else {
+      await driver.findElement(By.xpath(toggleButtonXPath)).click();
+      await driver.findElement(By.xpath(settingsLinkXPath)).click();
+    }
+  }
+
   //❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
 
   // Cambiar el contexto al iframe  necesario para click on mail 
