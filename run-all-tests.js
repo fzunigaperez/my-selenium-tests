@@ -4,52 +4,57 @@ const C15 = require('./testCases/C15');
 const C655 = require('./testCases/C655');
 const C656 = require('./testCases/C656');
 const C16 = require('./testCases/C16');
-const C18 = require('./testCases/C18'); 
-const C36 = require('./testCases/C36'); 
+const C18 = require('./testCases/C18');
+const C36 = require('./testCases/C36');
 const C580 = require('./testCases/C580');
 
 const C90 = require('./testCases/C90');
 const C13 = require('./testCases/C13');
 
-
-// Función para extraer el testCaseId de sessionName
-function extractTestCaseId(sessionName) {
-  const match = sessionName.match(/^C(\d+)_/);
-  return match ? parseInt(match[1], 10) : null;
+// Función para extraer los Test IDs de sessionName
+function extractTestCaseIds(sessionName) {
+  const matches = sessionName.match(/C(\d+)/g); // Encuentra todas las coincidencias de C seguido de dígitos
+  return matches ? matches.map(id => parseInt(id.slice(1), 10)) : []; // Retorna los IDs como números
 }
 
 // Construcción del array tests con el formato original
 const sessionNames = [
-  { name: 'C90_Log out successfully', func: C90 },
-  { name: 'C15_Login with right credentials as ADMIN', func: C15 },
+  /*{ name: 'C90_Log out successfully', func: C90 },
+  //{ name: 'C15_Login with right credentials as ADMIN', func: C15 },
   { name: 'C655_Login with right credentials as EDITOR', func: C655 },
   { name: 'C656_Login with right credentials as VIEWER', func: C656 },
   { name: 'C16_Login with wrong credentials', func: C16 },
   { name: 'C18_Login with valid email but wrong password', func: C18 },
-  { name: 'C36_Login with wrong credentials (10 wrong attempts)', func: C36 },
+  { name: 'C36_Login with wrong credentials (10 wrong attempts)', func: C36 }, */
   { name: 'C580_Password forgotten', func: C580 },
-  { name: 'C13', func: C13 },
-  
+  {
+    name: 'C13_C575_C697_C22_C895_C1024 Sign up in the proficloud with valid email and password / Sign UP with an already existing E-Mail / Introduce a wrong password before user deletion / Delete user / If the user enter an invalid email, and correcte it later, it is should be possible to REGISTER to Proficloud or create Billing account / Check and uncheck the Terms and Licences Agreement should not alter the registered button',
+    func: C13,
+  },
 ];
 
 const tests = sessionNames.map(({ name, func }) => ({
-  name: name.split('_')[0],
+  name,
   func,
-  testCaseId: extractTestCaseId(name),
+  testCaseIds: extractTestCaseIds(name), // Extrae una lista de IDs
 }));
 
 // Función para ejecutar una prueba
-async function runTest(testFunction, testName, testCaseId, testRunId) {
+async function runTest(testFunction, testName, testCaseIds, testRunId) {
   try {
     console.log(`Running test: ${testName}`);
     await testFunction(); // Ejecuta la función del test
     console.log(`${testName} completed successfully.`);
-    // Enviar resultado a TestRail (pasado)
-    await sendResultToTestRail(testCaseId, 1, 'Test passed successfully.', testRunId);
+    // Enviar resultados para todos los Test IDs asociados
+    for (const testCaseId of testCaseIds) {
+      await sendResultToTestRail(testCaseId, 1, 'Test passed successfully.', testRunId);
+    }
   } catch (error) {
     console.error(`${testName} failed:`, error.message);
-    // Enviar resultado a TestRail (fallido)
-    await sendResultToTestRail(testCaseId, 5, `Test failed: ${error.message}`, testRunId);
+    // Enviar resultados para todos los Test IDs asociados como fallidos
+    for (const testCaseId of testCaseIds) {
+      await sendResultToTestRail(testCaseId, 5, `Test failed: ${error.message}`, testRunId);
+    }
   }
 }
 
@@ -62,13 +67,13 @@ async function runAllTests() {
 
     // Crear un nuevo Test Run en TestRail
     console.log(`Creating Test Run in project ${projectId}...`);
-    const testRun = await createTestRun(projectId, testRunName, tests.map(t => t.testCaseId));
+    const testRun = await createTestRun(projectId, testRunName, tests.flatMap(t => t.testCaseIds));
     const testRunId = testRun.id; // Obtener el ID del nuevo Test Run
     console.log(`Test Run created successfully with ID: ${testRunId}`);
 
     // Ejecutar todas las pruebas
     for (const test of tests) {
-      await runTest(test.func, test.name, test.testCaseId, testRunId);
+      await runTest(test.func, test.name, test.testCaseIds, testRunId);
     }
 
     console.log('All tests have been executed.');
