@@ -9,6 +9,7 @@ const C36 = require('./testCases/C36');
 const C580 = require('./testCases/C580');
 
 const C90 = require('./testCases/C90');
+const C13 = require('./testCases/C13');
 
 
 // Función para extraer el testCaseId de sessionName
@@ -26,7 +27,8 @@ const sessionNames = [
   { name: 'C16_Login with wrong credentials', func: C16 },
   { name: 'C18_Login with valid email but wrong password', func: C18 },
   { name: 'C36_Login with wrong credentials (10 wrong attempts)', func: C36 },
-  { name: 'C580_Password forgotten', func: C580 }
+  { name: 'C580_Password forgotten', func: C580 },
+  { name: 'C13', func: C13 },
   
 ];
 
