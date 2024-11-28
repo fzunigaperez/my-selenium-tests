@@ -210,7 +210,7 @@ async function loginAdmin(driver, vars) {
   await driver.findElement(By.id("username")).sendKeys(vars["username"]);
   await driver.findElement(By.id("password")).sendKeys(vars["password"]);
   await driver.findElement(By.id("kc-login")).click();
-  await driver.sleep(1000);
+  //await driver.sleep(1000);
   await isTheOrganizationNameEmpty(driver, vars);
   await rootOrganizationTest(driver, vars);
 }
@@ -336,9 +336,11 @@ async function loginUnregisteredUser(driver,vars) {
     console.log('Manejadores de ventanas:', windowHandles);
     await driver.switchTo().window(windowHandles[1]);
     await logout(driver);
+    await loginAsUnregisteredUserAndDeleteAccount(driver,vars) 
+    
 
 
-     ///// here observe the window changes after clicking
+     
     
 
     return; 
@@ -351,8 +353,10 @@ async function loginUnregisteredUser(driver,vars) {
   await driver.sleep(2000);
 
   //HERE FUNCTION TO DELETE THE UNREGSTERED USER
+
+  /*await windowConfiguration(driver, vars);
   await loginUnregisteredUser(driver,vars);
-  await isTheOrganizationNameEmpty(driver);
+  await isTheOrganizationNameEmpty(driver, vars);
   await userMenu(driver);
   await accountSettingsMainMenu(driver);
   //Click on delete button 1
@@ -368,14 +372,37 @@ async function loginUnregisteredUser(driver,vars) {
   //Click on delete button 3
   await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Delete account')]")), 30000);
   await driver.findElement(By.xpath("//span[contains(.,'Delete account')]")).click();
-  await waitUntilXpathNotPresent(driver, "//div[contains(@class,'pc-status-overlay__icon-container')]");
+  await waitingLoadingRingProficloudToDissapear(driver);*/
+  await loginAsUnregisteredUserAndDeleteAccount(driver,vars);
 
 
 }
 
 
 
-
+async function loginAsUnregisteredUserAndDeleteAccount(driver,vars) {
+  
+  await windowConfiguration(driver, vars);
+  await loginUnregisteredUser(driver,vars);
+  await isTheOrganizationNameEmpty(driver, vars);
+  await userMenu(driver);
+  await accountSettingsMainMenu(driver);
+  //Click on delete button 1
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Delete Account')]")), 30000);
+  await driver.findElement(By.xpath("//span[contains(.,'Delete Account')]")).click();
+  //Click on delete button 2
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Delete account')]")), 30000);
+  await driver.findElement(By.xpath("//span[contains(.,'Delete account')]")).click();
+  
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,\'Delete account\')]")), 30000);
+  //Enter Mail 
+  await driver.wait(until.elementLocated(By.xpath("//input[contains(@placeholder,\'Email\')]")), 30000);
+  await driver.findElement(By.xpath("//input[contains(@placeholder,\'Email\')]")).sendKeys(vars["username"]);
+  //Click on delete button 3
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Delete account')]")), 30000);
+  await driver.findElement(By.xpath("//span[contains(.,'Delete account')]")).click();
+  await waitingLoadingRingProficloudToDissapear(driver);
+}
 
 
 
@@ -578,10 +605,52 @@ async function loginToProtonMail(driver, vars = {}) {
       30000
     );
   }
+
+  async function enterRegistrationData(driver, vars) {
+    
+    //REGISTRATION
+
+        // C895 If the user enter an invalid email, and correct it later, it is should be possible to REGISTER to Proficloud or create Billing account.
+
+      
+        
+       await driver.findElement(By.xpath("//input[@placeholder=\'Organization name\']")).sendKeys("Unregistered Orga");
+       await driver.findElement(By.xpath("//input[@placeholder=\'Email\']")).sendKeys("thisEmailNotValid@");
+       await driver.findElement(By.xpath("//div[@class=\'title\'][contains(.,\'Registration\')]")).click();
+       await driver.sleep(1000);
+     
+       await driver.findElements(By.xpath("//app-icon[@name=\'warning\']//*[name()=\'svg\']//*[name()=\'path\' and contains(@class,\'ng-star-in\')]"));
+         
+       await driver.findElement(By.xpath("//input[@placeholder=\'Email\']")).clear();
+       await driver.findElement(By.xpath("//input[@placeholder=\'Email\']")).sendKeys(vars["username"]);
+       await driver.findElement(By.id("mat-select-value-1")).click();
+       await driver.findElement(By.xpath("//span[contains(.,\'Spain\')]")).click();
+       await driver.findElement(By.xpath("//input[@placeholder=\'First name\']")).sendKeys(vars["firstName"]);
+       await driver.findElement(By.xpath("//input[@placeholder=\'Last name\']")).sendKeys(vars["lastName"]);
+       await driver.findElement(By.xpath("//input[@placeholder=\'Password\']")).sendKeys(vars["password"]);
+       await driver.findElement(By.xpath("//input[contains(@placeholder,\'Confirm password\')]")).sendKeys(vars["password"]);
+       await driver.sleep(1000);
+
+
+       // C1024  Check and uncheck the Terms and Licences Agreement should not alter the registered button
+       await driver.findElements(By.xpath("//*[@disabled=\'true\'][contains(.,\'Register\')]"));
+
+       // Agree terms
+       await agreeTerms(driver);
+       //Assert that Register button is deactivated
+       const buttonRegisterDisabled = await driver.findElements(By.xpath("//*[@disabled=\'true\'][contains(.,\'Register\')]"));
+       assert(!buttonRegisterDisabled.length);
+       await agreeTerms(driver);
+       await driver.findElements(By.xpath("//*[@disabled=\'true\'][contains(.,\'Register\')]"));
+       await agreeTerms(driver);
+       assert(!buttonRegisterDisabled.length);
+       await driver.findElement(By.xpath("//span[contains(.,\'Register\')]")).click();
+  }
+
   
   async function agreeTerms(driver) {
     await driver.findElement(By.id("mat-mdc-checkbox-1-input")).click();
-    await driver.sleep(1000);
+    await driver.sleep(2000);
   }
 
   async function waitUntilXpathNotPresent(driver, xpathName) {
@@ -592,6 +661,14 @@ async function loginToProtonMail(driver, vars = {}) {
     }, 15000); // Esperar hasta 15 segundos
     console.log(`El elemento con XPath "${xpathName}" ya no está presente en la página.`);
   }
+
+  async function waitingLoadingRingProficloudToDissapear(driver) {
+
+    await waitUntilXpathNotPresent(driver, "//div[contains(@class,'pc-status-overlay__icon-container')]");  
+    await driver.sleep(1000);
+  }
+  
+
 
 
 module.exports = {
@@ -619,8 +696,10 @@ module.exports = {
   logOutFromProtonMail,
   checkFailedLoginEmail,
   deleteAllEmails,
+  enterRegistrationData,
   confirmLinkURLsOn,
   deleteUnregisteredUserInCaseOfExistence,
-  agreeTerms,
-  waitUntilXpathNotPresent
+  loginAsUnregisteredUserAndDeleteAccount,
+  waitUntilXpathNotPresent,
+  waitingLoadingRingProficloudToDissapear,
 };

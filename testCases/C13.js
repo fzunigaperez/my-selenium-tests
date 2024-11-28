@@ -15,6 +15,8 @@ const {
   waitUntilXpathNotPresent,
   loginLandingPageButton,
   acceptCookies,
+  waitingLoadingRingProficloudToDissapear,
+  enterRegistrationData,
 } = require('../utils/sharedFunctions'); // Importación de funciones reutilizables
 
 async function C13() {
@@ -41,6 +43,7 @@ async function C13() {
         //await loginLandingPageButton(driver);
 
         await driver.wait(until.elementLocated(By.id("registration-button")), 30000).click();
+        await enterRegistrationData (driver, vars);
 
         //REGISTRATION
 
@@ -48,7 +51,7 @@ async function C13() {
 
        // await driver.findElement(By.id("registration-button")).click();
         
-          await driver.findElement(By.xpath("//input[@placeholder=\'Organization name\']")).sendKeys("Unregistered Orga");
+         /* await driver.findElement(By.xpath("//input[@placeholder=\'Organization name\']")).sendKeys("Unregistered Orga");
           await driver.findElement(By.xpath("//input[@placeholder=\'Email\']")).sendKeys("thisEmailNotValid@");
           await driver.findElement(By.xpath("//div[@class=\'title\'][contains(.,\'Registration\')]")).click();
           await driver.sleep(1000);
@@ -78,10 +81,11 @@ async function C13() {
           await driver.findElements(By.xpath("//*[@disabled=\'true\'][contains(.,\'Register\')]"));
           await agreeTerms(driver);
           assert(!buttonRegisterDisabled.length);
-          await driver.findElement(By.xpath("//span[contains(.,\'Register\')]")).click()
+          await driver.findElement(By.xpath("//span[contains(.,\'Register\')]")).click();*/
 
 
-          await waitUntilXpathNotPresent(driver, "//div[contains(@class,'pc-status-overlay__icon-container')]");
+          // Waiting the loading Ring to dissapear
+          await waitingLoadingRingProficloudToDissapear (driver);
 
 
           
