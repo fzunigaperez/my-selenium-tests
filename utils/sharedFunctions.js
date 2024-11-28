@@ -322,27 +322,10 @@ async function loginUnregisteredUser(driver,vars) {
   // Verificar si es necesario verificar el correo electrónico
   if (emailVerificationNeeded.length > 0) {
     console.log("You need to verify your email address.");
-    await loginToProtonMail(driver, vars);
-    await driver.wait(until.elementLocated(By.css(".active .text-ellipsis")), 30000);
-    await driver.findElement(By.css(".active .text-ellipsis")).click();
-    await driver.wait(until.elementLocated(By.css(".item-subject > .inline-block")), 60000);
-    await driver.findElement(By.css(".item-subject > .inline-block")).click();
-    await driver.sleep(3000);
-    const iframe = await driver.wait(until.elementLocated(By.css('iframe')), 10000);
-    await driver.switchTo().frame(iframe);
-    await driver.findElement(By.linkText("Verify E-Mail")).click();
-    await driver.sleep(10000);
-    const windowHandles = await driver.getAllWindowHandles();
-    console.log('Manejadores de ventanas:', windowHandles);
-    await driver.switchTo().window(windowHandles[1]);
-    await logout(driver);
+    
+    await emailVerification(driver,vars);
     await loginAsUnregisteredUserAndDeleteAccount(driver,vars) 
-    
-
-
-     
-    
-
+          
     return; 
   }
 
@@ -351,32 +334,48 @@ async function loginUnregisteredUser(driver,vars) {
   await driver.sleep(2000);
   await logout(driver);
   await driver.sleep(2000);
-
-  //HERE FUNCTION TO DELETE THE UNREGSTERED USER
-
-  /*await windowConfiguration(driver, vars);
-  await loginUnregisteredUser(driver,vars);
-  await isTheOrganizationNameEmpty(driver, vars);
-  await userMenu(driver);
-  await accountSettingsMainMenu(driver);
-  //Click on delete button 1
-  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Delete Account')]")), 30000);
-  await driver.findElement(By.xpath("//span[contains(.,'Delete Account')]")).click();
-  //Click on delete button 2
-  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Delete account')]")), 30000);
-  await driver.findElement(By.xpath("//span[contains(.,'Delete account')]")).click();
-  //Enter Mail 
-  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,\'Delete account\')]")), 30000)
-  await driver.sleep(1000)
-  await driver.findElement(By.xpath("//input[contains(@placeholder,\'Email\')]")).sendKeys(vars["username"])
-  //Click on delete button 3
-  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Delete account')]")), 30000);
-  await driver.findElement(By.xpath("//span[contains(.,'Delete account')]")).click();
-  await waitingLoadingRingProficloudToDissapear(driver);*/
   await loginAsUnregisteredUserAndDeleteAccount(driver,vars);
 
-
 }
+
+async function emailVerification(driver,vars) {
+
+  await loginToProtonMail(driver, vars);
+  await driver.wait(until.elementLocated(By.css(".active .text-ellipsis")), 30000);
+  await driver.findElement(By.css(".active .text-ellipsis")).click();
+  await driver.wait(until.elementLocated(By.css(".item-subject > .inline-block")), 60000);
+  await driver.findElement(By.css(".item-subject > .inline-block")).click();
+  await driver.sleep(3000);
+  const iframe = await driver.wait(until.elementLocated(By.css('iframe')), 10000);
+  await driver.switchTo().frame(iframe);
+  await driver.findElement(By.linkText("Verify E-Mail")).click();
+  await driver.sleep(5000);
+  // Obtener todos los manejadores de ventanas y seleccionar el último
+  const windowHandles = await driver.getAllWindowHandles();
+  console.log('Manejadores de ventanas:', windowHandles);
+  // Cambiar a la ventana más reciente
+  const latestWindow = windowHandles[windowHandles.length - 1]; // Seleccionar el último manejador
+  await driver.switchTo().window(latestWindow);
+  console.log('Cambiado a la ventana más reciente.');
+
+  await driver.sleep(2000);
+  const loginDataPagePresent = await driver.findElements(By.xpath("//h1[normalize-space()='Login']"));
+  console.log('Cantidad de elementos encontrados para "loginDataPagePresent":', loginDataPagePresent.length);
+  if (loginDataPagePresent.length > 0) {
+    console.log("Log out not necessary");
+  } else {
+    console.log("Log out necessary");
+    await logout(driver);
+  }
+}
+  
+
+
+ 
+
+
+  
+
 
 
 
@@ -391,10 +390,11 @@ async function loginAsUnregisteredUserAndDeleteAccount(driver,vars) {
   await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Delete Account')]")), 30000);
   await driver.findElement(By.xpath("//span[contains(.,'Delete Account')]")).click();
   //Click on delete button 2
+  await driver.sleep(500);
   await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Delete account')]")), 30000);
   await driver.findElement(By.xpath("//span[contains(.,'Delete account')]")).click();
-  
-  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,\'Delete account\')]")), 30000);
+  await driver.sleep(500);
+  await driver.wait(until.elementLocated(By.xpath("//div[@data-analytics='modal headline'][contains(.,'Confirmation required')]")), 30000);
   //Enter Mail 
   await driver.wait(until.elementLocated(By.xpath("//input[contains(@placeholder,\'Email\')]")), 30000);
   await driver.findElement(By.xpath("//input[contains(@placeholder,\'Email\')]")).sendKeys(vars["username"]);
@@ -405,45 +405,63 @@ async function loginAsUnregisteredUserAndDeleteAccount(driver,vars) {
 }
 
 
-
-
-  //await isTheOrganizationNameEmpty(driver, vars);
-  //await rootOrganizationTest(driver, vars);
-
-
-
 async function loginToProtonMail(driver, vars = {}) {
-    await driver.get("https://account.proton.me/login");
-       
-    vars["mailUsername"] = "testingpxc_admin@proton.me";
-    vars["mailPassword"] = "Proficloud2022!";
+  try {
+      // Navegar a la URL de inicio de sesión
+      await driver.get("https://mail.proton.me/");
 
+      // Verificar si el usuario está autenticado o si necesita iniciar sesión
+      const isLoggedIn = await driver.findElements(By.xpath("//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]"));
 
-    // Esperar que el campo de nombre de usuario esté disponible
-  const usernameField = await driver.wait(until.elementLocated(By.id("username")), 10000);
-  await driver.wait(until.elementIsVisible(usernameField), 10000); // Esperar visibilidad
-      
-  
-      await driver.wait(until.elementLocated(By.id("username")), 10000);
-      await driver.findElement(By.id("username")).sendKeys(vars["mailUsername"]);
-      await driver.findElement(By.id("password")).sendKeys(vars["mailPassword"]);
-      await driver.findElement(By.css('button[type="submit"]')).click();
+      if (isLoggedIn.length > 0) {
+          console.log("Usuario ya autenticado. Procediendo directamente a 'Proton Mail Plus'.");
 
-  //const elementToClickXpath = "//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]";   
-  const elementToClick = await driver.wait(until.elementLocated(By.xpath("//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]")), 30000);
-  
-  // Esperar a que el elemento esté visible y habilitado
-  await driver.wait(until.elementIsVisible(elementToClick), 30000);
-  await driver.wait(until.elementIsEnabled(elementToClick), 30000);
+          const elementToClick = await driver.wait(
+              until.elementLocated(By.xpath("//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]")),
+              10000
+          );
 
-  // Hacer clic en el elemento
-  await elementToClick.click();
-  console.log("El elemento 'Proton Mail Plus' fue encontrado y clicado exitosamente.");
-  //Esperamos a la pagina principal
-  await driver.sleep(1000);
-  await driver.wait(until.elementLocated(By.xpath("//button[normalize-space()='New message']")), 30000);
-          
+          await driver.wait(until.elementIsVisible(elementToClick), 10000);
+          await elementToClick.click();
+          console.log("Clic en 'Proton Mail Plus' exitoso.");
+
+      } else {
+          console.log("Usuario no autenticado. Procediendo con inicio de sesión.");
+
+          // Variables de usuario
+          vars["mailUsername"] = "testingpxc_admin@proton.me";
+          vars["mailPassword"] = "Proficloud2022!";
+
+          // Esperar a que el campo de usuario esté disponible
+          const usernameField = await driver.wait(until.elementLocated(By.id("username")), 10000);
+          await usernameField.sendKeys(vars["mailUsername"]);
+
+          // Esperar a que el campo de contraseña esté disponible y enviar los datos
+          const passwordField = await driver.wait(until.elementLocated(By.id("password")), 10000);
+          await passwordField.sendKeys(vars["mailPassword"]);
+
+          // Clic en el botón de inicio de sesión
+          const submitButton = await driver.wait(until.elementLocated(By.css('button[type="submit"]')), 10000);
+          await submitButton.click();
+          console.log("Credenciales ingresadas. Esperando a 'Proton Mail Plus'...");
+
+          // Esperar a que 'Proton Mail Plus' esté disponible
+          const elementToClick = await driver.wait(
+              until.elementLocated(By.xpath("//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]")),
+              10000
+          );
+
+          await driver.wait(until.elementIsVisible(elementToClick), 50000);
+          await elementToClick.click();
+          console.log("Clic en 'Proton Mail Plus' exitoso.");
+      }
+  } catch (err) {
+      console.error("Ocurrió un error:", err);
   }
+}
+
+ 
+  
 
 
   async function logOutFromProtonMail(driver) {
@@ -645,6 +663,7 @@ async function loginToProtonMail(driver, vars = {}) {
        await agreeTerms(driver);
        assert(!buttonRegisterDisabled.length);
        await driver.findElement(By.xpath("//span[contains(.,\'Register\')]")).click();
+       
   }
 
   
@@ -697,6 +716,7 @@ module.exports = {
   checkFailedLoginEmail,
   deleteAllEmails,
   enterRegistrationData,
+  emailVerification,
   confirmLinkURLsOn,
   deleteUnregisteredUserInCaseOfExistence,
   loginAsUnregisteredUserAndDeleteAccount,
