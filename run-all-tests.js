@@ -19,13 +19,13 @@ function extractTestCaseIds(sessionName) {
 
 // Construcción del array tests con el formato original
 const sessionNames = [
-  /*{ name: 'C90_Log out successfully', func: C90 },
-  //{ name: 'C15_Login with right credentials as ADMIN', func: C15 },
+  { name: 'C90_Log out successfully', func: C90 },
+  { name: 'C15_Login with right credentials as ADMIN', func: C15 },
   { name: 'C655_Login with right credentials as EDITOR', func: C655 },
   { name: 'C656_Login with right credentials as VIEWER', func: C656 },
   { name: 'C16_Login with wrong credentials', func: C16 },
   { name: 'C18_Login with valid email but wrong password', func: C18 },
-  { name: 'C36_Login with wrong credentials (10 wrong attempts)', func: C36 }, */
+  { name: 'C36_Login with wrong credentials (10 wrong attempts)', func: C36 },
   { name: 'C580_Password forgotten', func: C580 },
   {
     name: 'C13_C575_C697_C22_C895_C1024 Sign up in the proficloud with valid email and password / Sign UP with an already existing E-Mail / Introduce a wrong password before user deletion / Delete user / If the user enter an invalid email, and correcte it later, it is should be possible to REGISTER to Proficloud or create Billing account / Check and uncheck the Terms and Licences Agreement should not alter the registered button',

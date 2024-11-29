@@ -397,6 +397,31 @@ async function loginAsUnregisteredUserAndDeleteAccount(driver,vars) {
   await driver.wait(until.elementLocated(By.xpath("//div[@data-analytics='modal headline'][contains(.,'Confirmation required')]")), 30000);
   //Enter Mail 
   await driver.wait(until.elementLocated(By.xpath("//input[contains(@placeholder,\'Email\')]")), 30000);
+
+  //C697 Introduce a wrong password before user deletion 
+  await driver.findElement(By.xpath("//input[contains(@placeholder,\'Email\')]")).sendKeys("thiIs@badMail");
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Delete account')]")), 30000);
+  await driver.findElement(By.xpath("//span[contains(.,'Delete account')]")).click();
+  await driver.wait(until.elementLocated(By.xpath("//span[@class='pc-status-overlay__message'][contains(.,'It was not possible to delete your account. The email you provided was incorrect.')]")), 30000);
+  //Closing the warning message
+  const element = await driver.wait(until.elementLocated(By.xpath("/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/pc-status-overlay[1]/pc-overlay[1]/div[1]/div[2]/div[1]/div[1]/app-icon[1]/*[name()='svg'][1]")), 30000);
+  await element.click();
+
+  await driver.sleep(2000);
+  await driver.wait(until.elementLocated(By.css('[name="cross"]')), 30000).click();
+  await driver.sleep(2000);
+
+  //Click on delete button 1
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Delete Account')]")), 30000);
+  await driver.findElement(By.xpath("//span[contains(.,'Delete Account')]")).click();
+  //Click on delete button 2
+  await driver.sleep(500);
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Delete account')]")), 30000);
+  await driver.findElement(By.xpath("//span[contains(.,'Delete account')]")).click();
+  await driver.sleep(500);
+  await driver.wait(until.elementLocated(By.xpath("//div[@data-analytics='modal headline'][contains(.,'Confirmation required')]")), 30000);
+  //We enter now the correct credentials for deleting the account
+  await driver.findElement(By.xpath("//input[contains(@placeholder,\'Email\')]")).clear();
   await driver.findElement(By.xpath("//input[contains(@placeholder,\'Email\')]")).sendKeys(vars["username"]);
   //Click on delete button 3
   await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Delete account')]")), 30000);
@@ -460,7 +485,10 @@ async function loginToProtonMail(driver, vars = {}) {
   }
 }
 
- 
+ async function modalClose(driver, until) {
+  await driver.wait(until.elementLocated(By.id("modal-close")), 5000).click();
+  
+ }
   
 
 
@@ -473,7 +501,7 @@ async function loginToProtonMail(driver, vars = {}) {
   }
   
   async function checkFailedLoginEmail(driver) {
-    await driver.sleep(10000);  
+    await driver.sleep(5000);  
     const elementLocator = By.css(".item-subject > .inline-block");
     const firstMail = await driver.wait(until.elementLocated(elementLocator),60000);
     await driver.wait(until.elementIsVisible(firstMail), 60000);
@@ -513,6 +541,7 @@ async function loginToProtonMail(driver, vars = {}) {
         30000
     );
     await driver.wait(until.elementIsEnabled(allMailButton), 30000);
+    await driver.sleep(2000);
     await allMailButton.click();
 
     // Seleccionar todos los correos
@@ -573,56 +602,63 @@ async function loginToProtonMail(driver, vars = {}) {
   }
   
   async function confirmLinkURLsOn(driver, vars) {
-    const settingsLinkXPath = "//a[contains(text(), 'All settings')]";
-    const toggleButtonXPath = "//button[contains(., 'Toggle settings')]";
-  
-    // Verificar y hacer clic en el enlace de configuración o botón de alternar
-    const settingsLink = await driver.findElements(By.xpath(settingsLinkXPath));
-  
-    if (settingsLink.length > 0) {
-      await driver.findElement(By.xpath(settingsLinkXPath)).click();
-    } else {
-      await driver.findElement(By.xpath(toggleButtonXPath)).click();
-      await driver.findElement(By.xpath(settingsLinkXPath)).click();
-    }
-  
-    // Esperar a que el dashboard esté cargado
-    await driver.wait(
-      until.elementLocated(By.xpath("//h1[contains(.,'Dashboard')]")),
-      30000
-    );
-  
-    // Navegar a la configuración de mensajes
-    await driver.findElement(By.xpath("//span[@title='Messages and composing']")).click();
-  
-    // Esperar el elemento "Confirm link URLs"
-    await driver.wait(
-      until.elementLocated(By.xpath("//span[contains(.,'Confirm link URLs')]")),
-      30000
-    );
-    await driver.sleep(2000);
-  
-      // Comprobar el estado del toggle
-      vars["toggleOn"] = await driver.findElements(
-        By.xpath("//*[@class='toggle-container toggle-container--checked']")
-      ).length;
     
-      if (await driver.executeScript("return (arguments[0] == 6)", vars["toggleOn"])) {
-        console.log("All good, the settings are as DEFAULT for link confirmation");
+      const settingsLinkXPath = "//a[contains(text(), 'All settings')]";
+      const toggleButtonXPath = "//button[contains(., 'Toggle settings')]";
+  
+      // Verificar y hacer clic en el enlace de configuración o botón de alternar
+      const settingsLink = await driver.findElements(By.xpath(settingsLinkXPath));
+      const toggleButton = await driver.findElements(By.xpath(toggleButtonXPath));
+  
+      if (settingsLink.length > 0) {
+        await settingsLink[0].click();
+      } else if (toggleButton.length > 0) {
+        await toggleButton[0].click();
+        await driver.findElement(By.xpath(settingsLinkXPath)).click();
       } else {
-        console.log("It is necessary to change to DEFAULT CONFIGURATION");
-        await driver.findElement(By.xpath("//span[normalize-space()='Confirm link URLs']")).click();
+        throw new Error("Neither settings link nor toggle button found.");
       }
   
-    // Navegar a la bandeja de entrada
-    await driver.findElement(By.xpath("//span[contains(.,'Inbox')]")).click();
+      // Esperar a que el dashboard esté cargado
+      await driver.wait(until.elementLocated(By.xpath("//h1[contains(.,'Dashboard')]")), 30000);
   
-    // Esperar al botón de "Nuevo mensaje"
-    await driver.wait(
-      until.elementLocated(By.xpath("//button[normalize-space()='New message']")),
-      30000
-    );
+      // Navegar a la configuración de mensajes
+      await driver.findElement(By.xpath("//span[@title='Messages and composing']")).click();
+  
+      // Esperar el elemento "Confirm link URLs"
+      await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Confirm link URLs')]")), 30000);
+      await driver.sleep(2000);
+
+      const numberOfTogglesActivated = await driver.findElements(By.xpath("//*[@class='toggle-container toggle-container--checked']"));
+
+
+
+  // Obtener la cantidad de elementos encontrados
+  console.log('Number of toggle elements activated":', numberOfTogglesActivated.length);
+  
+
+  if (numberOfTogglesActivated.length == 6) {
+    console.log("All good the link confirmation is deactivated");
+    return;
   }
+
+  
+  if (numberOfTogglesActivated.length > 6) {
+    console.log("Link confirmation is ACTIVATED, thus we need to deactivate for avoiding problems");
+    await driver.wait(until.elementLocated(By.xpath("//span[normalize-space()='Confirm link URLs']")), 30000).click();
+
+    return; 
+  }
+
+  
+
+
+
+
+  
+    
+  }
+  
 
   async function enterRegistrationData(driver, vars) {
     
@@ -701,6 +737,7 @@ module.exports = {
   isTheOrganizationNameEmpty,
   rootOrganizationTest,
   switchToOriginalOrganization,
+  modalClose,
   activeOrganization,
   logout,
   userMenu,

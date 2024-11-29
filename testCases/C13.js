@@ -12,6 +12,7 @@ const {
   loginToProtonMail,
   deleteAllEmails,
   logOutFromProtonMail,
+  confirmLinkURLsOn,
 } = require('../utils/sharedFunctions'); // Importación de funciones reutilizables
 
 async function C13() {
@@ -21,8 +22,12 @@ async function C13() {
       async (driver) => {
         let vars = {};
 
-             
+        await windowConfiguration(driver);
+        await loginToProtonMail(driver,vars);
+        await confirmLinkURLsOn(driver,vars,until);     
+        await logOutFromProtonMail(driver);
         await deleteUnregisteredUserInCaseOfExistence(driver,vars);
+        
         
         await windowConfiguration(driver);
         await driver.wait(until.elementLocated(By.id("registration-button")), 30000).click();
@@ -32,27 +37,16 @@ async function C13() {
         
         await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Register')]")), 2000).click();
         await enterRegistrationData(driver, vars);
-        //await driver.sleep(10000);
-
-
-       
+              
         await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'You are already registered. Please check the inbox of your given email address. If you experience any trouble, please contact our support.')]")), 30000);
         await driver.wait(until.elementLocated(By.id("modal-close")), 5000).click();
-        //await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Register')]")), 2000).click();
-
+        
 
         await emailVerification(driver,vars);
         await loginAsUnregisteredUserAndDeleteAccount(driver,vars);
         await loginToProtonMail(driver,vars);
         await deleteAllEmails(driver,vars);
         await logOutFromProtonMail(driver);
-
-
-
-
-        
-
-
 
       }
     );
