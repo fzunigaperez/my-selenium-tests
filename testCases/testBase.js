@@ -27,7 +27,7 @@ async function testBase(sessionName, testSteps) {
     } finally {
       if (driver) {
         await driver.quit();
-        console.log('🚪 Sesión del driver cerrada.');
+        console.log('🗝️ Sesión del driver cerrada.');
       }
     }
 
