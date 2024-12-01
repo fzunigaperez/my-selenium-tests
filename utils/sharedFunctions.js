@@ -114,6 +114,11 @@ async function unregisteredUserCredentials(driver, vars = {}) {
   console.log("Credentials set:", vars);
 }
 
+async function changeOrgaUserNameCredentials(driver, vars = {}) {
+  vars["username"] = "change_orga_name@proton.me";
+  vars["password"] = "Proficloud2022!";
+  console.log("Credentials set:", vars);
+}
 
 async function isTheOrganizationNameEmpty(driver, vars) {
   let attempts = 0; // Contador de intentos
@@ -300,7 +305,19 @@ async function loginUnregisteredUser(driver,vars) {
 }
 
 
-  
+async function loginChangeOrgaUserName(driver, vars) {
+  await acceptCookies(driver);
+  await loginLandingPageButton(driver);
+  await adminCredentials(driver, vars);
+  await driver.sleep(1000);
+  await driver.wait(until.elementLocated(By.id("username")), 50000);
+  await driver.findElement(By.id("username")).sendKeys(vars["username"]);
+  await driver.findElement(By.id("password")).sendKeys(vars["password"]);
+  await driver.findElement(By.id("kc-login")).click();
+  //await driver.sleep(1000);
+  await isTheOrganizationNameEmpty(driver, vars);
+  await rootOrganizationTest(driver, vars);
+}
 
   async function deleteUnregisteredUserInCaseOfExistence(driver, vars) {
   await windowConfiguration(driver);  
@@ -734,6 +751,7 @@ module.exports = {
   adminCredentials,
   unregisteredUserCredentials,
   registeredUserCredentials,
+  changeOrgaUserNameCredentials,
   isTheOrganizationNameEmpty,
   rootOrganizationTest,
   switchToOriginalOrganization,
@@ -748,6 +766,7 @@ module.exports = {
   loginViewer,
   loginRegisteredUser,
   loginUnregisteredUser,
+  loginChangeOrgaUserName,
   loginToProtonMail,
   logOutFromProtonMail,
   checkFailedLoginEmail,
