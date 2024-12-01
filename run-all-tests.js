@@ -1,5 +1,9 @@
 const { sendResultToTestRail, createTestRun } = require('./utils/sharedFunctions'); // Importa createTestRun
 
+// Sing Up
+const C13 = require('./testCases/C13');
+const C614 = require('./testCases/C614');
+// Login 
 const C15 = require('./testCases/C15');
 const C655 = require('./testCases/C655');
 const C656 = require('./testCases/C656');
@@ -7,9 +11,9 @@ const C16 = require('./testCases/C16');
 const C18 = require('./testCases/C18');
 const C36 = require('./testCases/C36');
 const C580 = require('./testCases/C580');
-
+//Log out
 const C90 = require('./testCases/C90');
-const C13 = require('./testCases/C13');
+
 
 // Función para extraer los Test IDs de sessionName
 function extractTestCaseIds(sessionName) {
@@ -19,7 +23,10 @@ function extractTestCaseIds(sessionName) {
 
 // Construcción del array tests con el formato original
 const sessionNames = [
-  { name: 'C90_Log out successfully', func: C90 },
+  //SignUp
+  { name: 'C13_C575_C697_C22_C895_C1024 Sign up in the proficloud with valid email and password / Sign UP with an already existing E-Mail / Introduce a wrong password before user deletion / Delete user / If the user enter an invalid email, and correcte it later, it is should be possible to REGISTER to Proficloud or create Billing account / Check and uncheck the Terms and Licences Agreement should not alter the registered button' },
+  { name: 'C614_Sign UP if two passwords are not the same should not be possible', func: C614 },
+  //Login
   { name: 'C15_Login with right credentials as ADMIN', func: C15 },
   { name: 'C655_Login with right credentials as EDITOR', func: C655 },
   { name: 'C656_Login with right credentials as VIEWER', func: C656 },
@@ -27,10 +34,8 @@ const sessionNames = [
   { name: 'C18_Login with valid email but wrong password', func: C18 },
   { name: 'C36_Login with wrong credentials (10 wrong attempts)', func: C36 },
   { name: 'C580_Password forgotten', func: C580 },
-  {
-    name: 'C13_C575_C697_C22_C895_C1024 Sign up in the proficloud with valid email and password / Sign UP with an already existing E-Mail / Introduce a wrong password before user deletion / Delete user / If the user enter an invalid email, and correcte it later, it is should be possible to REGISTER to Proficloud or create Billing account / Check and uncheck the Terms and Licences Agreement should not alter the registered button',
-    func: C13,
-  },
+  //LogOut
+    { name: 'C90_Log out successfully', func: C90 },
 ];
 
 const tests = sessionNames.map(({ name, func }) => ({

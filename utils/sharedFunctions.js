@@ -753,6 +753,7 @@ module.exports = {
   checkFailedLoginEmail,
   deleteAllEmails,
   enterRegistrationData,
+  agreeTerms,
   emailVerification,
   confirmLinkURLsOn,
   deleteUnregisteredUserInCaseOfExistence,
