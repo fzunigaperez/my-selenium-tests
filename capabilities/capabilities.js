@@ -6,7 +6,7 @@ module.exports = {
     'seleniumVersion': '4.21.0', // Actualizar a la versión más reciente de Selenium
     'userName': process.env.BROWSERSTACK_USERNAME,
     'accessKey': process.env.BROWSERSTACK_ACCESS_KEY,
-    'keepAlive': true, // Mantener la conexión activa
+    
   },
   'browserName': 'Chrome',
   'browserVersion': 'latest',
