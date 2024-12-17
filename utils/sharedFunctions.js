@@ -188,12 +188,32 @@ async function accountSettingsMainMenu(driver) {
   
 }
 
+async function accountSettingsTab(driver) {
+
+  const settingsButtonTab = await driver.wait(until.elementLocated(By.xpath("//span[@class='mdc-tab__text-label'][contains(.,'Account settings')]")),30000);
+
+  // Click the 'Settings' element
+  await settingsButtonTab.click();
+  
+}
+
+async function changeInformationButton(driver) {
+
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Change Information')]")), 30000);
+  await driver.findElement(By.xpath("//span[contains(.,'Change Information')]")).click();
+  
+}
+
 async function logout(driver) {
   await userMenu(driver);
   await driver
     .findElement(By.xpath("//div[@class='profile-menu_icon-text__text'][contains(.,'Logout')]"))
     .click();
   await driver.sleep(1000);
+}
+
+async function confirmButton(driver) {
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Confirm')]")), 30000).click();
 }
 
 async function userMenu(driver) {
@@ -308,13 +328,100 @@ async function loginUnregisteredUser(driver,vars) {
 async function loginChangeOrgaUserName(driver, vars) {
   await acceptCookies(driver);
   await loginLandingPageButton(driver);
-  await adminCredentials(driver, vars);
+  await changeOrgaUserNameCredentials(driver, vars);
   await driver.sleep(1000);
   await driver.wait(until.elementLocated(By.id("username")), 50000);
   await driver.findElement(By.id("username")).sendKeys(vars["username"]);
   await driver.findElement(By.id("password")).sendKeys(vars["password"]);
   await driver.findElement(By.id("kc-login")).click();
-  //await driver.sleep(1000);
+
+
+  await driver.sleep(1000);
+  const invalidUser = await driver.findElements(By.xpath("//span[@class='kc-feedback-text'][contains(.,'Invalid username or password.')]"));
+    
+
+  // Obtener la cantidad de elementos encontrados
+  console.log('Cantidad de elementos encontrados para "Invalid username or password":', invalidUser.length);
+  
+
+  // Verificar si el error es de usuario inválido
+  if (invalidUser.length > 0) {
+    console.log("The user does not exist because the email was Changed threfore we need to return to the original");
+    vars ["emailChanged"] = "testing_email_change@proton.me"
+    vars ["password"] = "Proficloud2022!"
+    await driver.findElement(By.id("username")).clear();
+    await driver.findElement(By.id("username")).sendKeys(vars["emailChanged"]);
+    await driver.findElement(By.id("password")).clear();
+    await driver.findElement(By.id("password")).sendKeys(vars["password"]);
+    await driver.findElement(By.id("kc-login")).click();
+    
+    await userMenu(driver,vars);  
+    await accountSettingsMainMenu(driver);
+    await accountSettingsTab(driver);
+    await changeInformationButton(driver);
+    await driver.sleep(1000);
+
+    await driver.findElement(By.xpath("//input[@placeholder='Email']")).clear();
+    await driver.findElement(By.xpath("//input[@placeholder='Email']")).sendKeys("change_orga_name@proton.me");
+    await saveProfileDataButton(driver);
+    await driver.sleep(1000);
+    await confirmButton(driver);
+    await modalClose(driver,until);
+    // Time to wait in order to get the mail
+    await driver.sleep(10000);
+
+    await loginToProtonMail(driver,vars);
+    //Filtering the mail since there are 2 mails and only one has the verificaton link
+    await driver.wait(until.elementLocated(By.css(".active .text-ellipsis")), 30000);
+    await driver.wait(until.elementLocated(By.xpath("//input[@data-testid='search-keyword']")), 30000).click();
+    await driver.wait(until.elementLocated(By.xpath("//button[contains(.,'More search options')]")), 30000).click();
+    await driver.wait(until.elementLocated(By.id("address")), 30000).click();
+    
+    await driver.wait(until.elementLocated(By.xpath("//li[@class='dropdown-item'][contains(.,'change_orga_name@proton.me')]")), 30000).click();
+    await driver.wait(until.elementLocated(By.xpath("//button[contains(text(),'Search')]")), 30000).click();
+    await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'You have requested an email change for Proficloud.io')]")), 30000).click();
+    
+    
+    await driver.sleep(2000);
+    const iframe = await driver.wait(until.elementLocated(By.css('iframe')), 10000);
+    await driver.switchTo().frame(iframe);
+    await driver.wait(until.elementLocated(By.css("a > div")), 10000).click();
+    //Accepting the last email change confirmation
+    
+    // Obtener todos los manejadores de ventanas y seleccionar el último
+    const windowHandles = await driver.getAllWindowHandles();
+    console.log('Manejadores de ventanas:', windowHandles);
+  // Cambiar a la ventana más reciente
+    const latestWindow = windowHandles[windowHandles.length - 1]; // Seleccionar el último manejador
+    await driver.switchTo().window(latestWindow);
+    console.log('Cambiado a la ventana más reciente.');
+
+    await driver.sleep(2000);
+    await driver.wait(until.elementLocated(By.xpath("//button")), 10000).click();
+
+  //Login with the original credentials after the email change verification
+
+  await changeOrgaUserNameCredentials(driver, vars);
+  await driver.sleep(1000);
+  await driver.wait(until.elementLocated(By.id("username")), 50000);
+  await driver.findElement(By.id("username")).sendKeys(vars["username"]);
+  await driver.findElement(By.id("password")).sendKeys(vars["password"]);
+  await driver.findElement(By.id("kc-login")).click();
+  await userMenu(driver,vars);  
+  await accountSettingsMainMenu(driver);
+  await accountSettingsTab(driver);
+  await driver.wait(until.elementLocated(By.xpath("//div[normalize-space()='change_orga_name@proton.me']")), 10000);
+  await logout(driver);
+
+
+
+    return;
+  }
+  else{
+
+    console.log("The original user eMail is there, therefore no changes are necessary");
+  }
+
   await isTheOrganizationNameEmpty(driver, vars);
   await rootOrganizationTest(driver, vars);
 }
@@ -386,7 +493,12 @@ async function emailVerification(driver,vars) {
   }
 }
   
+async function saveProfileDataButton(driver) {
 
+  await driver.wait(until.elementLocated(By.xpath("//button[contains(.,'SAVE PROFILE DATA')]")), 30000);
+  await driver.findElement(By.xpath("//button[contains(.,'SAVE PROFILE DATA')]")).click();
+  
+}
 
  
 
@@ -488,14 +600,38 @@ async function loginToProtonMail(driver, vars = {}) {
           console.log("Credenciales ingresadas. Esperando a 'Proton Mail Plus'...");
 
           // Esperar a que 'Proton Mail Plus' esté disponible
-          const elementToClick = await driver.wait(
-              until.elementLocated(By.xpath("//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]")),
-              10000
-          );
-
-          await driver.wait(until.elementIsVisible(elementToClick), 50000);
-          await elementToClick.click();
-          console.log("Clic en 'Proton Mail Plus' exitoso.");
+          try {
+            console.log("Esperando a que 'Proton Mail Plus' esté disponible...");
+        
+            // Tiempo máximo de espera (en milisegundos)
+            const maxWaitTime = 10000; // 30 segundos
+            const pollInterval = 1000; // Revisar cada 1 segundo
+            let elapsedTime = 0;
+            let elementToClick = null;
+        
+            // Bucle para comprobar repetidamente si el elemento aparece
+            while (elapsedTime < maxWaitTime) {
+                const elements = await driver.findElements(By.xpath("//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]"));
+                if (elements.length > 0) {
+                    elementToClick = elements[0];
+                    break; // Salir del bucle si el elemento se encuentra
+                }
+                await driver.sleep(pollInterval); // Esperar antes de volver a comprobar
+                elapsedTime += pollInterval;
+            }
+        
+            if (elementToClick) {
+                console.log("'Proton Mail Plus' encontrado. Procediendo a hacer clic.");
+                await driver.wait(until.elementIsVisible(elementToClick), 10000);
+                await elementToClick.click();
+                console.log("Clic en 'Proton Mail Plus' exitoso.");
+            } else {
+                console.log("'Proton Mail Plus' no apareció dentro del tiempo de espera permitido. Continuando sin clic.");
+            }
+        } catch (error) {
+            console.error("Ocurrió un error al verificar o hacer clic en 'Proton Mail Plus':", error);
+        }
+        
       }
   } catch (err) {
       console.error("Ocurrió un error:", err);
@@ -507,6 +643,49 @@ async function loginToProtonMail(driver, vars = {}) {
   
  }
   
+ async function resetToOriginalUserNameInRoothOrganization(driver,vars) {
+
+  await userMenu(driver,vars);  
+  await accountSettingsMainMenu(driver);
+  await accountSettingsTab(driver);
+
+  try {
+    vars["userName"] = await driver.findElement(By.xpath("//flex-col/div/div[2]/div[2]")).getText();
+    console.log(`The actual user Name is: ${vars["userName"]}`);
+    
+    if (vars["userName"] === 'Fernando Zuniga') {
+        console.log("The user name is the right one");
+    } else {
+        console.log("A change in the user name has to take place");
+
+      vars["originalName"] = "Fernando";
+      vars["originalSurname"] = "Zuniga";
+
+      await changeInformationButton(driver);
+      await driver.sleep(1000);
+      await driver.wait(until.elementLocated(By.xpath("//input[contains(@placeholder,'First name')]")), 30000);
+      
+      await driver.findElement(By.xpath("//input[contains(@placeholder,'First name')]")).clear();
+      await driver.findElement(By.xpath("//input[contains(@placeholder,'First name')]")).sendKeys(vars["originalName"]);
+      await driver.findElement(By.xpath("//input[contains(@placeholder,'Last name')]")).clear();
+
+      await driver.findElement(By.xpath("//input[contains(@placeholder,'Last name')]")).sendKeys(vars["originalSurname"]);
+      await saveProfileDataButton(driver);
+
+      // Asserting the precense of Success Message
+      await driver.sleep(1000);
+      await driver.wait(until.elementTextIs(driver.findElement(By.xpath('//pc-overlay/div/div[2]/div/div[2]/div')), "Your profile has been successfully updated."), 5000);
+      console.log("El texto esperado está presente!");
+      await modalClose(driver, until);
+
+      await driver.wait(until.elementTextIs(driver.findElement(By.xpath("//flex-col/div/div[2]/div[2]")), "Fernando Zuniga"), 5000);
+    }
+} catch (error) {
+    console.error("Error while fetching the user name:", error.message);
+}
+
+  
+}
 
 
   async function logOutFromProtonMail(driver) {
@@ -757,10 +936,14 @@ module.exports = {
   switchToOriginalOrganization,
   modalClose,
   activeOrganization,
+  changeInformationButton,
+  saveProfileDataButton,
   logout,
   userMenu,
   accountSettingsMainMenu,
+  accountSettingsTab,
   windowConfiguration,
+  resetToOriginalUserNameInRoothOrganization,
   loginAdmin,
   loginEditor,
   loginViewer,
@@ -773,6 +956,7 @@ module.exports = {
   deleteAllEmails,
   enterRegistrationData,
   agreeTerms,
+  confirmButton,
   emailVerification,
   confirmLinkURLsOn,
   deleteUnregisteredUserInCaseOfExistence,

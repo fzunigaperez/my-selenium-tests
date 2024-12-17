@@ -13,6 +13,8 @@ const C36 = require('./testCases/C36');
 const C580 = require('./testCases/C580');
 //Log out
 const C90 = require('./testCases/C90');
+//Profile Settings
+const C19 = require('./testCases/C19');
 
 
 // Función para extraer los Test IDs de sessionName
@@ -35,7 +37,10 @@ const sessionNames = [
   { name: 'C36_Login with wrong credentials (10 wrong attempts)', func: C36 },
   { name: 'C580_Password forgotten', func: C580 },
   //LogOut
-    { name: 'C90_Log out successfully', func: C90 },
+  { name: 'C90_Log out successfully', func: C90 },
+  //Profile Settings
+  { name: 'C19_C20_C21_C678 Add name and surname to the general information / Confirm email change in profile settings / Edit name and surname to the general information / Email change should not be possible if the email is already registered in proficloud', func: C19 },
+
 ];
 
 const tests = sessionNames.map(({ name, func }) => ({
