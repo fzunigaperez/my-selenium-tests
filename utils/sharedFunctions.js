@@ -753,6 +753,7 @@ async function loginToProtonMail(driver, vars = {}) {
         until.elementLocated(By.id("idSelectAll")),
         30000
     );
+    await driver.sleep(2000);
     await driver.wait(until.elementIsEnabled(selectAllButton), 30000);
     await selectAllButton.click();
 
@@ -777,6 +778,7 @@ async function loginToProtonMail(driver, vars = {}) {
         until.elementLocated(By.id("idSelectAll")),
         30000
     );
+    await driver.sleep(2000);
     await driver.wait(until.elementIsEnabled(selectAllTrashButton), 30000);
     await selectAllTrashButton.click();
 
