@@ -337,12 +337,20 @@ async function loginChangeOrgaUserName(driver, vars) {
 
 
   await driver.sleep(1000);
-  const invalidUser = await driver.findElements(By.xpath("//span[@class='kc-feedback-text'][contains(.,'Invalid username or password.')]"));
+  
+  //const invalidUser = await driver.findElements(By.xpath("//span[@class='kc-feedback-text'][contains(.,'Invalid username or password.')]"));
     
 
   // Obtener la cantidad de elementos encontrados
-  console.log('Cantidad de elementos encontrados para "Invalid username or password":', invalidUser.length);
-  
+ // console.log('Cantidad de elementos encontrados para "Invalid username or password":', invalidUser.length);
+ const timeout = 2000; // Tiempo máximo de espera en milisegundos
+
+ const invalidUser = await Promise.race([
+   driver.findElements(By.xpath("//span[@class='kc-feedback-text'][contains(.,'Invalid username or password.')]")),
+   new Promise(resolve => setTimeout(() => resolve([]), timeout)) // Timeout: devuelve lista vacía
+ ]);
+ 
+ console.log('Cantidad de elementos encontrados para "Invalid username or password":', invalidUser.length);
 
   // Verificar si el error es de usuario inválido
   if (invalidUser.length > 0) {
