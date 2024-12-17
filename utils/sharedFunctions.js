@@ -714,7 +714,7 @@ async function loginToProtonMail(driver, vars = {}) {
   async function deleteAllEmails(driver) {
     console.log("Deleting all mails...");
     // Esperar que se localice "Inbox"
-    await driver.wait(until.elementLocated(By.xpath("//span[contains(text(),'Inbox')]")), 60000);
+    await driver.wait(until.elementLocated(By.xpath("//span[contains(text(),'Inbox')]")), 30000);
 
     // Comprobar si existe "Less"
     const lessElements = await driver.findElements(By.xpath("//span[normalize-space()='Less']"));
@@ -725,9 +725,9 @@ async function loginToProtonMail(driver, vars = {}) {
         // Hacer clic en "More" si "Less" no está visible
         const moreButton = await driver.wait(
             until.elementLocated(By.xpath("//span[normalize-space()='More']")),
-            30000
+            5000
         );
-        await driver.wait(until.elementIsEnabled(moreButton), 30000);
+        await driver.wait(until.elementIsEnabled(moreButton), 5000);
         await moreButton.click();
     }
 
