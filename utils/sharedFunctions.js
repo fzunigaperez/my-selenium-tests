@@ -343,15 +343,23 @@ async function loginChangeOrgaUserName(driver, vars) {
 
   // Obtener la cantidad de elementos encontrados
  // console.log('Cantidad de elementos encontrados para "Invalid username or password":', invalidUser.length);
- const timeout = 2000; // Tiempo máximo de espera en milisegundos
+ const timeout = 2000; // Timeout de 2 segundos
 
- const invalidUser = await Promise.race([
-   driver.findElements(By.xpath("//span[@class='kc-feedback-text'][contains(.,'Invalid username or password.')]")),
-   new Promise(resolve => setTimeout(() => resolve([]), timeout)) // Timeout: devuelve lista vacía
- ]);
- 
- console.log('Cantidad de elementos encontrados para "Invalid username or password":', invalidUser.length);
+// Desactiva el timeout implícito antes de buscar el elemento
+await driver.manage().setTimeouts({ implicit: 0 });
 
+try {
+  const invalidUser = await driver.findElements(
+    By.xpath("//span[@class='kc-feedback-text'][contains(.,'Invalid username or password.')]")
+  );
+
+  console.log('Cantidad de elementos encontrados para "Invalid username or password":', invalidUser.length);
+} catch (error) {
+  console.error('Error al buscar el elemento:', error.message);
+} finally {
+  // Opcional: Restaura el timeout implícito global si lo necesitas más adelante
+  await driver.manage().setTimeouts({ implicit: 10000 });
+}
   // Verificar si el error es de usuario inválido
   if (invalidUser.length > 0) {
     console.log("The user does not exist because the email was Changed threfore we need to return to the original");
