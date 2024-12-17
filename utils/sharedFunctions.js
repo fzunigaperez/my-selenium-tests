@@ -604,7 +604,7 @@ async function loginToProtonMail(driver, vars = {}) {
             console.log("Esperando a que 'Proton Mail Plus' esté disponible...");
         
             // Tiempo máximo de espera (en milisegundos)
-            const maxWaitTime = 5000; // 30 segundos
+            const maxWaitTime = 2000; // 30 segundos
             const pollInterval = 1000; // Revisar cada 1 segundo
             let elapsedTime = 0;
             let elementToClick = null;
@@ -622,7 +622,7 @@ async function loginToProtonMail(driver, vars = {}) {
         
             if (elementToClick) {
                 console.log("'Proton Mail Plus' encontrado. Procediendo a hacer clic.");
-                await driver.wait(until.elementIsVisible(elementToClick), 2000);
+                await driver.wait(until.elementIsVisible(elementToClick), 1000);
                 await elementToClick.click();
                 console.log("Clic en 'Proton Mail Plus' exitoso.");
             } else {
