@@ -3,13 +3,14 @@ module.exports = {
     'os': 'Windows',
     'osVersion': '10',
     'local': 'false',
-    'seleniumVersion': '3.141.59',
+    'seleniumVersion': '4.21.0', // Actualizar a la versión más reciente de Selenium
     'userName': process.env.BROWSERSTACK_USERNAME,
     'accessKey': process.env.BROWSERSTACK_ACCESS_KEY,
+    'keepAlive': true, // Mantener la conexión activa
   },
   'browserName': 'Chrome',
   'browserVersion': 'latest',
-  'browserstack.debug': true, // Habilitar la grabación visual
-  'browserstack.console': 'info', // Capturar logs de la consola del navegador
-  'browserstack.networkLogs': true, // Capturar logs de red
+  'browserstack.debug': true,      // Habilitar la grabación visual
+  'browserstack.console': 'info',  // Capturar logs de la consola del navegador
+  'browserstack.networkLogs': true // Capturar logs de red
 };
