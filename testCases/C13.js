@@ -12,7 +12,7 @@ const {
   loginToProtonMail,
   deleteAllEmails,
   logOutFromProtonMail,
-  confirmLinkURLsOn,
+  confirmLinkUrlToggleIsOff,
 } = require('../utils/sharedFunctions'); // Importación de funciones reutilizables
 
 async function C13() {
@@ -24,7 +24,7 @@ async function C13() {
 
         await windowConfiguration(driver);
         await loginToProtonMail(driver,vars);
-        await confirmLinkURLsOn(driver,vars,until);     
+        await confirmLinkUrlToggleIsOff(driver,vars,until);     
         await logOutFromProtonMail(driver);
         await deleteUnregisteredUserInCaseOfExistence(driver,vars);
         

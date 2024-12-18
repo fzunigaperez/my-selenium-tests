@@ -4,6 +4,42 @@ await driver.wait(until.elementLocated(By.id("registrationlink")), 30000).click(
 
 //❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
 
+//XPATH SOLUTION for being fast using JAvA SCRIPT 
+
+const xpath = "";
+
+// Usar executeScript para buscar el elemento rápidamente
+const invalidUser = await driver.executeScript((xpath) => {
+const result = document.evaluate(
+    xpath, 
+    document, 
+    null, 
+    XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, 
+    null
+  );
+  return result.snapshotLength; // Retorna la cantidad de elementos encontrados
+}, xpath);
+
+console.log('', invalidUser);
+
+  // Verificar si el error es de usuario inválido
+  if (invalidUser > 0) {
+    
+    console.log("", invalidUser);
+
+    return;
+  }
+  else{
+
+    console.log("");
+  }
+
+ 
+
+
+//❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
+
+
 // When it is necessary to wait when a new page loadssw
 
 await driver.sleep(1000);

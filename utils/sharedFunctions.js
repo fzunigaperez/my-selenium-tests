@@ -156,11 +156,29 @@ async function isTheOrganizationNameEmpty(driver, vars) {
 }
 
 
-async function rootOrganizationTest(driver, vars) {
-  vars["root"] = await driver.findElements(By.xpath("//h4[contains(.,'Rooth Organization')]")).length;
-  if (vars["root"] > 0) {
-    console.log("We are in the right organization.");
+async function roothOrganizationTest(driver, vars) {
+  const xpath = "//h4[contains(.,'Rooth Organization')]";
+
+  // Use executeScript to quickly find the element using XPath
+  const rightOrganization = await driver.executeScript((xpath) => {
+    const result = document.evaluate(
+      xpath,
+      document,
+      null,
+      XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+      null
+    );
+    return result.snapshotLength; // Return the number of elements found
+  }, xpath);
+
+  console.log('Are we in the Rooth Organization?', rightOrganization);
+
+  // Check if we are in the correct organization
+  if (rightOrganization > 0) {
+    console.log("We are in the Rooth Organization");
+    return;
   } else {
+    console.log("We are not in the Rooth Organization, thus we need to switch the organization");
     await switchToOriginalOrganization(driver);
   }
 }
@@ -237,7 +255,7 @@ async function loginAdmin(driver, vars) {
   await driver.findElement(By.id("kc-login")).click();
   //await driver.sleep(1000);
   await isTheOrganizationNameEmpty(driver, vars);
-  await rootOrganizationTest(driver, vars);
+  await roothOrganizationTest(driver, vars);
 }
 
 async function loginEditor(driver, vars) {
@@ -262,7 +280,7 @@ async function loginEditor(driver, vars) {
   assert.strictEqual(pageTitle, "Device Management Service");
 
   // Check if in the right organization
-  await rootOrganizationTest(driver, vars);
+  await roothOrganizationTest(driver, vars);
 }
 
 async function loginViewer(driver, vars) {
@@ -295,7 +313,7 @@ async function loginViewer(driver, vars) {
 
   // Verifica la organización correcta
   console.log("Validando la organización...");
-  await rootOrganizationTest(driver, vars);
+  await roothOrganizationTest(driver, vars);
 }
 
 async function loginRegisteredUser(driver, vars) {
@@ -309,7 +327,7 @@ async function loginRegisteredUser(driver, vars) {
   await driver.findElement(By.id("kc-login")).click();
   await driver.sleep(1000);
   await isTheOrganizationNameEmpty(driver, vars);
-  await rootOrganizationTest(driver, vars);
+  await roothOrganizationTest(driver, vars);
 }
 
 
@@ -338,17 +356,13 @@ async function loginChangeOrgaUserName(driver, vars) {
 
   await driver.sleep(2000);
   
-  //const invalidUser = await driver.findElements(By.xpath("//span[@class='kc-feedback-text'][contains(.,'Invalid username or password.')]"));
-    
-
-  // Obtener la cantidad de elementos encontrados
- // console.log('Cantidad de elementos encontrados para "Invalid username or password":', invalidUser.length);
+  
  
  const xpath = "//span[@class='kc-feedback-text'][contains(.,'Invalid username or password.')]";
 
 // Usar executeScript para buscar el elemento rápidamente
 const invalidUser = await driver.executeScript((xpath) => {
-  const result = document.evaluate(
+const result = document.evaluate(
     xpath, 
     document, 
     null, 
@@ -439,7 +453,7 @@ console.log('Cantidad de elementos encontrados para "Invalid username or passwor
   }
 
   await isTheOrganizationNameEmpty(driver, vars);
-  await rootOrganizationTest(driver, vars);
+  await roothOrganizationTest(driver, vars);
 }
 
   async function deleteUnregisteredUserInCaseOfExistence(driver, vars) {
@@ -516,9 +530,94 @@ async function saveProfileDataButton(driver) {
   
 }
 
+async function resetBillingAccountInformation(driver,until) {
+  // Wait until the "Edit Billing Account" element is located
+  await driver.wait(
+    until.elementLocated(By.xpath("//*[contains(text(),'Edit Billing Account')]")),
+    5000
+  );
+
+  // XPath to check if the billing account reset is necessary
+  const xpath = "//div[normalize-space()='AR']";
+
+  // Use executeScript to quickly check for the element
+  const isBillingAccountResetNecessary = await driver.executeScript((xpath) => {
+    const result = document.evaluate(
+      xpath,
+      document,
+      null,
+      XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+      null
+    );
+    return result.snapshotLength; // Return the number of elements found
+  }, xpath);
+
+  console.log('Does Billing Account need an edit reset?:', isBillingAccountResetNecessary);
+
+  if (isBillingAccountResetNecessary > 0) {
+    console.log("Reset necessary");
+
+    // Navigate to the billing information tab and click the edit button
+    await billingInformationTab(driver,until);
+    await editBillingAccountButton(driver,until);
+
+    // Update Email
+    await driver.findElement(By.xpath("//input[@placeholder='Email']")).clear();
+    await driver.findElement(By.xpath("//input[@placeholder='Email']")).sendKeys("fzuniga@phoenixcontact-sb.io");
+
+    // Update First Name
+    await driver.findElement(By.xpath("//input[@placeholder='First Name']")).clear();
+    await driver.findElement(By.xpath("//input[@placeholder='First Name']")).sendKeys("Fernando");
+
+    // Update Last Name
+    await driver.findElement(By.xpath("//input[@placeholder='Last Name']")).clear();
+    await driver.findElement(By.xpath("//input[@placeholder='Last Name']")).sendKeys("Zuniga");
+
+    // Update Company Name
+    await driver.findElement(By.xpath("//input[@placeholder='Company Name']")).clear();
+    await driver.findElement(By.xpath("//input[@placeholder='Company Name']")).sendKeys("Rooth Company");
+
+    // Update Address Line 1
+    await driver.findElement(By.xpath("//input[@placeholder='Address Line 1']")).clear();
+    await driver.findElement(By.xpath("//input[@placeholder='Address Line 1']")).sendKeys("Rügenerstrasse 14");
+
+    // Update Postal Code
+    await driver.findElement(By.xpath("//input[@placeholder='Postal Code']")).clear();
+    await driver.findElement(By.xpath("//input[@placeholder='Postal Code']")).sendKeys("13355");
+
+    // Update City
+    await driver.findElement(By.xpath("//input[contains(@placeholder,'City')]")).clear();
+    await driver.findElement(By.xpath("//input[contains(@placeholder,'City')]")).sendKeys("Berlin");
+
+    // Update Country
+    await driver.findElement(By.xpath("//mat-label[contains(.,'Country')]")).click();
+    await driver.sleep(1000);
+    await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Germany')]")), 30000);
+    await driver.findElement(By.xpath("//span[contains(.,'Germany')]")).click();
+
+    // Update VAT Number
+    await driver.findElement(By.xpath("//input[@placeholder='VAT number']")).clear();
+    await driver.findElement(By.xpath("//input[@placeholder='VAT number']")).sendKeys("123456");
+
+    // Click on "Update billing account"
+    await driver.sleep(2000);
+    await driver.findElement(By.xpath("//span[contains(.,'Update billing account')]")).click();
+
+    // Wait for the loading ring to disappear
+    await waitingLoadingRingProficloudToDissapear(driver,until);
+
+    return;
+  } else {
+    console.log("No reset necessary");
+  }
+}
  
-
-
+async function editBillingAccountButton(driver,until) {
+  
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,\'Edit Billing Account\')]")), 50000)
+  await driver.findElement(By.xpath("//span[contains(.,\'Edit Billing Account\')]")).click()
+  await driver.sleep(1000)
+}
   
 
 
@@ -549,7 +648,7 @@ async function loginAsUnregisteredUserAndDeleteAccount(driver,vars) {
   await driver.findElement(By.xpath("//span[contains(.,'Delete account')]")).click();
   await driver.wait(until.elementLocated(By.xpath("//span[@class='pc-status-overlay__message'][contains(.,'It was not possible to delete your account. The email you provided was incorrect.')]")), 30000);
   //Closing the warning message
-  const element = await driver.wait(until.elementLocated(By.xpath("/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/pc-status-overlay[1]/pc-overlay[1]/div[1]/div[2]/div[1]/div[1]/app-icon[1]/*[name()='svg'][1]")), 30000);
+  const element = await driver.wait(until.elementLocated(By.xpath("/html[1]/body[1]/app-rooth[1]/div[1]/div[1]/div[1]/pc-status-overlay[1]/pc-overlay[1]/div[1]/div[2]/div[1]/div[1]/app-icon[1]/*[name()='svg'][1]")), 30000);
   await element.click();
 
   await driver.sleep(2000);
@@ -579,7 +678,7 @@ async function loginToProtonMail(driver, vars = {}) {
   try {
       // Navegar a la URL de inicio de sesión
       await driver.get("https://mail.proton.me/");
-      await driver.sleep(30000);  //Remove this because of Zacualpan
+      await driver.sleep(10000);  //Remove this because of Zacualpan
 
       // Verificar si el usuario está autenticado o si necesita iniciar sesión
       const isLoggedIn = await driver.findElements(By.xpath("//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]"));
@@ -621,15 +720,32 @@ async function loginToProtonMail(driver, vars = {}) {
             console.log("Esperando a que 'Proton Mail Plus' esté disponible...");
         
             // Tiempo máximo de espera (en milisegundos)
-            const maxWaitTime = 2000; // 30 segundos
+            const maxWaitTime = 10000; // 30 segundos
             const pollInterval = 1000; // Revisar cada 1 segundo
             let elapsedTime = 0;
             let elementToClick = null;
         
             // Bucle para comprobar repetidamente si el elemento aparece
             while (elapsedTime < maxWaitTime) {
-                const elements = await driver.findElements(By.xpath("//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]"));
-                if (elements.length > 0) {
+
+                const xpath = "//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]";
+
+                const elements = await driver.executeScript((xpath) => {
+                  const result = document.evaluate(
+                      xpath, 
+                      document, 
+                      null, 
+                      XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, 
+                      null
+                    );
+                    return result.snapshotLength; // Retorna la cantidad de elementos encontrados
+                  }, xpath);
+                  
+
+
+
+
+                if (elements > 0) {
                     elementToClick = elements[0];
                     break; // Salir del bucle si el elemento se encuentra
                 }
@@ -659,6 +775,17 @@ async function loginToProtonMail(driver, vars = {}) {
   await driver.wait(until.elementLocated(By.id("modal-close")), 5000).click();
   
  }
+
+ async function settings(driver, until) {
+  await driver.wait(until.elementLocated(By.xpath("//div[@class='profile-menu_icon-text__text'][contains(.,'Settings')]")), 5000).click();
+  
+ }
+
+ async function billingInformationTab(driver,until) {
+  await driver.wait(until.elementLocated(By.xpath("//span[@class='mdc-tab__text-label'][contains(.,'Billing Information')]")), 10000).click();
+  
+ }
+  
   
  async function resetToOriginalUserNameInRoothOrganization(driver,vars) {
 
@@ -815,63 +942,79 @@ async function loginToProtonMail(driver, vars = {}) {
    
   }
   
-  async function confirmLinkURLsOn(driver, vars) {
+  async function confirmLinkUrlToggleIsOff(driver, vars, until) {
+
     
-      const settingsLinkXPath = "//a[contains(text(), 'All settings')]";
-      const toggleButtonXPath = "//button[contains(., 'Toggle settings')]";
-  
-      // Verificar y hacer clic en el enlace de configuración o botón de alternar
-      const settingsLink = await driver.findElements(By.xpath(settingsLinkXPath));
-      const toggleButton = await driver.findElements(By.xpath(toggleButtonXPath));
-  
-      if (settingsLink.length > 0) {
-        await settingsLink[0].click();
-      } else if (toggleButton.length > 0) {
-        await toggleButton[0].click();
-        await driver.findElement(By.xpath(settingsLinkXPath)).click();
-      } else {
-        throw new Error("Neither settings link nor toggle button found.");
+    const xpath ="//a[contains(text(), 'All settings')]";
+
+    
+    const allSettingsButton = await driver.executeScript((xpath) => {
+    const result = document.evaluate(
+        xpath, 
+        document, 
+        null, 
+        XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, 
+        null
+      );
+      return result.snapshotLength; // Retorna la cantidad de elementos encontrados
+    }, xpath);
+    
+    console.log('Is the All Settings button in Proton Mail present?:', allSettingsButton);
+    
+      // Verificar si el error es de usuario inválido
+      if (allSettingsButton > 0) {
+
+        console.log("The allSetingsButton is present, thus we DONT need to uncovered it and we can just click on it");
+        await driver.wait(until.elementLocated(By.xpath("//a[contains(text(),'All settings')]")), 30000).click();
+        
+        
+        return;
       }
-  
-      // Esperar a que el dashboard esté cargado
-      await driver.wait(until.elementLocated(By.xpath("//h1[contains(.,'Dashboard')]")), 30000);
-  
-      // Navegar a la configuración de mensajes
-      await driver.findElement(By.xpath("//span[@title='Messages and composing']")).click();
-  
-      // Esperar el elemento "Confirm link URLs"
+      else{
+    
+        console.log("The allSetingsButton is NOT present, thus we need to uncovered it and then click on it");
+        
+        await driver.wait(until.elementLocated(By.xpath("//button[contains(.,'Toggle settings')]")), 30000).click();
+        await driver.wait(until.elementLocated(By.xpath("//a[contains(text(),'All settings')]")), 30000).click();
+      }
+
+      await driver.wait(until.elementLocated(By.xpath("//h1[contains(.,'Dashboard')]")), 30000)
+      await driver.wait(until.elementLocated(By.xpath("//span[@title='Messages and composing']")), 30000).click();
       await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Confirm link URLs')]")), 30000);
       await driver.sleep(2000);
 
-      const numberOfTogglesActivated = await driver.findElements(By.xpath("//*[@class='toggle-container toggle-container--checked']"));
+      const xpath1 = "//*[@class='toggle-container toggle-container--checked']";
 
-
-
-  // Obtener la cantidad de elementos encontrados
-  console.log('Number of toggle elements activated":', numberOfTogglesActivated.length);
+      
+      const numberOfTogglesActivated = await driver.executeScript((xpath1) => {
+      const result = document.evaluate(
+          xpath1, 
+          document, 
+          null, 
+          XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, 
+          null
+        );
+        return result.snapshotLength; // Retorna la cantidad de elementos encontrados
+      }, xpath1);
+      
+      console.log('Number of toggle elements:', numberOfTogglesActivated);
   
 
-  if (numberOfTogglesActivated.length == 6) {
-    console.log("All good the link confirmation is deactivated");
+    if (numberOfTogglesActivated == 6) {
+    console.log("All good the link confirmation is deactivated and thus standard conditions");
     return;
   }
 
   
-  if (numberOfTogglesActivated.length > 6) {
+  if (numberOfTogglesActivated > 6) {
     console.log("Link confirmation is ACTIVATED, thus we need to deactivate for avoiding problems");
     await driver.wait(until.elementLocated(By.xpath("//span[normalize-space()='Confirm link URLs']")), 30000).click();
 
     return; 
   }
 
-  
+}
 
-
-
-
-  
-    
-  }
   
 
   async function enterRegistrationData(driver, vars) {
@@ -934,7 +1077,7 @@ async function loginToProtonMail(driver, vars = {}) {
   async function waitingLoadingRingProficloudToDissapear(driver) {
 
     await waitUntilXpathNotPresent(driver, "//div[contains(@class,'pc-status-overlay__icon-container')]");  
-    await driver.sleep(1000);
+    await driver.sleep(4000);
   }
   
 
@@ -950,7 +1093,7 @@ module.exports = {
   registeredUserCredentials,
   changeOrgaUserNameCredentials,
   isTheOrganizationNameEmpty,
-  rootOrganizationTest,
+  roothOrganizationTest,
   switchToOriginalOrganization,
   modalClose,
   activeOrganization,
@@ -961,10 +1104,14 @@ module.exports = {
   accountSettingsMainMenu,
   accountSettingsTab,
   windowConfiguration,
+  settings,
+  billingInformationTab,
+  resetBillingAccountInformation,
   resetToOriginalUserNameInRoothOrganization,
   loginAdmin,
   loginEditor,
   loginViewer,
+  editBillingAccountButton,
   loginRegisteredUser,
   loginUnregisteredUser,
   loginChangeOrgaUserName,
@@ -976,9 +1123,10 @@ module.exports = {
   agreeTerms,
   confirmButton,
   emailVerification,
-  confirmLinkURLsOn,
+  confirmLinkUrlToggleIsOff,
   deleteUnregisteredUserInCaseOfExistence,
   loginAsUnregisteredUserAndDeleteAccount,
   waitUntilXpathNotPresent,
   waitingLoadingRingProficloudToDissapear,
+  
 };

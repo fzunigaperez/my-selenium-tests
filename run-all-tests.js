@@ -16,6 +16,7 @@ const C90 = require('./testCases/C90');
 //Profile Settings
 const C19 = require('./testCases/C19');
 const C84 = require('./testCases/C84');
+const C537 = require('./testCases/C537');
 
 
 // Función para extraer los Test IDs de sessionName
@@ -42,6 +43,8 @@ const sessionNames = [
   //Profile Settings
   { name: 'C19_C20_C21_C678 Add name and surname to the general information / Confirm email change in profile settings / Edit name and surname to the general information / Email change should not be possible if the email is already registered in proficloud', func: C19 },
   { name: 'C84_Download User CA certificate', func: C84 },
+  //Billing Account
+  { name: 'C537_Edit a billing account as an ADMIN', func: C537 },
 
 ];
 
