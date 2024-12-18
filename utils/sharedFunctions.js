@@ -686,7 +686,7 @@ async function loginToProtonMail(driver, vars = {}) {
       const xpath = "//button[contains(.,'New message')]";
 
 // Usar executeScript para buscar el elemento rápidamente
-const invalidUser = await driver.executeScript((xpath) => {
+const isLoggedIn = await driver.executeScript((xpath) => {
 const result = document.evaluate(
     xpath, 
     document, 
