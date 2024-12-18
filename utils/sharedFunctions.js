@@ -57,21 +57,63 @@ async function acceptCookies(driver) {
     const cookiesXPath = "//h2[normalize-space()='This website uses cookies']";
     const acceptButtonXPath = "//button[@id='ga-opt-out-false']";
 
-    // Esperar un máximo de 3 segundos para el banner de cookies
-    const cookiesBanner = await driver.wait(until.elementLocated(By.xpath(cookiesXPath)), 3000);
+    // Esperar un máximo de 3 segundos para que aparezca el banner de cookies
+    const timeout = 3000; // 3 segundos en milisegundos
+    const interval = 500; // Intervalo de comprobación de 500 ms
+    let bannerFound = false;
+    const startTime = Date.now();
 
-    if (cookiesBanner) {
+    while ((Date.now() - startTime) < timeout) {
+      bannerFound = await driver.executeScript((xpath) => {
+        const result = document.evaluate(
+          xpath,
+          document,
+          null,
+          XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+          null
+        );
+        return result.snapshotLength > 0;
+      }, cookiesXPath);
+
+      if (bannerFound) break;
+
+      // Espera 500 ms antes de volver a comprobar
+      await new Promise((resolve) => setTimeout(resolve, interval));
+    }
+
+    if (bannerFound) {
       console.log("Cookies banner detected.");
-      const acceptButton = await driver.wait(until.elementLocated(By.xpath(acceptButtonXPath)), 3000);
-      await acceptButton.click();
-      console.log("Cookies accepted.");
+
+      // Intentar hacer clic en el botón de aceptar cookies
+      const acceptButtonClicked = await driver.executeScript((xpath) => {
+        const result = document.evaluate(
+          xpath,
+          document,
+          null,
+          XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+          null
+        );
+
+        if (result.snapshotLength > 0) {
+          result.snapshotItem(0).click();
+          return true;
+        }
+        return false;
+      }, acceptButtonXPath);
+
+      if (acceptButtonClicked) {
+        console.log("Cookies accepted.");
+      } else {
+        console.warn("Accept button not found.");
+      }
     } else {
-      console.log("Cookies banner not found.");
+      console.log("Cookies banner not found within 3 seconds.");
     }
   } catch (error) {
     console.warn("Error while handling cookies banner, continuing execution:", error.message);
   }
 }
+
 
 
 
@@ -674,7 +716,7 @@ async function loginAsUnregisteredUserAndDeleteAccount(driver,vars) {
 }
 
 
-async function loginToProtonMail(driver, vars = {}) {
+async function fProtonMail(driver, vars = {}) {
   try {
       // Navegar a la URL de inicio de sesión
       await driver.get("https://mail.proton.me/");
