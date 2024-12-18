@@ -336,7 +336,7 @@ async function loginChangeOrgaUserName(driver, vars) {
   await driver.findElement(By.id("kc-login")).click();
 
 
-  await driver.sleep(1000);
+  await driver.sleep(2000);
   
   //const invalidUser = await driver.findElements(By.xpath("//span[@class='kc-feedback-text'][contains(.,'Invalid username or password.')]"));
     
@@ -361,7 +361,7 @@ const invalidUser = await driver.executeScript((xpath) => {
 console.log('Cantidad de elementos encontrados para "Invalid username or password":', invalidUser);
 
   // Verificar si el error es de usuario inválido
-  if (invalidUser.length > 0) {
+  if (invalidUser > 0) {
     console.log("The user does not exist because the email was Changed threfore we need to return to the original");
     vars ["emailChanged"] = "testing_email_change@proton.me"
     vars ["password"] = "Proficloud2022!"
@@ -388,7 +388,7 @@ console.log('Cantidad de elementos encontrados para "Invalid username or passwor
 
     await loginToProtonMail(driver,vars);
     //Filtering the mail since there are 2 mails and only one has the verificaton link
-    await driver.wait(until.elementLocated(By.css(".active .text-ellipsis")), 30000);
+    await driver.wait(until.elementLocated(By.css(".active .text-ellipsis")), 60000);
     await driver.wait(until.elementLocated(By.xpath("//input[@data-testid='search-keyword']")), 30000).click();
     await driver.wait(until.elementLocated(By.xpath("//button[contains(.,'More search options')]")), 30000).click();
     await driver.wait(until.elementLocated(By.id("address")), 30000).click();
@@ -579,6 +579,7 @@ async function loginToProtonMail(driver, vars = {}) {
   try {
       // Navegar a la URL de inicio de sesión
       await driver.get("https://mail.proton.me/");
+      await driver.sleep(30000);  //Remove this because of Zacualpan
 
       // Verificar si el usuario está autenticado o si necesita iniciar sesión
       const isLoggedIn = await driver.findElements(By.xpath("//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]"));
@@ -753,8 +754,7 @@ async function loginToProtonMail(driver, vars = {}) {
         30000
     );
     await driver.wait(until.elementIsEnabled(allMailButton), 30000);
-    await driver.sleep(2000);
-    await allMailButton.click();
+        await allMailButton.click();
 
     // Seleccionar todos los correos
     const selectAllButton = await driver.wait(
