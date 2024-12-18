@@ -1,21 +1,42 @@
-const { Builder, By, until } = require('selenium-webdriver');  // Localrun 
-const testBase = require('./testBase');  //Common
-const { windowConfiguration, loginAdmin, logout, userMenu,accountSettingsMainMenu } = require('../utils/sharedFunctions');// BS.
+const { Builder, By, until } = require('selenium-webdriver'); // Import Selenium
+const testBase = require('./testBase'); // Common test base
+const { 
+  windowConfiguration, 
+  loginAdmin, 
+  logout, 
+  userMenu, 
+  accountSettingsMainMenu 
+} = require('../utils/sharedFunctions'); // Shared functions
 
-
+/**
+ * Test C84: Download User CA certificate.
+ */
 async function C84() {
   try {
     await testBase('C84_Download User CA certificate', async (driver) => {
       let vars = {};
-            
+
+      // Window configuration
       await windowConfiguration(driver);
+
+      // Log in as admin
       await loginAdmin(driver, vars);
-      // Navigate to User Settings
+
+      // Navigate to the User Menu and Account Settings
       await userMenu(driver, vars);
       await accountSettingsMainMenu(driver);
-      //Clicking on Certificates
-      await driver.wait(until.elementLocated(By.xpath("//div[normalize-space()='Certificates']")), 30000).click();
-      await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Download User CA certificate')]")), 30000).click();
+
+      // Click on "Certificates"
+      await driver
+        .wait(until.elementLocated(By.xpath("//div[normalize-space()='Certificates']")), 30000)
+        .click();
+
+      // Download the User CA certificate
+      await driver
+        .wait(until.elementLocated(By.xpath("//span[contains(.,'Download User CA certificate')]")), 30000)
+        .click();
+
+      // Log out
       await logout(driver);
     });
   } catch (error) {
@@ -23,22 +44,18 @@ async function C84() {
   }
 }
 
-
-
-
-
 module.exports = C84;
 
-
+// Execute the test if run directly from the command line
 if (require.main === module) {
   (async () => {
     try {
-      console.log(`'🚀 Ejecutando el test `);
-      await C84();   // Change here the test name
-      
-      console.log('✅ Test completado con éxito.');
+      console.log('🚀 Running the test');
+      await C84(); // Change here the test name if needed
+
+      console.log('✅ Test completed successfully.');
     } catch (error) {
-      console.error('❌ Error al ejecutar el test:', error.message);
+      console.error('❌ Error while running the test:', error.message);
     }
   })();
 }
