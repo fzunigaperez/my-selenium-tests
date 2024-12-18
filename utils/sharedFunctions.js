@@ -681,9 +681,27 @@ async function loginToProtonMail(driver, vars = {}) {
       await driver.sleep(10000);  //Remove this because of Zacualpan
 
       // Verificar si el usuario está autenticado o si necesita iniciar sesión
-      const isLoggedIn = await driver.findElements(By.xpath("//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]"));
+      //const isLoggedIn = await driver.findElements(By.xpath("//button[contains(.,'New message')]"));
 
-      if (isLoggedIn.length > 0) {
+      const xpath = "//button[contains(.,'New message')]";
+
+// Usar executeScript para buscar el elemento rápidamente
+const invalidUser = await driver.executeScript((xpath) => {
+const result = document.evaluate(
+    xpath, 
+    document, 
+    null, 
+    XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, 
+    null
+  );
+  return result.snapshotLength; // Retorna la cantidad de elementos encontrados
+}, xpath);
+
+console.log('Are we already inside of ProtonMail?:', isLoggedIn);
+
+  
+
+      if (isLoggedIn > 0) {
           console.log("Usuario ya autenticado. Procediendo directamente a 'Proton Mail Plus'.");
 
           const elementToClick = await driver.wait(
@@ -860,20 +878,37 @@ async function loginToProtonMail(driver, vars = {}) {
     // Esperar que se localice "Inbox"
     await driver.wait(until.elementLocated(By.xpath("//span[contains(text(),'Inbox')]")), 30000);
 
-    // Comprobar si existe "Less"
-    const lessElements = await driver.findElements(By.xpath("//span[normalize-space()='Less']"));
-    if (lessElements.length > 0) {
-        // Esperar que el elemento "Less" sea visible (si es necesario interactuar con él en el futuro)
-        await driver.wait(until.elementIsEnabled(lessElements[0]), 3000);
-    } else {
-        // Hacer clic en "More" si "Less" no está visible
-        const moreButton = await driver.wait(
-            until.elementLocated(By.xpath("//span[normalize-space()='More']")),
-            5000
-        );
-        await driver.wait(until.elementIsEnabled(moreButton), 5000);
-        await moreButton.click();
-    }
+    // Comprobar si existe More button
+
+    const xpath = "//span[normalize-space()='More']";
+
+
+const buttonMorePresent = await driver.executeScript((xpath) => {
+const result = document.evaluate(
+    xpath, 
+    document, 
+    null, 
+    XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, 
+    null
+  );
+  return result.snapshotLength; // Retorna la cantidad de elementos encontrados
+}, xpath);
+
+console.log('Is the button More present?:',buttonMorePresent );
+
+  // Verificar si el error es de usuario inválido
+  if (buttonMorePresent > 0) {
+    
+    await driver.wait(until.elementLocated(By.xpath("//span[normalize-space()='More']")), 30000).click();
+
+    return;
+  }
+  else{
+
+    console.log("It is not necessary to to anything");
+  }
+
+    
 
     // Hacer clic en "All mail"
     const allMailButton = await driver.wait(
