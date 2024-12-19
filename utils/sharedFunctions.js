@@ -659,10 +659,15 @@ async function emailVerification(driver,vars) {
   await driver.switchTo().window(latestWindow);
   console.log('Cambiado a la ventana más reciente.');
 
-  await driver.sleep(2000);
-  const loginDataPagePresent = await driver.findElements(By.xpath("//h1[normalize-space()='Login']"));
-  console.log('Cantidad de elementos encontrados para "loginDataPagePresent":', loginDataPagePresent.length);
-  if (loginDataPagePresent.length > 0) {
+  //await driver.sleep(2000);
+  //const loginDataPagePresent = await driver.findElements(By.xpath("//h1[normalize-space()='Login']"));
+
+  //console.log('Cantidad de elementos encontrados para "loginDataPagePresent":', loginDataPagePresent.length);
+
+  const loginDataPagePresent = await waitForXPathPresentTimeout(driver, "//h1[normalize-space()='Login']", 10000);
+
+
+  if (loginDataPagePresent) {
     console.log("Log out not necessary");
   } else {
     console.log("Log out necessary");
@@ -1271,6 +1276,42 @@ console.log('Are we already inside of ProtonMail?:', isLoggedIn);
     await driver.sleep(4000);
   }
   
+async function waitForXPathPresentTimeout(driver, xpath, timeout) {
+  const pollInterval = 1000; // Polling interval in milliseconds (1 second)
+  const endTime = Date.now() + timeout;
+
+  console.log(`Starting to wait for the element with XPath: "${xpath}" for up to ${timeout / 1000} seconds.`);
+
+  while (Date.now() < endTime) {
+    try {
+      const elementCount = await driver.executeScript((xp) => {
+        const result = document.evaluate(
+          xp,
+          document,
+          null,
+          XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+          null
+        );
+        return result.snapshotLength;
+      }, xpath);
+
+      if (elementCount > 0) {
+        console.log(`Element with XPath: "${xpath}" found. Number of matches: ${elementCount}`);
+        return true; // The element was found
+      } else {
+        console.log(`Element with XPath: "${xpath}" not found. Checking again in ${pollInterval / 1000} second(s).`);
+      }
+    } catch (err) {
+      console.error(`Error during XPath evaluation: ${err}`);
+    }
+
+    // Wait 1 second before checking again
+    await new Promise(resolve => setTimeout(resolve, pollInterval));
+  }
+
+  console.log(`Timed out after ${timeout / 1000} seconds. The element with XPath: "${xpath}" was not found.`);
+  return false; // The element was not found within the defined time
+}
 
 
 
@@ -1318,6 +1359,7 @@ module.exports = {
   deleteUnregisteredUserInCaseOfExistence,
   loginAsUnregisteredUserAndDeleteAccount,
   waitUntilXpathNotPresent,
+  waitForXPathPresentTimeout,
   countElementsByXPath,
   waitingLoadingRingProficloudToDissapear,
   
