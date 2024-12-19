@@ -117,7 +117,7 @@ async function C19() {
 
         // Confirm Email in ProtonMail
         await driver.sleep(10000);
-        await loginToProtonMail(driver, vars);
+        await loginToProtonMail(driver, vars,until);
 
         // Filter and Select Verification Email
         await driver.wait(until.elementLocated(By.css(".active .text-ellipsis")), 30000);
@@ -166,7 +166,7 @@ async function C19() {
         await logout(driver);
         await windowConfiguration(driver);
         await loginChangeOrgaUserName(driver, vars, until);
-        await loginToProtonMail(driver, vars);
+        await loginToProtonMail(driver, vars, until);
         await deleteAllEmails(driver, vars);
         await logOutFromProtonMail(driver);
       }

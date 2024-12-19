@@ -23,7 +23,7 @@ async function C13() {
         let vars = {};
 
         await windowConfiguration(driver);
-        await loginToProtonMail(driver,vars);
+        await loginToProtonMail(driver,vars,until);
         await confirmLinkUrlToggleIsOff(driver,vars,until);     
         await logOutFromProtonMail(driver);
         await deleteUnregisteredUserInCaseOfExistence(driver,vars);
@@ -44,7 +44,7 @@ async function C13() {
 
         await emailVerification(driver,vars);
         await loginAsUnregisteredUserAndDeleteAccount(driver,vars);
-        await loginToProtonMail(driver,vars);
+        await loginToProtonMail(driver,vars,until);
         await deleteAllEmails(driver,vars);
         await logOutFromProtonMail(driver);
 

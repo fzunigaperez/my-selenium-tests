@@ -39,7 +39,7 @@ async function C18() {
   
     // Check email for failed login attempt
     let vars = {}; // Initialize vars
-    await loginToProtonMail(driver, vars); // Log into Proton Mail
+    await loginToProtonMail(driver, vars,until); // Log into Proton Mail
     await checkFailedLoginEmail(driver); // Verify email notification about failed login attempt
   
     // Optionally, delete all emails

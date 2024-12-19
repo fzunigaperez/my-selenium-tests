@@ -53,11 +53,11 @@ async function sendResultToTestRail(testCaseId, status, comment = '', testRunId)
 
 
 // Function to log in to ProtonMail
-async function loginToProtonMail(driver, vars = {}) {
+async function loginToProtonMail(driver, vars, until = {}) {
   try {
     // Navigate to the login URL
     await driver.get("https://mail.proton.me/");
-    await driver.sleep(6000);  // Remove this because of Zacualpan
+    await driver.sleep(10000);  // Remove this because of Zacualpan
 
     // Verify if the user is authenticated or needs to log in
     const xpath = "//button[contains(.,'New message')]";
@@ -153,6 +153,10 @@ async function loginToProtonMail(driver, vars = {}) {
   } catch (err) {
     console.error("An error occurred:", err);
   }
+  console.log("Waiting the Inbox button to appear");
+  await driver.wait(until.elementLocated(By.css(".active .text-ellipsis")), 60000);
+  console.log("Inbox button appeared");
+
 }
 
 
@@ -547,7 +551,7 @@ console.log('Cantidad de elementos encontrados para "Invalid username or passwor
     // Time to wait in order to get the mail
     await driver.sleep(10000);
 
-    await loginToProtonMail(driver,vars);
+    await loginToProtonMail(driver,vars,until);
     //Filtering the mail since there are 2 mails and only one has the verificaton link
     await driver.wait(until.elementLocated(By.css(".active .text-ellipsis")), 60000);
     await driver.wait(until.elementLocated(By.xpath("//input[@data-testid='search-keyword']")), 30000).click();
@@ -639,10 +643,10 @@ console.log('Cantidad de elementos encontrados para "Invalid username or passwor
 
 }
 
-async function emailVerification(driver,vars) {
+async function emailVerification(driver,vars,until) {
 
-  await loginToProtonMail(driver, vars);
-  await driver.wait(until.elementLocated(By.css(".active .text-ellipsis")), 30000);
+  await loginToProtonMail(driver, vars,until);
+  await driver.wait(until.elementLocated(By.css(".active .text-ellipsis")), 60000);
   await driver.findElement(By.css(".active .text-ellipsis")).click();
   await driver.wait(until.elementLocated(By.css(".item-subject > .inline-block")), 60000);
   await driver.findElement(By.css(".item-subject > .inline-block")).click();
