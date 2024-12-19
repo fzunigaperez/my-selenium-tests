@@ -16,7 +16,9 @@ const C90 = require('./testCases/C90');
 //Profile Settings
 const C19 = require('./testCases/C19');
 const C84 = require('./testCases/C84');
+//Billing account
 const C537 = require('./testCases/C537');
+const C706 = require('./testCases/C706');
 
 
 // Función para extraer los Test IDs de sessionName
@@ -45,6 +47,8 @@ const sessionNames = [
   { name: 'C84_Download User CA certificate', func: C84 },
   //Billing Account
   { name: 'C537_Edit a billing account as an ADMIN', func: C537 },
+  { name: 'C706_C707_Edit a billing account as an EDITOR not allowed / Edit a billing account as an VIEWER not allowed', func: C706},
+
 
 ];
 

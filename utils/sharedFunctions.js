@@ -374,6 +374,8 @@ async function changeInformationButton(driver) {
 }
 
 async function logout(driver) {
+
+  await deviceManagementMenu(driver,until);
   await userMenu(driver);
   await driver
     .findElement(By.xpath("//div[@class='profile-menu_icon-text__text'][contains(.,'Logout')]"))
@@ -1359,8 +1361,15 @@ async function assertElementNotPresent(driver, elementSelector, selectorType = '
 }
 
 
+async function deviceManagementMenu(driver,until) {
+
+await driver.wait(until.elementLocated(By.xpath("//span[normalize-space()='Device Management Service']")), 30000).click();
+  
+}
+
 module.exports = {
   createTestRun,
+  deviceManagementMenu,
   sendResultToTestRail,
   acceptCookies,
   loginLandingPageButton,
