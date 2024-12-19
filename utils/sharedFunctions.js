@@ -1,27 +1,27 @@
 const { By, until } = require('selenium-webdriver');
-const assert = require('assert'); // Importa el módulo assert
-const axios = require('axios'); // Necesary to send test results
-//const { sendResultToTestRail } = require('../utils/sharedFunctions');
+const assert = require('assert'); // Import the assert module
+const axios = require('axios'); // Necessary to send test results
+// const { sendResultToTestRail } = require('../utils/sharedFunctions');
 
 
-// Función para crear un Test Run en TestRail
+// Function to create a Test Run in TestRail
 async function createTestRun(projectId, testRunName, testCaseIds = []) {
   const url = `https://testingpxc.testrail.io/index.php?/api/v2/add_run/${projectId}`;
   const auth = {
-    username: process.env.TESTRAIL_USERNAME, // Configura tus variables de entorno
+    username: process.env.TESTRAIL_USERNAME, // Set your environment variables
     password: process.env.TESTRAIL_API_KEY
   };
 
   const data = {
     name: testRunName,
-    include_all: testCaseIds.length === 0, // Incluye todos los casos si la lista está vacía
-    case_ids: testCaseIds // Lista de IDs de casos, opcional
+    include_all: testCaseIds.length === 0, // Include all cases if the list is empty
+    case_ids: testCaseIds // List of case IDs, optional
   };
 
   try {
     const response = await axios.post(url, data, { auth });
     console.log('Test run created successfully:', response.data);
-    return response.data; // Retorna los detalles del Test Run (como su ID)
+    return response.data; // Return the details of the Test Run (such as its ID)
   } catch (error) {
     console.error('Error creating test run:', error.message);
     throw error;
@@ -29,7 +29,7 @@ async function createTestRun(projectId, testRunName, testCaseIds = []) {
 }
 
 
-// Función para enviar resultados a TestRail
+// Function to send results to TestRail
 async function sendResultToTestRail(testCaseId, status, comment = '', testRunId) {
   const url = `https://testingpxc.testrail.io/index.php?/api/v2/add_result_for_case/${testRunId}/${testCaseId}`;
   const auth = {
@@ -52,132 +52,119 @@ async function sendResultToTestRail(testCaseId, status, comment = '', testRunId)
 }
 
 
+// Function to log in to ProtonMail
 async function loginToProtonMail(driver, vars = {}) {
   try {
-      // Navegar a la URL de inicio de sesión
-      await driver.get("https://mail.proton.me/");
-      await driver.sleep(6000);  //Remove this because of Zacualpan
+    // Navigate to the login URL
+    await driver.get("https://mail.proton.me/");
+    await driver.sleep(6000);  // Remove this because of Zacualpan
 
-      // Verificar si el usuario está autenticado o si necesita iniciar sesión
-      //const isLoggedIn = await driver.findElements(By.xpath("//button[contains(.,'New message')]"));
+    // Verify if the user is authenticated or needs to log in
+    const xpath = "//button[contains(.,'New message')]";
 
-      const xpath = "//button[contains(.,'New message')]";
+    // Use executeScript to quickly search for the element
+    const isLoggedIn = await driver.executeScript((xpath) => {
+      const result = document.evaluate(
+        xpath,
+        document,
+        null,
+        XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+        null
+      );
+      return result.snapshotLength; // Return the number of elements found
+    }, xpath);
 
-// Usar executeScript para buscar el elemento rápidamente
-const isLoggedIn = await driver.executeScript((xpath) => {
-const result = document.evaluate(
-    xpath, 
-    document, 
-    null, 
-    XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, 
-    null
-  );
-  return result.snapshotLength; // Retorna la cantidad de elementos encontrados
-}, xpath);
+    console.log('Are we already inside of ProtonMail?:', isLoggedIn);
 
-console.log('Are we already inside of ProtonMail?:', isLoggedIn);
+    if (isLoggedIn > 0) {
+      console.log("User already authenticated. Proceeding directly to 'Proton Mail Plus'.");
 
-  
+      const elementToClick = await driver.wait(
+        until.elementLocated(By.xpath("//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]")),
+        10000
+      );
 
-      if (isLoggedIn > 0) {
-          console.log("Usuario ya autenticado. Procediendo directamente a 'Proton Mail Plus'.");
+      await driver.wait(until.elementIsVisible(elementToClick), 2000);
+      await elementToClick.click();
+      console.log("Click on 'Proton Mail Plus' successful.");
+    } else {
+      console.log("User not authenticated. Proceeding with login.");
 
-          const elementToClick = await driver.wait(
-              until.elementLocated(By.xpath("//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]")),
-              10000
-          );
+      // User variables
+      vars["mailUsername"] = "testingpxc_admin@proton.me";
+      vars["mailPassword"] = "Proficloud2022!";
 
-          await driver.wait(until.elementIsVisible(elementToClick), 2000);
-          await elementToClick.click();
-          console.log("Clic en 'Proton Mail Plus' exitoso.");
+      // Wait for the username field to be available
+      const usernameField = await driver.wait(until.elementLocated(By.id("username")), 10000);
+      await usernameField.sendKeys(vars["mailUsername"]);
 
-      } else {
-          console.log("Usuario no autenticado. Procediendo con inicio de sesión.");
+      // Wait for the password field to be available and send data
+      const passwordField = await driver.wait(until.elementLocated(By.id("password")), 10000);
+      await passwordField.sendKeys(vars["mailPassword"]);
 
-          // Variables de usuario
-          vars["mailUsername"] = "testingpxc_admin@proton.me";
-          vars["mailPassword"] = "Proficloud2022!";
+      // Click the login button
+      const submitButton = await driver.wait(until.elementLocated(By.css('button[type="submit"]')), 10000);
+      await submitButton.click();
+      console.log("Credentials entered. Waiting for 'Proton Mail Plus'...");
 
-          // Esperar a que el campo de usuario esté disponible
-          const usernameField = await driver.wait(until.elementLocated(By.id("username")), 10000);
-          await usernameField.sendKeys(vars["mailUsername"]);
+      // Wait for 'Proton Mail Plus' to be available
+      try {
+        console.log("Waiting for 'Proton Mail Plus' to be available...");
 
-          // Esperar a que el campo de contraseña esté disponible y enviar los datos
-          const passwordField = await driver.wait(until.elementLocated(By.id("password")), 10000);
-          await passwordField.sendKeys(vars["mailPassword"]);
+        const maxWaitTime = 5000; // 5 seconds
+        const pollInterval = 1000; // Check every 1 second
+        let elapsedTime = 0;
+        let elementToClick = null;
 
-          // Clic en el botón de inicio de sesión
-          const submitButton = await driver.wait(until.elementLocated(By.css('button[type="submit"]')), 10000);
-          await submitButton.click();
-          console.log("Credenciales ingresadas. Esperando a 'Proton Mail Plus'...");
+        while (elapsedTime < maxWaitTime) {
+          const xpath = "//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]";
 
-          // Esperar a que 'Proton Mail Plus' esté disponible
-          try {
-            console.log("Esperando a que 'Proton Mail Plus' esté disponible...");
-        
-            // Tiempo máximo de espera (en milisegundos)
-            const maxWaitTime = 5000; // 10 segundos
-            const pollInterval = 1000; // Revisar cada 1 segundo
-            let elapsedTime = 0;
-            let elementToClick = null;
-        
-            // Bucle para comprobar repetidamente si el elemento aparece
-            while (elapsedTime < maxWaitTime) {
+          const elements = await driver.executeScript((xpath) => {
+            const result = document.evaluate(
+              xpath,
+              document,
+              null,
+              XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+              null
+            );
+            return result.snapshotLength; // Return the number of elements found
+          }, xpath);
 
-                const xpath = "//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]";
-
-                const elements = await driver.executeScript((xpath) => {
-                  const result = document.evaluate(
-                      xpath, 
-                      document, 
-                      null, 
-                      XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, 
-                      null
-                    );
-                    return result.snapshotLength; // Retorna la cantidad de elementos encontrados
-                  }, xpath);
-                  
-
-
-
-
-                if (elements > 0) {
-                    elementToClick = elements[0];
-                    break; // Salir del bucle si el elemento se encuentra
-                }
-                await driver.sleep(pollInterval); // Esperar antes de volver a comprobar
-                elapsedTime += pollInterval;
-            }
-        
-            if (elementToClick) {
-                console.log("'Proton Mail Plus' encontrado. Procediendo a hacer clic.");
-                await driver.wait(until.elementIsVisible(elementToClick), 1000);
-                await elementToClick.click();
-                console.log("Clic en 'Proton Mail Plus' exitoso.");
-            } else {
-                console.log("'Proton Mail Plus' no apareció dentro del tiempo de espera permitido. Continuando sin clic.");
-            }
-        } catch (error) {
-            console.error("Ocurrió un error al verificar o hacer clic en 'Proton Mail Plus':", error);
+          if (elements > 0) {
+            elementToClick = elements[0];
+            break; // Exit loop if element is found
+          }
+          await driver.sleep(pollInterval); // Wait before checking again
+          elapsedTime += pollInterval;
         }
-        
+
+        if (elementToClick) {
+          console.log("'Proton Mail Plus' found. Proceeding to click.");
+          await driver.wait(until.elementIsVisible(elementToClick), 1000);
+          await elementToClick.click();
+          console.log("Click on 'Proton Mail Plus' successful.");
+        } else {
+          console.log("'Proton Mail Plus' did not appear within the allowed time. Continuing without clicking.");
+        }
+      } catch (error) {
+        console.error("An error occurred while checking or clicking 'Proton Mail Plus':", error);
       }
+    }
   } catch (err) {
-      console.error("Ocurrió un error:", err);
+    console.error("An error occurred:", err);
   }
 }
 
 
-
-
+// Function to accept cookies
 async function acceptCookies(driver) {
   try {
     const cookiesXPath = "//h2[normalize-space()='This website uses cookies']";
     const acceptButtonXPath = "//button[@id='ga-opt-out-false']";
 
-    // Esperar un máximo de 3 segundos para que aparezca el banner de cookies
-    const timeout = 3000; // 3 segundos en milisegundos
-    const interval = 500; // Intervalo de comprobación de 500 ms
+    // Wait up to 3 seconds for the cookies banner to appear
+    const timeout = 3000; // 3 seconds in milliseconds
+    const interval = 500; // 500 ms check interval
     let bannerFound = false;
     const startTime = Date.now();
 
@@ -195,14 +182,14 @@ async function acceptCookies(driver) {
 
       if (bannerFound) break;
 
-      // Espera 500 ms antes de volver a comprobar
+      // Wait 500 ms before checking again
       await new Promise((resolve) => setTimeout(resolve, interval));
     }
 
     if (bannerFound) {
       console.log("Cookies banner detected.");
 
-      // Intentar hacer clic en el botón de aceptar cookies
+      // Try clicking the accept cookies button
       const acceptButtonClicked = await driver.executeScript((xpath) => {
         const result = document.evaluate(
           xpath,
@@ -1034,108 +1021,102 @@ console.log('Are we already inside of ProtonMail?:', isLoggedIn);
   }
   
   async function deleteAllEmails(driver) {
-    console.log("Deleting all mails...");
-    // Esperar que se localice "Inbox"
+    console.log("Deleting all emails...");
+  
+    // Wait until "Inbox" is located
     await driver.wait(until.elementLocated(By.xpath("//span[contains(text(),'Inbox')]")), 30000);
-
-    // Comprobar si existe More button
-
+  
+    // Check if the "More" button exists
     const xpath = "//span[normalize-space()='More']";
-
-
-const buttonMorePresent = await driver.executeScript((xpath) => {
-const result = document.evaluate(
-    xpath, 
-    document, 
-    null, 
-    XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, 
-    null
-  );
-  return result.snapshotLength; // Retorna la cantidad de elementos encontrados
-}, xpath);
-
-console.log('Is the button More present?:',buttonMorePresent );
-
-  // Verificar si el error es de usuario inválido
-  if (buttonMorePresent > 0) {
-    
-    await driver.wait(until.elementLocated(By.xpath("//span[normalize-space()='More']")), 30000).click();
-
-    return;
-  }
-  else{
-
-    console.log("It is not necessary to to anything");
-  }
-
-    
-
-    // Hacer clic en "All mail"
+  
+    const buttonMorePresent = await driver.executeScript((xpath) => {
+      const result = document.evaluate(
+        xpath,
+        document,
+        null,
+        XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+        null
+      );
+      return result.snapshotLength; // Returns the number of elements found
+    }, xpath);
+  
+    console.log("Is the 'More' button present?:", buttonMorePresent);
+  
+    // Verify if the error is due to an invalid user
+    if (buttonMorePresent > 0) {
+      await driver.wait(until.elementLocated(By.xpath("//span[normalize-space()='More']")), 30000).click();
+      return;
+    } else {
+      console.log("It is not necessary to do anything.");
+    }
+  
+    // Click on "All mail"
     const allMailButton = await driver.wait(
-        until.elementLocated(By.xpath("//span[contains(text(),'All mail')]")),
-        30000
+      until.elementLocated(By.xpath("//span[contains(text(),'All mail')]")),
+      30000
     );
     await driver.wait(until.elementIsEnabled(allMailButton), 30000);
-        await allMailButton.click();
-
-    // Seleccionar todos los correos
+    await allMailButton.click();
+  
+    // Select all emails
     const selectAllButton = await driver.wait(
-        until.elementLocated(By.id("idSelectAll")),
-        30000
+      until.elementLocated(By.id("idSelectAll")),
+      30000
     );
     await driver.sleep(2000);
     await driver.wait(until.elementIsEnabled(selectAllButton), 30000);
     await selectAllButton.click();
-
-    // Mover a la papelera
+  
+    // Move to trash
     const moveToTrashButton = await driver.wait(
-        until.elementLocated(By.xpath("//button[contains(.,'Move to trash')]")),
-        30000
+      until.elementLocated(By.xpath("//button[contains(.,'Move to trash')]")),
+      30000
     );
     await driver.wait(until.elementIsEnabled(moveToTrashButton), 30000);
     await moveToTrashButton.click();
-
-    // Navegar a la papelera
+  
+    // Navigate to the trash folder
     const trashButton = await driver.wait(
-        until.elementLocated(By.xpath("//span[@class='text-ellipsis'][contains(.,'Trash')]")),
-        30000
+      until.elementLocated(By.xpath("//span[@class='text-ellipsis'][contains(.,'Trash')]")),
+      30000
     );
     await driver.wait(until.elementIsEnabled(trashButton), 30000);
     await trashButton.click();
-
-    // Seleccionar todo en la papelera
+  
+    // Select all in the trash folder
     const selectAllTrashButton = await driver.wait(
-        until.elementLocated(By.id("idSelectAll")),
-        30000
+      until.elementLocated(By.id("idSelectAll")),
+      30000
     );
     await driver.sleep(2000);
     await driver.wait(until.elementIsEnabled(selectAllTrashButton), 30000);
     await selectAllTrashButton.click();
-
-    // Eliminar permanentemente
+  
+    // Delete permanently
     const deletePermanentlyButton = await driver.wait(
-        until.elementLocated(By.xpath("//button[contains(.,'Delete permanently')]")),
-        30000
+      until.elementLocated(By.xpath("//button[contains(.,'Delete permanently')]")),
+      30000
     );
     await driver.wait(until.elementIsEnabled(deletePermanentlyButton), 30000);
     await deletePermanentlyButton.click();
-
-    // Confirmar eliminación
+  
+    // Confirm deletion
     const confirmDeleteButton = await driver.wait(
-        until.elementLocated(By.xpath("//button[contains(text(),'Delete')]")),
-        30000
+      until.elementLocated(By.xpath("//button[contains(text(),'Delete')]")),
+      30000
     );
-
     await driver.wait(until.elementIsVisible(confirmDeleteButton), 30000);
     await confirmDeleteButton.click();
-
+  
+    // Wait until "No messages found" confirmation appears
     const noMessagesFound = await driver.wait(
       until.elementLocated(By.xpath("//h3[contains(@data-testid,'empty-view-placeholder--empty-title')]")),
       30000
     );
     await driver.wait(until.elementIsVisible(noMessagesFound), 30000);
-   
   }
+  
+   
   
   async function confirmLinkUrlToggleIsOff(driver, vars, until) {
 
