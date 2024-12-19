@@ -52,6 +52,124 @@ async function sendResultToTestRail(testCaseId, status, comment = '', testRunId)
 }
 
 
+async function loginToProtonMail(driver, vars = {}) {
+  try {
+      // Navegar a la URL de inicio de sesión
+      await driver.get("https://mail.proton.me/");
+      await driver.sleep(6000);  //Remove this because of Zacualpan
+
+      // Verificar si el usuario está autenticado o si necesita iniciar sesión
+      //const isLoggedIn = await driver.findElements(By.xpath("//button[contains(.,'New message')]"));
+
+      const xpath = "//button[contains(.,'New message')]";
+
+// Usar executeScript para buscar el elemento rápidamente
+const isLoggedIn = await driver.executeScript((xpath) => {
+const result = document.evaluate(
+    xpath, 
+    document, 
+    null, 
+    XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, 
+    null
+  );
+  return result.snapshotLength; // Retorna la cantidad de elementos encontrados
+}, xpath);
+
+console.log('Are we already inside of ProtonMail?:', isLoggedIn);
+
+  
+
+      if (isLoggedIn > 0) {
+          console.log("Usuario ya autenticado. Procediendo directamente a 'Proton Mail Plus'.");
+
+          const elementToClick = await driver.wait(
+              until.elementLocated(By.xpath("//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]")),
+              10000
+          );
+
+          await driver.wait(until.elementIsVisible(elementToClick), 2000);
+          await elementToClick.click();
+          console.log("Clic en 'Proton Mail Plus' exitoso.");
+
+      } else {
+          console.log("Usuario no autenticado. Procediendo con inicio de sesión.");
+
+          // Variables de usuario
+          vars["mailUsername"] = "testingpxc_admin@proton.me";
+          vars["mailPassword"] = "Proficloud2022!";
+
+          // Esperar a que el campo de usuario esté disponible
+          const usernameField = await driver.wait(until.elementLocated(By.id("username")), 10000);
+          await usernameField.sendKeys(vars["mailUsername"]);
+
+          // Esperar a que el campo de contraseña esté disponible y enviar los datos
+          const passwordField = await driver.wait(until.elementLocated(By.id("password")), 10000);
+          await passwordField.sendKeys(vars["mailPassword"]);
+
+          // Clic en el botón de inicio de sesión
+          const submitButton = await driver.wait(until.elementLocated(By.css('button[type="submit"]')), 10000);
+          await submitButton.click();
+          console.log("Credenciales ingresadas. Esperando a 'Proton Mail Plus'...");
+
+          // Esperar a que 'Proton Mail Plus' esté disponible
+          try {
+            console.log("Esperando a que 'Proton Mail Plus' esté disponible...");
+        
+            // Tiempo máximo de espera (en milisegundos)
+            const maxWaitTime = 10000; // 30 segundos
+            const pollInterval = 1000; // Revisar cada 1 segundo
+            let elapsedTime = 0;
+            let elementToClick = null;
+        
+            // Bucle para comprobar repetidamente si el elemento aparece
+            while (elapsedTime < maxWaitTime) {
+
+                const xpath = "//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]";
+
+                const elements = await driver.executeScript((xpath) => {
+                  const result = document.evaluate(
+                      xpath, 
+                      document, 
+                      null, 
+                      XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, 
+                      null
+                    );
+                    return result.snapshotLength; // Retorna la cantidad de elementos encontrados
+                  }, xpath);
+                  
+
+
+
+
+                if (elements > 0) {
+                    elementToClick = elements[0];
+                    break; // Salir del bucle si el elemento se encuentra
+                }
+                await driver.sleep(pollInterval); // Esperar antes de volver a comprobar
+                elapsedTime += pollInterval;
+            }
+        
+            if (elementToClick) {
+                console.log("'Proton Mail Plus' encontrado. Procediendo a hacer clic.");
+                await driver.wait(until.elementIsVisible(elementToClick), 1000);
+                await elementToClick.click();
+                console.log("Clic en 'Proton Mail Plus' exitoso.");
+            } else {
+                console.log("'Proton Mail Plus' no apareció dentro del tiempo de espera permitido. Continuando sin clic.");
+            }
+        } catch (error) {
+            console.error("Ocurrió un error al verificar o hacer clic en 'Proton Mail Plus':", error);
+        }
+        
+      }
+  } catch (err) {
+      console.error("Ocurrió un error:", err);
+  }
+}
+
+
+
+
 async function acceptCookies(driver) {
   try {
     const cookiesXPath = "//h2[normalize-space()='This website uses cookies']";
