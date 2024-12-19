@@ -116,7 +116,7 @@ console.log('Are we already inside of ProtonMail?:', isLoggedIn);
             console.log("Esperando a que 'Proton Mail Plus' esté disponible...");
         
             // Tiempo máximo de espera (en milisegundos)
-            const maxWaitTime = 10000; // 30 segundos
+            const maxWaitTime = 5000; // 10 segundos
             const pollInterval = 1000; // Revisar cada 1 segundo
             let elapsedTime = 0;
             let elementToClick = null;
@@ -1254,6 +1254,21 @@ console.log('Is the button More present?:',buttonMorePresent );
        
   }
 
+  async function countElementsByXPath(driver, xpath) {
+    const elementCount = await driver.executeScript((xp) => {
+      const result = document.evaluate(
+        xp,
+        document,
+        null,
+        XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+        null
+      );
+      return result.snapshotLength;
+    }, xpath);
+  
+    return elementCount;
+  }
+
   
   async function agreeTerms(driver) {
     await driver.findElement(By.id("mat-mdc-checkbox-1-input")).click();
@@ -1322,6 +1337,7 @@ module.exports = {
   deleteUnregisteredUserInCaseOfExistence,
   loginAsUnregisteredUserAndDeleteAccount,
   waitUntilXpathNotPresent,
+  countElementsByXPath,
   waitingLoadingRingProficloudToDissapear,
   
 };
