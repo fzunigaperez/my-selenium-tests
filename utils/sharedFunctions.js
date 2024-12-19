@@ -1317,6 +1317,46 @@ async function waitForXPathPresentTimeout(driver, xpath, timeout) {
   return false; // The element was not found within the defined time
 }
 
+async function assertElementNotPresent(driver, elementSelector, selectorType = 'css', timeout = 5000) {
+  try {
+      // Select the type of selector that will be used
+      let locator;
+      switch (selectorType) {
+          case 'id':
+              locator = By.id(elementSelector);
+              break;
+          case 'class':
+              locator = By.className(elementSelector);
+              break;
+          case 'name':
+              locator = By.name(elementSelector);
+              break;
+          case 'xpath':
+              locator = By.xpath(elementSelector);
+              break;
+          case 'css':
+          default:
+              locator = By.css(elementSelector);
+              break;
+      }
+
+      // Wait for the element to be located on the page (within the timeout period)
+      await driver.wait(until.elementLocated(locator), timeout);
+      
+      // If the element is found, fail the test and log a failure message
+      console.log(`Failure: Element with selector ${elementSelector} was found, but it shouldn't have been.`);
+      throw new Error(`Element with selector ${elementSelector} should not be present.`);
+  } catch (error) {
+      // If the element is not found within the timeout, we expect a TimeoutError
+      if (error.name === 'TimeoutError') {
+          // Element is not present, which is the expected behavior, log success message
+          console.log(`Success: Element with selector ${elementSelector} was not found, as expected.`);
+          return;
+      }
+      // Rethrow any other errors
+      throw error;
+  }
+}
 
 
 module.exports = {
@@ -1366,5 +1406,6 @@ module.exports = {
   waitForXPathPresentTimeout,
   countElementsByXPath,
   waitingLoadingRingProficloudToDissapear,
+  assertElementNotPresent,
   
 };
