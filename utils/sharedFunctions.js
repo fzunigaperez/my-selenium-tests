@@ -53,7 +53,7 @@ async function sendResultToTestRail(testCaseId, status, comment = '', testRunId)
 
 
 // Function to log in to ProtonMail
-async function loginToProtonMail(driver, vars, until = {}) {
+async function loginToProtonMail(driver,vars) {
   try {
     // Navigate to the login URL
     await driver.get("https://mail.proton.me/");
@@ -146,6 +146,9 @@ async function loginToProtonMail(driver, vars, until = {}) {
         } else {
           console.log("'Proton Mail Plus' did not appear within the allowed time. Continuing without clicking.");
         }
+
+     
+
       } catch (error) {
         console.error("An error occurred while checking or clicking 'Proton Mail Plus':", error);
       }
@@ -153,9 +156,7 @@ async function loginToProtonMail(driver, vars, until = {}) {
   } catch (err) {
     console.error("An error occurred:", err);
   }
-  console.log("Waiting the Inbox button to appear");
-  await driver.wait(until.elementLocated(By.css(".active .text-ellipsis")), 60000);
-  console.log("Inbox button appeared");
+  
 
 }
 
@@ -375,7 +376,7 @@ async function changeInformationButton(driver) {
 
 async function logout(driver) {
 
-  await deviceManagementMenu(driver,until);
+  await deviceManagementMenu(driver);
   await userMenu(driver);
   await driver
     .findElement(By.xpath("//div[@class='profile-menu_icon-text__text'][contains(.,'Logout')]"))
@@ -469,6 +470,30 @@ async function loginViewer(driver, vars) {
   await roothOrganizationTest(driver, vars);
 }
 
+
+async function loginFerchoAlejandro86(driver, vars) {
+  await acceptCookies(driver);
+  await loginLandingPageButton(driver);
+  vars["username"] = "ferchoalejandro86@gmail.com";
+  vars["password"] = "Proficloud2020!";
+  console.log("Credentials set for ferchoalejandro86:", vars);
+
+  // Log in
+  await driver.wait(until.elementLocated(By.id("username")), 5000);
+  await driver.findElement(By.id("username")).sendKeys(vars["username"]);
+  await driver.findElement(By.id("password")).sendKeys(vars["password"]);
+  await driver.findElement(By.id("kc-login")).click();
+
+  // Wait for page to load
+  
+  await isTheOrganizationNameEmpty(driver, vars);
+
+  // Assert the correct page is loaded
+  const pageTitle = await driver.findElement(By.xpath("//div[@id='routeTitle']")).getText();
+  assert.strictEqual(pageTitle, "Device Management Service");
+
+}
+
 async function loginRegisteredUser(driver, vars) {
   await acceptCookies(driver);
   await loginLandingPageButton(driver);
@@ -538,7 +563,7 @@ console.log('Cantidad de elementos encontrados para "Invalid username or passwor
     await driver.findElement(By.id("password")).sendKeys(vars["password"]);
     await driver.findElement(By.id("kc-login")).click();
     
-    await userMenu(driver,vars);  
+    await userMenu(driver);  
     await accountSettingsMainMenu(driver);
     await accountSettingsTab(driver);
     await changeInformationButton(driver);
@@ -549,11 +574,11 @@ console.log('Cantidad de elementos encontrados para "Invalid username or passwor
     await saveProfileDataButton(driver);
     await driver.sleep(1000);
     await confirmButton(driver);
-    await modalClose(driver,until);
+    await modalClose(driver);
     // Time to wait in order to get the mail
     await driver.sleep(10000);
 
-    await loginToProtonMail(driver,vars,until);
+    await loginToProtonMail(driver,vars);
     //Filtering the mail since there are 2 mails and only one has the verificaton link
     await driver.wait(until.elementLocated(By.css(".active .text-ellipsis")), 60000);
     await driver.wait(until.elementLocated(By.xpath("//input[@data-testid='search-keyword']")), 30000).click();
@@ -590,7 +615,7 @@ console.log('Cantidad de elementos encontrados para "Invalid username or passwor
   await driver.findElement(By.id("username")).sendKeys(vars["username"]);
   await driver.findElement(By.id("password")).sendKeys(vars["password"]);
   await driver.findElement(By.id("kc-login")).click();
-  await userMenu(driver,vars);  
+  await userMenu(driver);  
   await accountSettingsMainMenu(driver);
   await accountSettingsTab(driver);
   await driver.wait(until.elementLocated(By.xpath("//div[normalize-space()='change_orga_name@proton.me']")), 10000);
@@ -609,32 +634,32 @@ console.log('Cantidad de elementos encontrados para "Invalid username or passwor
   await roothOrganizationTest(driver, vars);
 }
 
-  async function deleteUnregisteredUserInCaseOfExistence(driver, vars) {
-  await windowConfiguration(driver);  
-  await loginUnregisteredUser(driver, vars); 
-  await driver.sleep(2000);
-  const invalidUser = await driver.findElements(By.xpath("//span[@class='kc-feedback-text'][contains(.,'Invalid username or password.')]"));
-  const emailVerificationNeeded = await driver.findElements(By.xpath("//span[contains(.,'You need to verify your email address to activate your account.')]"));
+    async function deleteUnregisteredUserInCaseOfExistence(driver, vars) {
+    await windowConfiguration(driver);  
+    await loginUnregisteredUser(driver, vars); 
+    await driver.sleep(2000);
+    const invalidUser = await driver.findElements(By.xpath("//span[@class='kc-feedback-text'][contains(.,'Invalid username or password.')]"));
+    const emailVerificationNeeded = await driver.findElements(By.xpath("//span[contains(.,'You need to verify your email address to activate your account.')]"));
 
-  // Obtener la cantidad de elementos encontrados
-  console.log('Cantidad de elementos encontrados para "Invalid username or password":', invalidUser.length);
-  console.log('Cantidad de elementos encontrados para "Email verification needed":', emailVerificationNeeded.length);
+    // Obtener la cantidad de elementos encontrados
+    console.log('Cantidad de elementos encontrados para "Invalid username or password":', invalidUser.length);
+    console.log('Cantidad de elementos encontrados para "Email verification needed":', emailVerificationNeeded.length);
 
-  // Verificar si el error es de usuario inválido
-  if (invalidUser.length > 0) {
-    console.log("The user does not exist, no other measures have to be taken.");
-    return;
-  }
+    // Verificar si el error es de usuario inválido
+    if (invalidUser.length > 0) {
+      console.log("The user does not exist, no other measures have to be taken.");
+      return;
+    }
 
-  // Verificar si es necesario verificar el correo electrónico
-  if (emailVerificationNeeded.length > 0) {
-    console.log("You need to verify your email address.");
-    
-    await emailVerification(driver,vars);
-    await loginAsUnregisteredUserAndDeleteAccount(driver,vars) 
-          
-    return; 
-  }
+    // Verificar si es necesario verificar el correo electrónico
+    if (emailVerificationNeeded.length > 0) {
+      console.log("You need to verify your email address.");
+      
+      await emailVerification(driver,vars);
+      await loginAsUnregisteredUserAndDeleteAccount(driver,vars) 
+            
+      return; 
+    }
 
   // Si el usuario existe, se procede con la eliminación de la cuenta
   console.log("The user exists, therefore the account has to be deleted.");
@@ -645,9 +670,9 @@ console.log('Cantidad de elementos encontrados para "Invalid username or passwor
 
 }
 
-async function emailVerification(driver,vars,until) {
+async function emailVerification(driver,vars) {
 
-  await loginToProtonMail(driver, vars,until);
+  await loginToProtonMail(driver, vars);
   await driver.wait(until.elementLocated(By.css(".active .text-ellipsis")), 60000);
   await driver.findElement(By.css(".active .text-ellipsis")).click();
   await driver.wait(until.elementLocated(By.css(".item-subject > .inline-block")), 60000);
@@ -688,7 +713,7 @@ async function saveProfileDataButton(driver) {
   
 }
 
-async function resetBillingAccountInformation(driver,until) {
+async function resetBillingAccountInformation(driver) {
   // Wait until the "Edit Billing Account" element is located
   await driver.wait(
     until.elementLocated(By.xpath("//*[contains(text(),'Edit Billing Account')]")),
@@ -716,8 +741,8 @@ async function resetBillingAccountInformation(driver,until) {
     console.log("Reset necessary");
 
     // Navigate to the billing information tab and click the edit button
-    await billingInformationTab(driver,until);
-    await editBillingAccountButton(driver,until);
+    await billingInformationTab(driver);
+    await editBillingAccountButton(driver);
 
     // Update Email
     await driver.findElement(By.xpath("//input[@placeholder='Email']")).clear();
@@ -762,7 +787,7 @@ async function resetBillingAccountInformation(driver,until) {
     await driver.findElement(By.xpath("//span[contains(.,'Update billing account')]")).click();
 
     // Wait for the loading ring to disappear
-    await waitingLoadingRingProficloudToDissapear(driver,until);
+    await waitingLoadingRingProficloudToDissapear(driver);
 
     return;
   } else {
@@ -770,7 +795,7 @@ async function resetBillingAccountInformation(driver,until) {
   }
 }
  
-async function editBillingAccountButton(driver,until) {
+async function editBillingAccountButton(driver) {
   
   await driver.wait(until.elementLocated(By.xpath("//span[contains(.,\'Edit Billing Account\')]")), 50000)
   await driver.findElement(By.xpath("//span[contains(.,\'Edit Billing Account\')]")).click()
@@ -957,7 +982,7 @@ console.log('Are we already inside of ProtonMail?:', isLoggedIn);
   
  }
 
- async function billingInformationTab(driver,until) {
+ async function billingInformationTab(driver) {
   await driver.wait(until.elementLocated(By.xpath("//span[@class='mdc-tab__text-label'][contains(.,'Billing Information')]")), 10000).click();
   
  }
@@ -965,7 +990,7 @@ console.log('Are we already inside of ProtonMail?:', isLoggedIn);
   
  async function resetToOriginalUserNameInRoothOrganization(driver,vars) {
 
-  await userMenu(driver,vars);  
+  await userMenu(driver);  
   await accountSettingsMainMenu(driver);
   await accountSettingsTab(driver);
 
@@ -1129,7 +1154,7 @@ console.log('Are we already inside of ProtonMail?:', isLoggedIn);
   
    
   
-  async function confirmLinkUrlToggleIsOff(driver, vars, until) {
+  async function confirmLinkUrlToggleIsOff(driver) {
 
     
     const xpath ="//a[contains(text(), 'All settings')]";
@@ -1361,15 +1386,57 @@ async function assertElementNotPresent(driver, elementSelector, selectorType = '
 }
 
 
-async function deviceManagementMenu(driver,until) {
+async function deviceManagementMenu(driver) {
 
 await driver.wait(until.elementLocated(By.xpath("//span[normalize-space()='Device Management Service']")), 30000).click();
   
 }
 
+async function userManagementMenu(driver) {
+
+await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'User Management Service')]")), 30000).click();
+    
+}
+
+async function arrowButton(driver) {
+  await driver.wait(until.elementLocated(By.css(".pc-icon-dropdown__right-icon > .ng-star-inserted")), 30000);
+  await driver.findElement(By.css(".pc-icon-dropdown__right-icon > .ng-star-inserted")).click();
+}
+
+async function lastNameButton(driver) {
+  await driver.findElement(By.xpath("//span[contains(.,'last name')]")).click();
+}
+
+async function removeMemberButton(driver) {
+  await driver.findElement(By.xpath("//div[contains(text(),'remove member')]")).click();
+  await driver.sleep(2000);
+  await driver.wait(until.elementLocated(By.xpath("//div[@data-analytics='modal headline'][contains(.,'Remove Member')]")), 30000);
+}
+
+async function removeMemberButton2(driver) {
+
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'remove member')]")), 30000).click();
+  
+  await driver.sleep(2000);
+}
+
+async function inviteMemberButton(driver) {
+
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Invite Member')]")), 30000).click();
+  await driver.sleep(2000);
+}
+
+async function inviteMemberButton2(driver) {
+
+  await driver.wait(until.elementLocated(By.xpath("(//span[contains(.,'Invite Member')])[4]")), 30000).click();
+  await driver.sleep(2000);
+}
+
+
 module.exports = {
   createTestRun,
   deviceManagementMenu,
+  userManagementMenu,
   sendResultToTestRail,
   acceptCookies,
   loginLandingPageButton,
@@ -1401,6 +1468,7 @@ module.exports = {
   loginUnregisteredUser,
   loginChangeOrgaUserName,
   loginToProtonMail,
+  loginFerchoAlejandro86,
   logOutFromProtonMail,
   checkFailedLoginEmail,
   deleteAllEmails,
@@ -1416,5 +1484,11 @@ module.exports = {
   countElementsByXPath,
   waitingLoadingRingProficloudToDissapear,
   assertElementNotPresent,
+  arrowButton,
+  lastNameButton,
+  removeMemberButton,
+  removeMemberButton2,
+  inviteMemberButton,
+  inviteMemberButton2,
   
 };
