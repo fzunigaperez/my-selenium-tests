@@ -483,7 +483,9 @@ async function loginFerchoAlejandro86(driver, vars) {
 
   // Log in
   await driver.wait(until.elementLocated(By.id("username")), 5000);
+  await driver.findElement(By.id("username")).clear();
   await driver.findElement(By.id("username")).sendKeys(vars["username"]);
+  await driver.findElement(By.id("password")).clear();
   await driver.findElement(By.id("password")).sendKeys(vars["password"]);
   await driver.findElement(By.id("kc-login")).click();
 
