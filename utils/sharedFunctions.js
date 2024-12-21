@@ -345,6 +345,7 @@ async function switchToOriginalOrganization(driver) {
     .findElement(By.xpath("//div[@class='profile-menu_icon-text__text'][contains(.,'Rooth Organization')]"))
     .click();
   await driver.sleep(1000);
+  await waitingLoadingRingProficloudToDissapear(driver);
   await driver.wait(until.elementLocated(By.id("routeTitle")), 30000);
 }
 
