@@ -156,6 +156,9 @@ async function loginToProtonMail(driver,vars) {
   } catch (err) {
     console.error("An error occurred:", err);
   }
+  console.log("Waiting for Inbox to appear")
+  await driver.wait(until.elementLocated(By.xpath("//span[@class='text-ellipsis'][contains(.,'Inbox')]")), 30000);
+  console.log("Inbox to appeared we are indise of Proton Mail")
   
 
 }
@@ -690,10 +693,7 @@ async function emailVerification(driver,vars) {
   await driver.switchTo().window(latestWindow);
   console.log('Cambiado a la ventana más reciente.');
 
-  //await driver.sleep(2000);
-  //const loginDataPagePresent = await driver.findElements(By.xpath("//h1[normalize-space()='Login']"));
 
-  //console.log('Cantidad de elementos encontrados para "loginDataPagePresent":', loginDataPagePresent.length);
 
   const loginDataPagePresent = await waitForXPathPresentTimeout(driver, "//h1[normalize-space()='Login']", 10000);
 
@@ -820,9 +820,10 @@ async function loginAsUnregisteredUserAndDeleteAccount(driver,vars) {
   await driver.sleep(500);
   await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Delete account')]")), 30000);
   await driver.findElement(By.xpath("//span[contains(.,'Delete account')]")).click();
-  await driver.sleep(500);
+  await driver.sleep(2000);
   await driver.wait(until.elementLocated(By.xpath("//div[@data-analytics='modal headline'][contains(.,'Confirmation required')]")), 30000);
   //Enter Mail 
+  await driver.sleep(2000);
   await driver.wait(until.elementLocated(By.xpath("//input[contains(@placeholder,\'Email\')]")), 30000);
 
   //C697 Introduce a wrong password before user deletion 
@@ -845,7 +846,7 @@ async function loginAsUnregisteredUserAndDeleteAccount(driver,vars) {
   await driver.sleep(500);
   await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Delete account')]")), 30000);
   await driver.findElement(By.xpath("//span[contains(.,'Delete account')]")).click();
-  await driver.sleep(500);
+  await driver.sleep(2000);
   await driver.wait(until.elementLocated(By.xpath("//div[@data-analytics='modal headline'][contains(.,'Confirmation required')]")), 30000);
   //We enter now the correct credentials for deleting the account
   await driver.findElement(By.xpath("//input[contains(@placeholder,\'Email\')]")).clear();
@@ -857,7 +858,7 @@ async function loginAsUnregisteredUserAndDeleteAccount(driver,vars) {
 }
 
 
-async function fProtonMail(driver, vars = {}) {
+async function loginToProtonMail(driver, vars = {}) {
   try {
       // Navegar a la URL de inicio de sesión
       await driver.get("https://mail.proton.me/");
@@ -972,12 +973,12 @@ console.log('Are we already inside of ProtonMail?:', isLoggedIn);
   }
 }
 
- async function modalClose(driver, until) {
+ async function modalClose(driver) {
   await driver.wait(until.elementLocated(By.id("modal-close")), 5000).click();
   
  }
 
- async function settings(driver, until) {
+ async function settings(driver) {
   await driver.wait(until.elementLocated(By.xpath("//div[@class='profile-menu_icon-text__text'][contains(.,'Settings')]")), 5000).click();
   
  }
@@ -1021,7 +1022,7 @@ console.log('Are we already inside of ProtonMail?:', isLoggedIn);
       await driver.sleep(1000);
       await driver.wait(until.elementTextIs(driver.findElement(By.xpath('//pc-overlay/div/div[2]/div/div[2]/div')), "Your profile has been successfully updated."), 5000);
       console.log("El texto esperado está presente!");
-      await modalClose(driver, until);
+      await modalClose(driver);
 
       await driver.wait(until.elementTextIs(driver.findElement(By.xpath("//flex-col/div/div[2]/div[2]")), "Fernando Zuniga"), 5000);
     }
@@ -1386,6 +1387,55 @@ async function assertElementNotPresent(driver, elementSelector, selectorType = '
 }
 
 
+/**
+ * Valida que el texto de un elemento identificado por un selector sea el esperado.
+ * 
+ * @param {WebDriver} driver - La instancia del WebDriver.
+ * @param {string} locatorType - El tipo de localizador: 'xpath', 'css', 'id', 'name', 'class', 'tag'.
+ * @param {string} locatorValue - El valor del selector.
+ * @param {string} expectedText - El texto que se espera encontrar.
+ */
+async function assertText(driver, locatorType, locatorValue, expectedText) {
+  try {
+    let element;
+    switch (locatorType.toLowerCase()) {
+      case 'xpath':
+        element = await driver.findElement(By.xpath(locatorValue));
+        break;
+      case 'css':
+        element = await driver.findElement(By.css(locatorValue));
+        break;
+      case 'id':
+        element = await driver.findElement(By.id(locatorValue));
+        break;
+      case 'name':
+        element = await driver.findElement(By.name(locatorValue));
+        break;
+      case 'class':
+        element = await driver.findElement(By.className(locatorValue));
+        break;
+      case 'tag':
+        element = await driver.findElement(By.tagName(locatorValue));
+        break;
+      default:
+        throw new Error(`❌ Tipo de localizador no válido: "${locatorType}"`);
+    }
+
+    // Obtener el texto del elemento
+    let actualText = await element.getText();
+
+    // Comparar el texto real con el esperado
+    if (actualText === expectedText) {
+      console.log(`✅ El texto coincide: "${actualText}"`);
+    } else {
+      throw new Error(`❌ El texto no coincide. Se esperaba: "${expectedText}", pero se obtuvo: "${actualText}"`);
+    }
+  } catch (error) {
+    console.error(`Error al validar el texto: ${error.message}`);
+    throw error;
+  }
+}
+
 async function deviceManagementMenu(driver) {
 
 await driver.wait(until.elementLocated(By.xpath("//span[normalize-space()='Device Management Service']")), 30000).click();
@@ -1432,6 +1482,61 @@ async function inviteMemberButton2(driver) {
   await driver.sleep(2000);
 }
 
+async function roleSelectionDropDownMenu(driver) {
+
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Role')]")), 30000).click();
+  
+}
+
+
+/**
+ * Retrieves and returns the text of an element identified by a specific locator.
+ *
+ * @param {WebDriver} driver - The WebDriver instance.
+ * @param {string} locatorType - The type of locator: 'xpath', 'css', 'id', 'name', 'class', 'tag'.
+ * @param {string} locatorValue - The selector's value.
+ * @returns {Promise<string>} - The text of the element.
+ */
+async function getTextByLocator(driver, locatorType, locatorValue) {
+  try {
+    let element;
+    switch (locatorType.toLowerCase()) {
+      case 'xpath':
+        element = await driver.findElement(By.xpath(locatorValue));
+        break;
+      case 'css':
+        element = await driver.findElement(By.css(locatorValue));
+        break;
+      case 'id':
+        element = await driver.findElement(By.id(locatorValue));
+        break;
+      case 'name':
+        element = await driver.findElement(By.name(locatorValue));
+        break;
+      case 'class':
+        element = await driver.findElement(By.className(locatorValue));
+        break;
+      case 'tag':
+        element = await driver.findElement(By.tagName(locatorValue));
+        break;
+      default:
+        throw new Error(`❌ Invalid locator type: "${locatorType}"`);
+    }
+
+    // Get the text of the element
+    const text = await element.getText();
+    console.log(`✅ Text found: "${text}"`);
+    return text;
+  } catch (error) {
+    console.error(`❌ Error retrieving the text: ${error.message}`);
+    throw error;
+  }
+}
+
+async function clickFirstMail(driver){
+
+await driver.wait(until.elementLocated(By.xpath("//span[@class='text-ellipsis'][contains(.,'Inbox')]")), 60000).click();
+}
 
 module.exports = {
   createTestRun,
@@ -1490,5 +1595,9 @@ module.exports = {
   removeMemberButton2,
   inviteMemberButton,
   inviteMemberButton2,
+  roleSelectionDropDownMenu,
+  assertText,
+  getTextByLocator,
+  clickFirstMail
   
 };
