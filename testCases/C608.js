@@ -135,7 +135,7 @@ async function C608() {
         await driver.sleep(5000);
 
         // Assert success message
-        await assertText(driver, "css", ".pc-status-overlay__message", "We have successfully invited the new member to your organization. For privacy reasons, we are not allowed to send an email to the invitee. Please inform them personally.");
+        await assertText(driver, "css", ".pc-status-overlay__message", "We have successfully invited the new member to your organization. For privacy reasons, we are not allowed to send an email to the invitee. Please inform him/her personally.");
         await modalClose(driver);
 
         // Wait for invitation link and copy it
