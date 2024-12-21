@@ -7,7 +7,6 @@ const {
   userManagementMenu,
   removeRegisteredUserNew,
   countElementsByXPath,
-  inviteMember,
   assertText,
   logout,
   loginToProtonMail,
@@ -24,16 +23,8 @@ const {
   inviteMemberButton2,
   roleSelectionDropDownMenu,
   removeOldMemberInvitationsRoothOrga,
-  rootOrganizationTest,
   userMenu,
-  accountSettings,
-  changeInformationButton,
-  saveProfileDataButton,
-  confirmButton,
-  mailLogin,
-  deleteAllMails,
-  mailLogout,
-  clickFirstMailInProton,
+  
   roothOrganizationTest,
   modalClose,
   changeFrameAndClickonProficloudEmail,
@@ -135,13 +126,13 @@ async function C613() {
         await logout(driver);
 
     
-        await mailLogin(driver, vars);
-        await clickFirstMailInProton(driver);
+        await loginToProtonMail(driver, vars);
+        await clickFirstMail(driver);
         await driver.sleep(2000);
         await waitForXPathPresentTimeout(driver,"//h1[contains(@title,'organization Rooth Organization')]//span[contains(text(),'You have been removed from the Proficloud.io')]",10000);
         
-        await deleteAllMails(driver);
-        await mailLogout(driver);
+        await deleteAllEmails(driver);
+        await logOutFromProtonMail(driver);
 
         
       }
