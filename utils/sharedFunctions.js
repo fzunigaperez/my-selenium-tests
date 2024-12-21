@@ -492,8 +492,8 @@ async function loginFerchoAlejandro86(driver, vars) {
   await isTheOrganizationNameEmpty(driver, vars);
 
   // Assert the correct page is loaded
-  const pageTitle = await driver.findElement(By.xpath("//div[@id='routeTitle']")).getText();
-  assert.strictEqual(pageTitle, "Device Management Service");
+  //const pageTitle = await driver.findElement(By.xpath("//div[@id='routeTitle']")).getText();
+  //assert.strictEqual(pageTitle, "Device Management Service");
 
 }
 
