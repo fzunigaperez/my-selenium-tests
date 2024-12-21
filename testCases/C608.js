@@ -25,6 +25,8 @@ const {
   loginToProtonMail,
   clickFirstMail,
   loginAsUnregisteredUserAndDeleteAccount,
+  deleteAllEmails,
+  logOutFromProtonMail,
   
 
 } = require('../utils/sharedFunctions'); // Importación de funciones reutilizables
@@ -41,7 +43,7 @@ async function C608() {
         
         
         await windowConfiguration(driver);
-        await deleteUnregisteredUserInCaseOfExistence(driver, vars)
+        await deleteUnregisteredUserInCaseOfExistence(driver, vars);
         await loginFerchoAlejandro86(driver,vars);
         await userManagementMenu(driver);
         await arrowButton(driver);
@@ -166,21 +168,26 @@ async function C608() {
         
         await loginToProtonMail(driver,vars);
         await clickFirstMail(driver);
-        await driver.sleep(2000);
-    const iframe = await driver.wait(until.elementLocated(By.css('iframe')), 10000);
-    await driver.switchTo().frame(iframe);
-    await driver.wait(until.elementLocated(By.css("a > div")), 10000).click();
-    //Accepting the last email change confirmation
-    
-    // Obtener todos los manejadores de ventanas y seleccionar el último
-    const windowHandles = await driver.getAllWindowHandles();
-    console.log('Manejadores de ventanas:', windowHandles);
+        const iframe = await driver.wait(until.elementLocated(By.css('iframe')), 10000);
+  await driver.switchTo().frame(iframe);
+  await driver.findElement(By.linkText("Verify E-Mail")).click();
+  await driver.sleep(5000);
+  // Obtener todos los manejadores de ventanas y seleccionar el último
+  const windowHandles = await driver.getAllWindowHandles();
+  console.log('Manejadores de ventanas:', windowHandles);
   // Cambiar a la ventana más reciente
-    const latestWindow = windowHandles[windowHandles.length - 1]; // Seleccionar el último manejador
-    await driver.switchTo().window(latestWindow);
-    console.log('Cambiado a la ventana más reciente.');
+  const latestWindow = windowHandles[windowHandles.length - 1]; // Seleccionar el último manejador
+  await driver.switchTo().window(latestWindow);
+  console.log('Cambiado a la ventana más reciente.');
 
-    await driver.sleep(2000);
+
+  await windowConfiguration(driver);
+        await deleteUnregisteredUserInCaseOfExistence(driver, vars);
+
+
+      await loginToProtonMail(driver,vars);
+      await deleteAllEmails(driver);
+      await logOutFromProtonMail(driver);
         
 
 
