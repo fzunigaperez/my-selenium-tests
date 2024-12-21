@@ -26,7 +26,7 @@ async function C19() {
 
         // Initial Configuration and Login
         await windowConfiguration(driver);
-        await loginChangeOrgaUserName(driver, vars, until);
+        await loginChangeOrgaUserName(driver, vars);
         await resetToOriginalUserNameInRoothOrganization(driver, vars);
 
         // Navigate to User Settings
@@ -60,7 +60,7 @@ async function C19() {
           5000
         );
         console.log("El texto esperado está presente!");
-        await modalClose(driver, until);
+        await modalClose(driver);
 
         // Confirm Name and Surname Update
         await driver.wait(
@@ -103,7 +103,7 @@ async function C19() {
           ),
           10000
         ).click();
-        await modalClose(driver, until);
+        await modalClose(driver);
 
         // C20: Confirm Email Change in Profile Settings
         await changeInformationButton(driver);
@@ -117,7 +117,7 @@ async function C19() {
 
         // Confirm Email in ProtonMail
         await driver.sleep(10000);
-        await loginToProtonMail(driver, vars,until);
+        await loginToProtonMail(driver, vars);
 
         // Filter and Select Verification Email
         await driver.wait(until.elementLocated(By.css(".active .text-ellipsis")), 30000);
@@ -165,8 +165,8 @@ async function C19() {
         // Logout and Cleanup
         await logout(driver);
         await windowConfiguration(driver);
-        await loginChangeOrgaUserName(driver, vars, until);
-        await loginToProtonMail(driver, vars, until);
+        await loginChangeOrgaUserName(driver, vars);
+        await loginToProtonMail(driver, vars);
         await deleteAllEmails(driver, vars);
         await logOutFromProtonMail(driver);
       }
