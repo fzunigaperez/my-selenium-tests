@@ -1047,10 +1047,7 @@ console.log('Are we already inside of ProtonMail?:', isLoggedIn);
   
   async function checkFailedLoginEmail(driver) {
     await driver.sleep(5000);  
-    const elementLocator = By.css(".item-subject > .inline-block");
-    const firstMail = await driver.wait(until.elementLocated(elementLocator),60000);
-    await driver.wait(until.elementIsVisible(firstMail), 60000);
-    await firstMail.click();
+    await clickFirstMail(driver);
 
     await driver.wait(until.elementLocated(By.css(".message-conversation-summary-header > span")), 10000);
     const emailSubject = await driver.findElement(By.css(".message-conversation-summary-header > span")).getText();
