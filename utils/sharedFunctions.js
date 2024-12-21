@@ -1085,7 +1085,7 @@ console.log('Are we already inside of ProtonMail?:', isLoggedIn);
     // Verify if the error is due to an invalid user
     if (buttonMorePresent > 0) {
       await driver.wait(until.elementLocated(By.xpath("//span[normalize-space()='More']")), 30000).click();
-      return;
+      
     } else {
       console.log("It is not necessary to do anything.");
     }
