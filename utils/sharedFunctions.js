@@ -861,7 +861,7 @@ async function loginAsUnregisteredUserAndDeleteAccount(driver,vars) {
 }
 
 
-async function loginToProtonMail(driver, vars = {}) {
+/*async function loginToProtonMail(driver, vars = {}) {
   try {
       // Navegar a la URL de inicio de sesión
       await driver.get("https://mail.proton.me/");
@@ -974,7 +974,7 @@ console.log('Are we already inside of ProtonMail?:', isLoggedIn);
   } catch (err) {
       console.error("Ocurrió un error:", err);
   }
-}
+}*/
 
  async function modalClose(driver) {
   await driver.wait(until.elementLocated(By.id("modal-close")), 5000).click();
@@ -1448,7 +1448,7 @@ await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'User Managem
     
 }
 
-async function arrowButton(driver) {
+async function arrowSortByButton(driver) {
   await driver.wait(until.elementLocated(By.css(".pc-icon-dropdown__right-icon > .ng-star-inserted")), 30000);
   await driver.findElement(By.css(".pc-icon-dropdown__right-icon > .ng-star-inserted")).click();
 }
@@ -1538,6 +1538,166 @@ async function clickFirstMail(driver){
 await driver.wait(until.elementLocated(By.css(".item-subject > .inline-block")), 60000).click();
 }
 
+
+async function removeRegisteredUserNew(driver, vars) {
+  console.log("Removing registered user...");
+
+  // Sort by Last Name
+  await arrowSortByButton(driver);
+  await lastNameButton(driver);
+
+  // Verify initial state
+  assert(
+    await driver.findElement(By.xpath("//div[5]/pc-list-item/div/div/div/div")).getText() === "Registered Zuser in Proficloud"
+  );
+  assert(
+    await driver.findElement(By.xpath("//h4[contains(.,'Rooth Organization')]")).getText() === "Rooth Organization"
+  );
+  
+  vars["extraMember"] = await driver.findElements(By.xpath(
+    "/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[2]/app-user-management[1]/div[1]/app-members[1]/flex-col[1]/flex-col[1]/div[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/div[5]/pc-list-item[1]/div[1]/div[1]/div[4]/app-icon[1]/*[name()='svg'][1]"
+  )).length;
+
+  console.log("Extra member invitations present?:", vars["extraMember"]);
+
+  // Remove all extra members if found
+  while (vars["extraMember"] > 0) {
+    await driver.findElement(By.xpath(
+      "/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[2]/app-user-management[1]/div[1]/app-members[1]/flex-col[1]/flex-col[1]/div[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/div[5]/pc-list-item[1]/div[1]/div[1]/div[4]/app-icon[1]/*[name()='svg'][1]"
+    )).click();
+
+    await removeMemberButton(driver);
+
+    vars["emailOfExtraMember"] = await driver
+      .findElement(By.xpath("//div[5]/pc-list-item/div/div/div/div[2]"))
+      .getText();
+
+    await driver.findElement(By.xpath("//input[contains(@placeholder,'email ')]")).sendKeys(
+      vars["emailOfExtraMember"]
+    );
+
+    await removeMemberButton2(driver);
+    await waitingLoadingRingProficloudToDissapear(driver);
+
+    vars["extraMember"] = await driver.findElements(By.xpath(
+      "/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[2]/app-user-management[1]/div[1]/app-members[1]/flex-col[1]/flex-col[1]/div[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/div[5]/pc-list-item[1]/div[1]/div[1]/div[4]/app-icon[1]/*[name()='svg'][1]"
+    )).length;
+
+    console.log("Remaining extra members:", vars["extraMember"]);
+  }
+
+  console.log("All extra members removed successfully.");
+}
+
+
+async function removeOldMemberInvitationsRoothOrga (driver) {
+
+  await userManagementMenu(driver);
+        await arrowSortByButton(driver);
+        await lastNameButton(driver);
+
+        // Wait for the element with the name 'Fernando Admin' to load
+        await driver.wait(until.elementLocated(By.xpath("//div[contains(text(),'Fernando Zuniga')]")), 30000);
+        await driver.sleep(3000);
+
+        // Check for any extra members in the organization
+        let extraMember = await countElementsByXPath(
+          driver,
+          "/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-user-management[1]/div[1]/app-members[1]/flex-col[1]/flex-col[1]/div[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/div[5]/pc-list-item[1]/div[1]/div[1]/div[4]/app-icon[1]/*[name()='svg'][1]"
+        );
+        console.log('Extra member in the organization found?:', extraMember);
+
+        let retries = 0;
+        const maxRetries = 50;
+
+        // Attempt to remove extra member
+        while (extraMember > 0 && retries < maxRetries) {
+          console.log(`Attempting to remove extra member (Attempt ${retries + 1}/${maxRetries})`);
+
+          try {
+            const emailOfExtraMember = await getTextByLocator(
+              driver,
+              "xpath",
+              "//div[5]/pc-list-item/div/div/div/div[2]"
+            );
+
+            const protectedEmails = [
+              "rsylvester@phoenixcontact-sb.io",
+              "testingpxc_viewer@proton.me",
+              "testingpxc_editor@proton.me",
+              "testingpxc_admin@proton.me"
+            ];
+
+            // Check if the email is protected
+            if (protectedEmails.includes(emailOfExtraMember)) {
+              console.log("❌ Email is protected. Stopping removal process.");
+              return; // Stops the process if email is protected
+            }
+
+            // Click to remove the member
+            await driver.wait(
+              until.elementLocated(
+                By.xpath(
+                  "/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-user-management[1]/div[1]/app-members[1]/flex-col[1]/flex-col[1]/div[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/div[5]/pc-list-item[1]/div[1]/div[1]/div[4]/app-icon[1]/*[name()='svg'][1]"
+                )
+              ),
+              30000
+            ).click();
+
+            await removeMemberButton(driver);
+
+            // Clear the email input and enter the email of the extra member
+            await driver.wait(until.elementLocated(By.xpath("//input[contains(@placeholder,'email ')]")), 30000);
+            await driver.findElement(By.xpath("//input[contains(@placeholder,'email ')]")).clear();
+            await driver.findElement(By.xpath("//input[contains(@placeholder,'email ')]")).sendKeys(emailOfExtraMember);
+
+            await removeMemberButton2(driver);
+            await waitingLoadingRingProficloudToDissapear(driver);
+          } catch (error) {
+            console.error(`❌ Error while attempting to remove extra member: ${error.message}`);
+          }
+
+          // Recheck if the extra member still exists
+          extraMember = await countElementsByXPath(
+            driver,
+            "/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-user-management[1]/div[1]/app-members[1]/flex-col[1]/flex-col[1]/div[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/div[5]/pc-list-item[1]/div[1]/div[1]/div[4]/app-icon[1]/*[name()='svg'][1]"
+          );
+          console.log('Extra member in the organization found?:', extraMember);
+
+          retries++;
+        }
+
+        if (extraMember === 0) {
+          console.log("✅ Extra member successfully removed or no action was needed.");
+        } else {
+          console.log(`❌ Extra member removal failed after ${maxRetries} attempts.`);
+        }
+  
+}
+
+async function changeFrameAndClickonProficloudEmail(driver) {
+  try {
+      // Wait for the iframe to load and switch to it
+      await driver.sleep(2000); // Short delay to ensure smooth transitions
+      const iframe = await driver.wait(until.elementLocated(By.css('iframe')), 10000);
+      await driver.switchTo().frame(iframe);
+
+      console.log("Clicking the button from Proficloud (e.g., Accept invitation / Join Organization)");
+      await driver.wait(until.elementLocated(By.css("a > div")), 10000).click();
+
+      // Handle the new window or tab that opens
+      const windowHandles = await driver.getAllWindowHandles();
+      console.log('Window handles found:', windowHandles);
+      const latestWindow = windowHandles[windowHandles.length - 1];
+      await driver.switchTo().window(latestWindow);
+
+      console.log('Switched to the most recent window.');
+  } catch (error) {
+      console.error("An error occurred while handling the Proficloud email:", error);
+  }
+}
+
+
 module.exports = {
   createTestRun,
   deviceManagementMenu,
@@ -1589,7 +1749,7 @@ module.exports = {
   countElementsByXPath,
   waitingLoadingRingProficloudToDissapear,
   assertElementNotPresent,
-  arrowButton,
+  arrowSortByButton,
   lastNameButton,
   removeMemberButton,
   removeMemberButton2,
@@ -1598,6 +1758,9 @@ module.exports = {
   roleSelectionDropDownMenu,
   assertText,
   getTextByLocator,
-  clickFirstMail
+  clickFirstMail,
+  removeRegisteredUserNew,
+  removeOldMemberInvitationsRoothOrga,
+  changeFrameAndClickonProficloudEmail,
   
 };
