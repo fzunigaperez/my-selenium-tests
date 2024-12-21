@@ -1537,7 +1537,7 @@ async function getTextByLocator(driver, locatorType, locatorValue) {
 
 async function clickFirstMail(driver){
 
-await driver.wait(until.elementLocated(By.xpath("//span[@class='text-ellipsis'][contains(.,'Inbox')]")), 60000).click();
+await driver.wait(until.elementLocated(By.css(".item-subject > .inline-block")), 60000).click();
 }
 
 module.exports = {
