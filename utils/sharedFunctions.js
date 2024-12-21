@@ -685,6 +685,7 @@ async function emailVerification(driver,vars) {
   await driver.sleep(3000);
   const iframe = await driver.wait(until.elementLocated(By.css('iframe')), 10000);
   await driver.switchTo().frame(iframe);
+  await driver.sleep(5000);
   await driver.findElement(By.linkText("Verify E-Mail")).click();
   await driver.sleep(5000);
   // Obtener todos los manejadores de ventanas y seleccionar el último
