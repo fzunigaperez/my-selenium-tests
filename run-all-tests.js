@@ -19,6 +19,9 @@ const C84 = require('./testCases/C84');
 //Billing account
 const C537 = require('./testCases/C537');
 const C706 = require('./testCases/C706');
+//User Management
+const C608 = require('./testCases/C608');
+const C613 = require('./testCases/C613');
 
 
 // Función para extraer los Test IDs de sessionName
@@ -48,6 +51,10 @@ const sessionNames = [
   //Billing Account
   { name: 'C537_Edit a billing account as an ADMIN', func: C537 },
   { name: 'C706_C707_Edit a billing account as an EDITOR not allowed / Edit a billing account as an VIEWER not allowed', func: C706},
+  //User Management
+  { name: 'C608_Invite a user to an organization that is not registered in proficloud and is not part of the same company', func: C608 },
+  { name: 'C613_C610_C882_C871_Invite member to an organization that is already registered to proficloud as ADMIN / Remove member from orgnization / Members cannot be invited more than 1 time to Proficloud / Inviting user to an organization of the same domain should be possible without data security message', func: C613 },
+
 
 
 ];

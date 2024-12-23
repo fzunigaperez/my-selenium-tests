@@ -13,18 +13,11 @@ const {
   clickFirstMail,
   deleteAllEmails,
   logOutFromProtonMail,
-  arrowSortByButton,
-  lastNameButton,
-  removeMemberButton,
-  removeMemberButton2,
   waitingLoadingRingProficloudToDissapear,
-  registeredUserCredentials,
   inviteMemberButton,
   inviteMemberButton2,
   roleSelectionDropDownMenu,
   removeOldMemberInvitationsRoothOrga,
-  userMenu,
-  
   roothOrganizationTest,
   modalClose,
   changeFrameAndClickonProficloudEmail,
@@ -37,7 +30,7 @@ const { rootCertificates } = require('tls');
 async function C613() {
   try {
     await testBase(
-      'C613 / C610 / C882 / C871: Member Invitation and Removal Tests',
+      'C613_C610_C882_C871_Invite member to an organization that is already registered to proficloud as ADMIN / Remove member from orgnization / Members cannot be invited more than 1 time to Proficloud / Inviting user to an organization of the same domain should be possible without data security message',
       async (driver) => {
         let vars = {};
 
@@ -67,16 +60,14 @@ async function C613() {
         }
 
  
-             
+           
     
-
-
-
-
 
         // Remove old member invitations
         await removeOldMemberInvitationsRoothOrga(driver, vars);
-        
+
+
+        //C871 Inviting user to an organization of the same domain should be possible without data security message
 
         // Invite a new member
         vars["username"] = "testingpxc@proton.me";
@@ -89,7 +80,7 @@ async function C613() {
         await inviteMemberButton2(driver);
         await waitingLoadingRingProficloudToDissapear(driver);
 
-        
+        // C882 Members cannot be invited more than 1 time to Proficloud
         await inviteMemberButton(driver);
         await driver.findElement(By.xpath("//input[@placeholder='Email']")).clear();
         await driver.findElement(By.xpath("//input[@placeholder='Email']")).sendKeys(vars["username"]);
@@ -118,6 +109,10 @@ async function C613() {
         await windowConfiguration(driver);
         await loginRegisteredUser(driver,vars);
         await logout(driver);
+
+
+        //C610 Remove member from organization as ADMIN
+
 
         await windowConfiguration(driver);
         await loginAdmin(driver,vars);
