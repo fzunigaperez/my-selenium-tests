@@ -17,11 +17,11 @@ async function C681() {
       let vars = {};
       await windowConfiguration(driver);
       await loginEditor(driver, vars);
-      await assertElementNotPresent(driver,"xpath","//span[contains(.,'User Management')]",5000);
+      await assertElementNotPresent(driver,"id","user-management-service",5000);
       await logout(driver);
       await windowConfiguration(driver);
       await loginViewer(driver, vars);
-      await assertElementNotPresent(driver,"xpath","//span[contains(.,'User Management')]",5000);
+      await assertElementNotPresent(driver,"id","user-management-service",5000);
       await logout(driver);
       
 
