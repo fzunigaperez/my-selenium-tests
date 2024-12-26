@@ -1,4 +1,4 @@
-const { Builder } = require('selenium-webdriver'); // Importación completa y precisa
+const { Builder, By, until  } = require('selenium-webdriver'); // Importación completa y precisa
 const path = require('path');
 const baseCapabilities = require(path.resolve(__dirname, '../capabilities/capabilities'));
 const testBase = require('./testBase');  //Common

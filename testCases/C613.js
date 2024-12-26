@@ -53,6 +53,7 @@ async function C613() {
             await removeRegisteredUserNew(driver, vars);
             await userManagementMenu(driver);
             await roothOrganizationTest(driver,vars);
+            
         }
 
         else{
