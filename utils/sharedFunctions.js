@@ -164,6 +164,13 @@ async function loginToProtonMail(driver,vars) {
 }
 
 
+async function reloadPage(driver) {
+
+    // Reload (refresh) the page
+    await driver.navigate().refresh();
+  
+}
+
 // Function to accept cookies
 async function acceptCookies(driver) {
   try {
@@ -343,6 +350,18 @@ async function switchToOriginalOrganization(driver) {
   await driver.sleep(1000);
   await driver
     .findElement(By.xpath("//div[@class='profile-menu_icon-text__text'][contains(.,'Rooth Organization')]"))
+    .click();
+  await driver.sleep(1000);
+  await waitingLoadingRingProficloudToDissapear(driver);
+  await driver.wait(until.elementLocated(By.id("routeTitle")), 30000);
+}
+
+
+async function switchToPxcOrganization(driver) {
+  await activeOrganization(driver);
+  await driver.sleep(1000);
+  await driver
+    .findElement(By.xpath("//div[@class='profile-menu_icon-text__text'][contains(.,'Phoenix Contact Smart Bus...')]"))
     .click();
   await driver.sleep(1000);
   await waitingLoadingRingProficloudToDissapear(driver);
@@ -862,120 +881,7 @@ async function loginAsUnregisteredUserAndDeleteAccount(driver,vars) {
 }
 
 
-/*async function loginToProtonMail(driver, vars = {}) {
-  try {
-      // Navegar a la URL de inicio de sesión
-      await driver.get("https://mail.proton.me/");
-      await driver.sleep(10000);  //Remove this because of Zacualpan
 
-      // Verificar si el usuario está autenticado o si necesita iniciar sesión
-      //const isLoggedIn = await driver.findElements(By.xpath("//button[contains(.,'New message')]"));
-
-      const xpath = "//button[contains(.,'New message')]";
-
-// Usar executeScript para buscar el elemento rápidamente
-const isLoggedIn = await driver.executeScript((xpath) => {
-const result = document.evaluate(
-    xpath, 
-    document, 
-    null, 
-    XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, 
-    null
-  );
-  return result.snapshotLength; // Retorna la cantidad de elementos encontrados
-}, xpath);
-
-console.log('Are we already inside of ProtonMail?:', isLoggedIn);
-
-  
-
-      if (isLoggedIn > 0) {
-          console.log("Usuario ya autenticado. Procediendo directamente a 'Proton Mail Plus'.");
-
-          const elementToClick = await driver.wait(
-              until.elementLocated(By.xpath("//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]")),
-              10000
-          );
-
-          await driver.wait(until.elementIsVisible(elementToClick), 2000);
-          await elementToClick.click();
-          console.log("Clic en 'Proton Mail Plus' exitoso.");
-
-      } else {
-          console.log("Usuario no autenticado. Procediendo con inicio de sesión.");
-
-          // Variables de usuario
-          vars["mailUsername"] = "testingpxc_admin@proton.me";
-          vars["mailPassword"] = "Proficloud2022!";
-
-          // Esperar a que el campo de usuario esté disponible
-          const usernameField = await driver.wait(until.elementLocated(By.id("username")), 10000);
-          await usernameField.sendKeys(vars["mailUsername"]);
-
-          // Esperar a que el campo de contraseña esté disponible y enviar los datos
-          const passwordField = await driver.wait(until.elementLocated(By.id("password")), 10000);
-          await passwordField.sendKeys(vars["mailPassword"]);
-
-          // Clic en el botón de inicio de sesión
-          const submitButton = await driver.wait(until.elementLocated(By.css('button[type="submit"]')), 10000);
-          await submitButton.click();
-          console.log("Credenciales ingresadas. Esperando a 'Proton Mail Plus'...");
-
-          // Esperar a que 'Proton Mail Plus' esté disponible
-          try {
-            console.log("Esperando a que 'Proton Mail Plus' esté disponible...");
-        
-            // Tiempo máximo de espera (en milisegundos)
-            const maxWaitTime = 10000; // 30 segundos
-            const pollInterval = 1000; // Revisar cada 1 segundo
-            let elapsedTime = 0;
-            let elementToClick = null;
-        
-            // Bucle para comprobar repetidamente si el elemento aparece
-            while (elapsedTime < maxWaitTime) {
-
-                const xpath = "//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]";
-
-                const elements = await driver.executeScript((xpath) => {
-                  const result = document.evaluate(
-                      xpath, 
-                      document, 
-                      null, 
-                      XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, 
-                      null
-                    );
-                    return result.snapshotLength; // Retorna la cantidad de elementos encontrados
-                  }, xpath);
-                  
-
-
-
-
-                if (elements > 0) {
-                    elementToClick = elements[0];
-                    break; // Salir del bucle si el elemento se encuentra
-                }
-                await driver.sleep(pollInterval); // Esperar antes de volver a comprobar
-                elapsedTime += pollInterval;
-            }
-        
-            if (elementToClick) {
-                console.log("'Proton Mail Plus' encontrado. Procediendo a hacer clic.");
-                await driver.wait(until.elementIsVisible(elementToClick), 1000);
-                await elementToClick.click();
-                console.log("Clic en 'Proton Mail Plus' exitoso.");
-            } else {
-                console.log("'Proton Mail Plus' no apareció dentro del tiempo de espera permitido. Continuando sin clic.");
-            }
-        } catch (error) {
-            console.error("Ocurrió un error al verificar o hacer clic en 'Proton Mail Plus':", error);
-        }
-        
-      }
-  } catch (err) {
-      console.error("Ocurrió un error:", err);
-  }
-}*/
 
  async function modalClose(driver) {
   await driver.wait(until.elementLocated(By.id("modal-close")), 5000).click();
@@ -1288,6 +1194,32 @@ console.log('Are we already inside of ProtonMail?:', isLoggedIn);
     return elementCount;
   }
 
+
+  async function assertXpathNotPresent(driver, xpath) {
+    await driver.sleep(1000);
+  
+    // Guardamos el resultado retornado por countElementsByXPath
+    const elementCount = await countElementsByXPath(driver, xpath);
+  
+    if (elementCount > 0) {
+      console.log(`We have a problem: the element ${xpath} was found.`);
+      await driver.quit();  // Cierra el navegador
+    } else {
+      console.log(`All good: the element: ${xpath} is not present in the page`);
+    }
+  }
+  
+
+
+
+
+
+  
+
+
+    
+  
+
   
   async function agreeTerms(driver) {
     await driver.findElement(By.id("mat-mdc-checkbox-1-input")).click();
@@ -1346,46 +1278,9 @@ async function waitForXPathPresentTimeout(driver, xpath, timeout) {
   return false; // The element was not found within the defined time
 }
 
-async function assertElementNotPresent(driver, elementSelector, selectorType = 'css', timeout = 5000) {
-  try {
-      // Select the type of selector that will be used
-      let locator;
-      switch (selectorType) {
-          case 'id':
-              locator = By.id(elementSelector);
-              break;
-          case 'class':
-              locator = By.className(elementSelector);
-              break;
-          case 'name':
-              locator = By.name(elementSelector);
-              break;
-          case 'xpath':
-              locator = By.xpath(elementSelector);
-              break;
-          case 'css':
-          default:
-              locator = By.css(elementSelector);
-              break;
-      }
 
-      // Wait for the element to be located on the page (within the timeout period)
-      await driver.wait(until.elementLocated(locator), timeout);
-      
-      // If the element is found, fail the test and log a failure message
-      console.log(`Failure: Element with selector ${elementSelector} was found, but it shouldn't have been.`);
-      throw new Error(`Element with selector ${elementSelector} should not be present.`);
-  } catch (error) {
-      // If the element is not found within the timeout, we expect a TimeoutError
-      if (error.name === 'TimeoutError') {
-          // Element is not present, which is the expected behavior, log success message
-          console.log(`Success: Element with selector ${elementSelector} was not found, as expected.`);
-          return;
-      }
-      // Rethrow any other errors
-      throw error;
-  }
-}
+
+
 
 
 /**
@@ -1488,6 +1383,11 @@ async function roleSelectionDropDownMenu(driver) {
   await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Role')]")), 30000).click();
   
 }
+
+
+
+
+
 
 
 /**
@@ -1698,70 +1598,107 @@ async function changeFrameAndClickonProficloudEmail(driver) {
   }
 }
 
+async function viewerRoleReset(driver) {
+
+  await driver.findElement(By.xpath("//input")).sendKeys("Viewer");
+  await driver.sleep(2000);
+  let roleOfViewerUser = await driver.findElement(By.css(".pc-list-item__type")).getText();
+  console.log("Role of viewer user at the beginning of the test:", roleOfViewerUser);
+   
+  
+  if (roleOfViewerUser !== "Viewer") {
+
+      console.log("Viewer role different than VIEWER some changes has to be taken");
+      await driver.findElement(By.css(".pc-list-item__action-button > .ng-star-inserted")).click();
+      await driver.findElement(By.xpath("//div[contains(text(),\'change role\')]")).click();
+      assert(await driver.findElement(By.css(".pc-overlay__title")).getText() == "Change members role");
+      await roleSelectionField(driver);
+      await driver.findElement(By.xpath("//span[contains(.,\'Viewer\')]")).click();
+      await driver.findElement(By.xpath("//span[contains(.,\'Apply role\')]")).click();
+      await waitingLoadingRingProficloudToDissapear(driver);
+      assert(await driver.findElement(By.css(".pc-list-item__type")).getText() == "Viewer");
+      
+    } else {
+  
+      console.log("Viewer member has the viewer role :) ");
+  }
+  await driver.findElement(By.xpath("//input")).clear();
+  await reloadPage(driver);
+}
+
+async function roleSelectionField(driver) {
+
+  await driver.wait(until.elementLocated(By.xpath("//mat-label[contains(.,'Role')]")), 30000).click();
+  
+}
+
 
 module.exports = {
-  createTestRun,
-  deviceManagementMenu,
-  userManagementMenu,
-  sendResultToTestRail,
   acceptCookies,
-  loginLandingPageButton,
-  adminCredentials,
-  unregisteredUserCredentials,
-  registeredUserCredentials,
-  changeOrgaUserNameCredentials,
-  isTheOrganizationNameEmpty,
-  roothOrganizationTest,
-  switchToOriginalOrganization,
-  modalClose,
-  activeOrganization,
-  changeInformationButton,
-  saveProfileDataButton,
-  logout,
-  userMenu,
   accountSettingsMainMenu,
   accountSettingsTab,
-  windowConfiguration,
-  settings,
-  billingInformationTab,
-  resetBillingAccountInformation,
-  resetToOriginalUserNameInRoothOrganization,
-  loginAdmin,
-  loginEditor,
-  loginViewer,
-  editBillingAccountButton,
-  loginRegisteredUser,
-  loginUnregisteredUser,
-  loginChangeOrgaUserName,
-  loginToProtonMail,
-  loginFerchoAlejandro86,
-  logOutFromProtonMail,
-  checkFailedLoginEmail,
-  deleteAllEmails,
-  enterRegistrationData,
+  activeOrganization,
+  adminCredentials,
   agreeTerms,
-  confirmButton,
-  emailVerification,
-  confirmLinkUrlToggleIsOff,
-  deleteUnregisteredUserInCaseOfExistence,
-  loginAsUnregisteredUserAndDeleteAccount,
-  waitUntilXpathNotPresent,
-  waitForXPathPresentTimeout,
-  countElementsByXPath,
-  waitingLoadingRingProficloudToDissapear,
-  assertElementNotPresent,
   arrowSortByButton,
-  lastNameButton,
-  removeMemberButton,
-  removeMemberButton2,
+  assertText,
+  assertXpathNotPresent,
+  billingInformationTab,
+  changeFrameAndClickonProficloudEmail,
+  changeInformationButton,
+  changeOrgaUserNameCredentials,
+  checkFailedLoginEmail,
+  clickFirstMail,
+  confirmButton,
+  confirmLinkUrlToggleIsOff,
+  countElementsByXPath,
+  createTestRun,
+  deleteAllEmails,
+  deleteUnregisteredUserInCaseOfExistence,
+  deviceManagementMenu,
+  editBillingAccountButton,
+  emailVerification,
+  enterRegistrationData,
+  getTextByLocator,
   inviteMemberButton,
   inviteMemberButton2,
-  roleSelectionDropDownMenu,
-  assertText,
-  getTextByLocator,
-  clickFirstMail,
-  removeRegisteredUserNew,
+  isTheOrganizationNameEmpty,
+  lastNameButton,
+  loginAdmin,
+  loginAsUnregisteredUserAndDeleteAccount,
+  loginChangeOrgaUserName,
+  loginEditor,
+  loginFerchoAlejandro86,
+  loginLandingPageButton,
+  loginRegisteredUser,
+  loginToProtonMail,
+  loginUnregisteredUser,
+  loginViewer,
+  logOutFromProtonMail,
+  logout,
+  modalClose,
+  reloadPage,
+  removeMemberButton,
+  removeMemberButton2,
   removeOldMemberInvitationsRoothOrga,
-  changeFrameAndClickonProficloudEmail,
+  removeRegisteredUserNew,
+  resetBillingAccountInformation,
+  resetToOriginalUserNameInRoothOrganization,
+  roleSelectionDropDownMenu,
+  roleSelectionField,
+  roothOrganizationTest,
+  saveProfileDataButton,
+  sendResultToTestRail,
+  settings,
+  switchToOriginalOrganization,
+  switchToPxcOrganization,
+  unregisteredUserCredentials,
+  userManagementMenu,
+  userMenu,
+  viewerRoleReset,
+  waitForXPathPresentTimeout,
+  waitUntilXpathNotPresent,
+  waitingLoadingRingProficloudToDissapear,
+  windowConfiguration,
   
 };
