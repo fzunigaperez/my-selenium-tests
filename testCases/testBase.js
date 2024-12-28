@@ -7,8 +7,8 @@ async function testBase(sessionName, testSteps) {
 
   // Selector para decidir ejecución local o en BrowserStack
   const EXECUTION_MODE = {
-    LOCAL: 'ON',
-    BROWSERSTACK: 'OFF',
+    LOCAL: 'OFF',
+    BROWSERSTACK: 'ON',
   };
 
   let selectLocal = EXECUTION_MODE.LOCAL;
