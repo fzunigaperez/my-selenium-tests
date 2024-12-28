@@ -93,7 +93,7 @@ async function C609() {
           // Si no están ordenados, detener el programa
           if (!isSorted) {
             console.error('❌ Los nombres no están ordenados alfabéticamente. Deteniendo el programa.');
-            throw new Error('Los nombres no están ordenados alfabéticamente.');
+            driver.quit();
           }
         } catch (error) {
           console.error('Error en la verificación del orden:', error);
