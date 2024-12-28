@@ -10,8 +10,6 @@ async function C90() {
             
       await windowConfiguration(driver);
       await loginAdmin(driver, vars);
-      let undefinedFunction = undefined; 
-      undefinedFunction(); // Esto generará un error
       await logout(driver);
     });
   } catch (error) {
