@@ -10,6 +10,7 @@ async function C90() {
             
       await windowConfiguration(driver);
       await loginAdmin(driver, vars);
+      driver.quit();
       await logout(driver);
     });
   } catch (error) {
