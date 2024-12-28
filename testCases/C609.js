@@ -23,7 +23,7 @@ async function C609() {
       await switchToPxcOrganization(driver);
       await userManagementMenu(driver);
       await arrowSortByButton(driver);
-      //await lastNameButton(driver);
+      await lastNameButton(driver);
 
       async function checkNamesSorting(driver) {
         try {
