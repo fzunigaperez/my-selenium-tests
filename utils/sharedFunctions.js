@@ -945,6 +945,17 @@ async function loginAsUnregisteredUserAndDeleteAccount(driver,vars) {
 }
 
 
+      async function forceFailStatus(driver) {
+
+        let failureFoundInTest = undefined; 
+        failureFoundInTest(); // Esto generará un error
+    
+      }
+      
+
+
+
+
   async function logOutFromProtonMail(driver) {
     await driver.findElement(By.css(".my-auto > .m-auto")).click()
     await driver.sleep(1000)
@@ -1660,6 +1671,7 @@ module.exports = {
   editBillingAccountButton,
   emailVerification,
   enterRegistrationData,
+  forceFailStatus,
   getTextByLocator,
   inviteMemberButton,
   inviteMemberButton2,

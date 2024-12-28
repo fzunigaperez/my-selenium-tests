@@ -11,6 +11,7 @@ const {
   userManagementMenu,
   arrowSortByButton,
   lastNameButton,
+  forceFailStatus,
 } = require('../utils/sharedFunctions'); // Funciones reutilizables
 
 async function C609() {
@@ -93,7 +94,7 @@ async function C609() {
           // Si no están ordenados, detener el programa
           if (!isSorted) {
             console.error('❌ Los nombres no están ordenados alfabéticamente. Deteniendo el programa.');
-            driver.quit();
+            await forceFailStatus(driver);
           }
         } catch (error) {
           console.error('Error en la verificación del orden:', error);
