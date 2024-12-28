@@ -10,7 +10,8 @@ async function C90() {
             
       await windowConfiguration(driver);
       await loginAdmin(driver, vars);
-      driver.quit();
+      let undefinedFunction = undefined; 
+      undefinedFunction(); // Esto generará un error
       await logout(driver);
     });
   } catch (error) {
