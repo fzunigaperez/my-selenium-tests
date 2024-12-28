@@ -906,6 +906,7 @@ async function loginAsUnregisteredUserAndDeleteAccount(driver,vars) {
   await accountSettingsTab(driver);
 
   try {
+    
     vars["userName"] = await driver.findElement(By.xpath("//flex-col/div/div[2]/div[2]")).getText();
     console.log(`The actual user Name is: ${vars["userName"]}`);
     

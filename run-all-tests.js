@@ -22,6 +22,8 @@ const C706 = require('./testCases/C706');
 //User Management
 const C608 = require('./testCases/C608');
 const C613 = require('./testCases/C613');
+const C681 = require('./testCases/C681');
+
 
 
 // Función para extraer los Test IDs de sessionName
@@ -54,7 +56,7 @@ const sessionNames = [
   //User Management
   { name: 'C608_Invite a user to an organization that is not registered in proficloud and is not part of the same company', func: C608 },
   { name: 'C613_C610_C882_C871_Invite member to an organization that is already registered to proficloud as ADMIN / Remove member from orgnization / Members cannot be invited more than 1 time to Proficloud / Inviting user to an organization of the same domain should be possible without data security message', func: C613 },
-
+  { name: 'C681_C682_C683_C684_C695_C696_C679_C680_C632_C633_Inviting an user to an organization as EDITOR/VIEWER is not allowed and User Management menu is hidden / Remove member from organization not allowed as EDITOR / Change user roles is not allowed for EDITOR/VIEWER / Editor/Viewer can NOT access to User Management / Viewer/Editor rights check', func: C681 },
 
 
 ];
