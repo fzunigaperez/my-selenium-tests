@@ -1215,7 +1215,7 @@ async function loginAsUnregisteredUserAndDeleteAccount(driver,vars) {
   
     if (elementCount > 0) {
       console.log(`We have a problem: the element ${xpath} was found.`);
-      await driver.quit();  // Cierra el navegador
+      await forceFailStatus(driver);  // Cierra el navegador
     } else {
       console.log(`All good: the element: ${xpath} is not present in the page`);
     }
