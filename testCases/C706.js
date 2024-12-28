@@ -8,7 +8,7 @@ const {
   roothOrganizationTest,
   activeOrganization,
   settings,
-  assertElementNotPresent,
+  assertXpathNotPresent,
  
 } = require('../utils/sharedFunctions');  // BS
 
@@ -23,7 +23,7 @@ async function C706() {
       await roothOrganizationTest(driver,vars,until);
       await activeOrganization(driver);
       await settings(driver,until)
-      await assertElementNotPresent(driver,"//div[@class='content__tab ng-star-inserted'][contains(.,'Billing Information')]","xpath", 5000);
+      await assertXpathNotPresent(driver,"//div[@class='content__tab ng-star-inserted'][contains(.,'Billing Information')]","xpath");
       await logout(driver);
 
       //C707 Edit a billing account as an VIEWER not allowed
@@ -33,7 +33,7 @@ async function C706() {
       await roothOrganizationTest(driver,vars,until);
       await activeOrganization(driver);
       await settings(driver,until)
-      await assertElementNotPresent(driver,"//div[@class='content__tab ng-star-inserted'][contains(.,'Billing Information')]","xpath", 5000);
+      await assertXpathNotPresent(driver,"//div[@class='content__tab ng-star-inserted'][contains(.,'Billing Information')]","xpath");
       await logout(driver);
 
 
