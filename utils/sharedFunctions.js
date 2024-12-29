@@ -277,6 +277,67 @@ async function sortByRole(driver) {
   }
 }
 
+async function sortByInvitedStatus(driver) {
+  try {
+    // Encuentra todos los elementos de invitación con el XPath (aumenta de 1 en 1)
+    let invitedStatuses = [];
+    let index = 1;
+    while (true) {
+      try {
+        let invitedElement = await driver.findElement(
+          By.xpath(`//div[${index}]/pc-list-item/div/div/div[2]`)
+        );
+        let status = await invitedElement.getText();
+
+        // Ignorar si el texto contiene "(you)"
+        if (status.toLowerCase().includes('(you)')) {
+          index += 1;
+          continue;
+        }
+
+        invitedStatuses.push(status ? status.trim() : '');
+        index += 1; // Aumenta de 1 en 1
+      } catch (err) {
+        break; // Salir cuando no haya más elementos
+      }
+    }
+
+    // Asignar valores numéricos a los estados de invitación
+    let invitedValues = invitedStatuses.map((status) => {
+      let numericValue;
+      if (status === '') numericValue = 1; // Sin información
+      else if (status.toLowerCase() === '(invitation pending)') numericValue = 2;
+      else numericValue = 999; // Valor alto para estados desconocidos
+
+      return { status, numericValue };
+    });
+
+    // Verificar que los primeros estén vacíos y los últimos tengan "(invitation pending)"
+    let isSorted = invitedValues.every((item, index, array) => 
+      index === 0 || item.numericValue >= array[index - 1].numericValue
+    );
+
+    // Imprimir resultados
+    console.table(
+      invitedValues.map((item, index) => ({
+        Index: index + 1, // Índice humano (empezando en 1)
+        Status: item.status,
+        NumericValue: item.numericValue
+      }))
+    );
+
+    console.log(`¿Están los estados de invitación ordenados correctamente (vacío, luego "(invitation pending)")? ${isSorted ? 'Sí' : 'No'}`);
+
+    // Si no están ordenados, detener el programa
+    if (!isSorted) {
+      console.error('❌ Los estados de invitación no están ordenados correctamente. Deteniendo el programa.');
+      await forceFailStatus(driver);
+    }
+  } catch (error) {
+    console.error('Error al ordenar los estados de invitación:', error);
+    process.exit(1); // Terminar el proceso con un código de error
+  }
+}
 
 
 
@@ -1653,6 +1714,14 @@ async function roleNameButton(driver) {
 }
 
 
+async function invitedNameButton(driver) {
+
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'invited')]")), 30000).click();
+
+  
+}
+
+
 async function removeMemberButton(driver) {
   await driver.findElement(By.xpath("//div[contains(text(),'remove member')]")).click();
   await driver.sleep(2000);
@@ -1963,6 +2032,7 @@ module.exports = {
   firstNameButton,
   forceFailStatus,
   getTextByLocator,
+  invitedNameButton,
   inviteMemberButton,
   inviteMemberButton2,
   isTheOrganizationNameEmpty,
@@ -1998,6 +2068,7 @@ module.exports = {
   sortByFirstName,
   sortByLastName,
   sortByRole,
+  sortByInvitedStatus,
   switchToOriginalOrganization,
   switchToPxcOrganization,
   unregisteredUserCredentials,

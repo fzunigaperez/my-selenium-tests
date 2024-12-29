@@ -18,6 +18,9 @@ const {
   emailNameButton,
   roleNameButton,
   sortByRole,
+  invitedNameButton,
+  sortByInvitedStatus,
+  logout,
   
 } = require('../utils/sharedFunctions'); // Funciones reutilizables
 
@@ -48,6 +51,10 @@ async function C609() {
       await roleNameButton(driver);
       await driver.sleep(1000);
       await sortByRole(driver);
+      await arrowSortByButton(driver);
+      await invitedNameButton(driver);
+      await sortByInvitedStatus(driver);
+      await logout(driver	);
 
 
 
