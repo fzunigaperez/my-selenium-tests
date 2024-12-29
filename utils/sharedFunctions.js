@@ -163,6 +163,122 @@ async function loginToProtonMail(driver,vars) {
 
 }
 
+async function sortByEmails(driver) {
+  try {
+    // Encuentra todos los elementos de email con el XPath (aumenta de 2 en 2)
+    let emails = [];
+    let index = 1;
+    while (true) {
+      try {
+        let emailElement = await driver.findElement(
+          By.xpath(`(//pc-list-item/div/div/div/div[2])[${index}]`)
+        );
+        let email = await emailElement.getText();
+        if (email) emails.push(email);
+        index += 2; // Aumenta de 2 en 2
+      } catch (err) {
+        break; // Salir cuando no haya más elementos
+      }
+    }
+
+    // Ordenar los emails alfabéticamente (A-Z)
+    emails.sort((a, b) => a.localeCompare(b));
+
+    // Asignar valores numéricos a las letras iniciales de los emails
+    let emailsWithValues = emails.map((email) => {
+      let firstLetter = email[0].toLowerCase(); // Primera letra del email
+      let numericValue = firstLetter.charCodeAt(0) - 96; // Convertir letra a valor (a=1, b=2, ..., z=26)
+      return { email, numericValue };
+    });
+
+    // Verificar si los emails están ordenados de menor a mayor
+    let isSorted = emailsWithValues.every((item, index, array) => 
+      index === 0 || item.email >= array[index - 1].email
+    );
+
+    // Imprimir resultados
+    console.table(
+      emailsWithValues.map((item, index) => ({
+        Index: index + 1, // Índice humano (empezando en 1)
+        Email: item.email,
+        NumericValue: item.numericValue
+      }))
+    );
+
+    console.log(`¿Están los emails ordenados alfabéticamente (A-Z)? ${isSorted ? 'Sí' : 'No'}`);
+
+    // Si no están ordenados, detener el programa
+    if (!isSorted) {
+      console.error('❌ Los emails no están ordenados alfabéticamente. Deteniendo el programa.');
+      await forceFailStatus(driver);
+    }
+  } catch (error) {
+    console.error('Error al ordenar los emails:', error);
+    process.exit(1); // Terminar el proceso con un código de error
+  }
+}
+
+async function sortByRole(driver) {
+  try {
+    // Encuentra todos los elementos de roles con el XPath (aumenta de 1 en 1)
+    let roles = [];
+    let index = 1;
+    while (true) {
+      try {
+        let roleElement = await driver.findElement(
+          By.xpath(`//div[${index}]/pc-list-item/div/div/div[3]/div[2]`)
+        );
+        let role = await roleElement.getText();
+        if (role) roles.push(role);
+        index += 1; // Aumenta de 1 en 1
+      } catch (err) {
+        break; // Salir cuando no haya más elementos
+      }
+    }
+
+    // Asignar valores numéricos a los roles
+    let roleValues = roles.map((role) => {
+      let numericValue;
+      if (role.toLowerCase() === 'admin') numericValue = 1;
+      else if (role.toLowerCase() === 'editor') numericValue = 2;
+      else if (role.toLowerCase() === 'viewer') numericValue = 3;
+      else numericValue = 999; // Valor alto para roles desconocidos
+
+      return { role, numericValue };
+    });
+
+    // Ordenar los roles por sus valores numéricos
+    roleValues.sort((a, b) => a.numericValue - b.numericValue);
+
+    // Verificar si los roles están ordenados de menor a mayor
+    let isSorted = roleValues.every((item, index, array) => 
+      index === 0 || item.numericValue >= array[index - 1].numericValue
+    );
+
+    // Imprimir resultados
+    console.table(
+      roleValues.map((item, index) => ({
+        Index: index + 1, // Índice humano (empezando en 1)
+        Role: item.role,
+        NumericValue: item.numericValue
+      }))
+    );
+
+    console.log(`¿Están los roles ordenados correctamente (Admin, Editor, Viewer)? ${isSorted ? 'Sí' : 'No'}`);
+
+    // Si no están ordenados, detener el programa
+    if (!isSorted) {
+      console.error('❌ Los roles no están ordenados correctamente. Deteniendo el programa.');
+      await forceFailStatus(driver);
+    }
+  } catch (error) {
+    console.error('Error al ordenar los roles:', error);
+    process.exit(1); // Terminar el proceso con un código de error
+  }
+}
+
+
+
 
 async function reloadPage(driver) {
 
@@ -881,6 +997,161 @@ async function loginAsUnregisteredUserAndDeleteAccount(driver,vars) {
 }
 
 
+async function sortByLastName(driver) {
+  try {
+    // Encuentra todos los elementos del XPath
+    let elements = await driver.findElements(By.xpath("//div[pc-list-item]"));
+
+    let names = [];
+
+    for (let element of elements) {
+      let fullText = await element.getText();
+
+      // Dividir las líneas del texto (suponiendo que el formato sea "Nombre\nCorreo\nRol")
+      let lines = fullText.split('\n');
+      if (lines.length < 1) continue;
+
+      let fullName = lines[0]; // Primera línea como nombre completo
+      let email = lines.length > 1 ? lines[1] : ''; // Segunda línea como correo electrónico, si existe
+      let lastName;
+
+      // Si el nombre completo contiene números, ignorarlo
+      if (/\d/.test(fullName)) continue;
+
+      // Si el nombre completo es un correo electrónico, ignorarlo
+      if (fullName.includes('@')) continue;
+
+      // Si el nombre completo contiene "von", ignorarlo
+      if (fullName.toLowerCase().includes(' von ')) continue;
+
+      // Extraer el apellido del nombre completo
+      if (fullName && fullName.includes(' ')) {
+        let parts = fullName.trim().split(' ');
+        lastName = parts[parts.length - 1].toLowerCase(); // Usar la última palabra como apellido
+
+        // Si el apellido contiene números, ignorarlo
+        if (/\d/.test(lastName)) continue;
+      } else {
+        continue; // Ignorar si no hay un nombre válido
+      }
+
+      names.push({ fullName, lastName });
+    }
+
+    // Convertir la primera letra de cada apellido a un valor numérico (A=1, B=2, ..., Z=26)
+    let lastNameValues = names.map((n) => {
+      let firstLetter = n.lastName[0]; // Primera letra del apellido
+      let numericValue = firstLetter.charCodeAt(0) - 96; // Convertir letra a valor (a=1, b=2, ..., z=26)
+      return { ...n, numericValue };
+    });
+
+    // Verificar si los valores están ordenados de menor a mayor
+    let isSorted = lastNameValues.every(
+      (item, index, array) => index === 0 || item.numericValue >= array[index - 1].numericValue
+    );
+
+    // Imprimir resultados
+    console.table(
+      lastNameValues.map((n, index) => ({
+        Index: index + 1, // Índice humano (empezando en 1)
+        Name: n.fullName,
+        LastName: n.lastName,
+        NumericValue: n.numericValue,
+      }))
+    );
+
+    console.log(`¿Están los nombres ordenados alfabéticamente por apellido (A-Z)? ${isSorted ? 'Sí' : 'No'}`);
+
+    // Si no están ordenados, detener el programa
+    if (!isSorted) {
+      console.error('❌ Los nombres no están ordenados alfabéticamente. Deteniendo el programa.');
+      await forceFailStatus(driver);
+    }
+  } catch (error) {
+    console.error('Error en la verificación del orden:', error);
+    process.exit(1); // Terminar el proceso con un código de error
+  }
+}
+
+async function sortByFirstName(driver) {
+  try {
+    // Encuentra todos los elementos del XPath
+    let elements = await driver.findElements(By.xpath("//div[pc-list-item]"));
+
+    let names = [];
+
+    for (let element of elements) {
+      let fullText = await element.getText();
+
+      // Dividir las líneas del texto (suponiendo que el formato sea "Nombre\nCorreo\nRol")
+      let lines = fullText.split('\n');
+      if (lines.length < 1) continue;
+
+      let fullName = lines[0]; // Primera línea como nombre completo
+      let email = lines.length > 1 ? lines[1] : ''; // Segunda línea como correo electrónico, si existe
+      let firstName;
+
+      // Si el nombre completo contiene números, ignorarlo
+      if (/\d/.test(fullName)) continue;
+
+      // Si el nombre completo es un correo electrónico, ignorarlo
+      if (fullName.includes('@')) continue;
+
+      // Si el nombre completo contiene "von", ignorarlo
+      if (fullName.toLowerCase().includes(' von ')) continue;
+
+      // Extraer el primer nombre del nombre completo
+      if (fullName && fullName.includes(' ')) {
+        let parts = fullName.trim().split(' ');
+        firstName = parts[0].toLowerCase(); // Usar la primera palabra como nombre
+
+        // Si el primer nombre contiene números, ignorarlo
+        if (/\d/.test(firstName)) continue;
+      } else {
+        continue; // Ignorar si no hay un nombre válido
+      }
+
+      names.push({ fullName, firstName });
+    }
+
+    // Ordenar los nombres por primer nombre en orden alfabético (A-Z)
+    names.sort((a, b) => a.firstName.localeCompare(b.firstName));
+
+    // Convertir la primera letra de cada primer nombre a un valor numérico (A=1, B=2, ..., Z=26)
+    let sortedNames = names.map((n) => {
+      let firstLetter = n.firstName[0]; // Primera letra del primer nombre
+      let numericValue = firstLetter.charCodeAt(0) - 96; // Convertir letra a valor (a=1, b=2, ..., z=26)
+      return { ...n, numericValue };
+    });
+
+    // Verificar si los valores están ordenados de menor a mayor
+    let isSorted = sortedNames.every(
+      (item, index, array) => index === 0 || item.numericValue >= array[index - 1].numericValue
+    );
+
+    // Imprimir resultados
+    console.table(
+      sortedNames.map((n, index) => ({
+        Index: index + 1, // Índice humano (empezando en 1)
+        Name: n.fullName,
+        FirstName: n.firstName,
+        NumericValue: n.numericValue,
+      }))
+    );
+
+    console.log(`¿Están los nombres ordenados alfabéticamente por primer nombre (A-Z)? ${isSorted ? 'Sí' : 'No'}`);
+
+    // Si no están ordenados, detener el programa
+    if (!isSorted) {
+      console.error('❌ Los nombres no están ordenados alfabéticamente. Deteniendo el programa.');
+      await forceFailStatus(driver);
+    }
+  } catch (error) {
+    console.error('Error al ordenar los nombres por primer nombre:', error);
+    process.exit(1); // Terminar el proceso con un código de error
+  }
+}
+
 
 
  async function modalClose(driver) {
@@ -1362,8 +1633,25 @@ async function arrowSortByButton(driver) {
 }
 
 async function lastNameButton(driver) {
-  await driver.findElement(By.xpath("//span[contains(.,'last name')]")).click();
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'last name')]")), 30000).click();
 }
+
+async function firstNameButton(driver) {
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'first name')]")), 30000).click();
+  
+  
+}
+
+async function emailNameButton(driver) {
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'email')]")), 30000).click();
+
+}
+
+async function roleNameButton(driver) {
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'role')]")), 30000).click();
+
+}
+
 
 async function removeMemberButton(driver) {
   await driver.findElement(By.xpath("//div[contains(text(),'remove member')]")).click();
@@ -1669,8 +1957,10 @@ module.exports = {
   deleteUnregisteredUserInCaseOfExistence,
   deviceManagementMenu,
   editBillingAccountButton,
+  emailNameButton,
   emailVerification,
   enterRegistrationData,
+  firstNameButton,
   forceFailStatus,
   getTextByLocator,
   inviteMemberButton,
@@ -1697,12 +1987,17 @@ module.exports = {
   removeRegisteredUserNew,
   resetBillingAccountInformation,
   resetToOriginalUserNameInRoothOrganization,
+  roleNameButton,
   roleSelectionDropDownMenu,
   roleSelectionField,
   roothOrganizationTest,
   saveProfileDataButton,
   sendResultToTestRail,
   settings,
+  sortByEmails,
+  sortByFirstName,
+  sortByLastName,
+  sortByRole,
   switchToOriginalOrganization,
   switchToPxcOrganization,
   unregisteredUserCredentials,
