@@ -17,7 +17,11 @@ const {
   lastNameButton,
   removeOldMemberInvitationsRoothOrga,
   roleSelectionField,
-  assertText
+  assertText,
+  loginToProtonMail,
+  clickFirstMail,
+  deleteAllEmails,
+  logOutFromProtonMail
 } = require('../utils/sharedFunctions'); // Importación de funciones reutilizables
 
 async function C624() {
@@ -38,17 +42,22 @@ async function C624() {
       await roleSelectionField(driver);
       await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Editor')]")), 30000).click();
       await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Apply role')]")), 30000).click();
-      await waitForElementByXPath(driver,"//div[@data-analytics='list-item- rsylvester@phoenixcontact-sb.io']",5000);
+      await waitForElementByXPath(driver,"//div[@data-analytics='list-item- rsylvester@phoenixcontact-sb.io']",10000);
       await assertText(driver,"xpath","//div[@id='outlet']/app-user-management/div/app-members/flex-col/flex-col/div/ng-scrollbar/div/div/div/div/div[4]/pc-list-item/div/div/div[3]/div[2]","Editor");
       await driver.wait(until.elementLocated(By.xpath("/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-user-management[1]/div[1]/app-members[1]/flex-col[1]/flex-col[1]/div[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/div[4]/pc-list-item[1]/div[1]/div[1]/div[4]/app-icon[1]/*[name()='svg'][1]")), 30000).click();
       await driver.wait(until.elementLocated(By.xpath("//div[contains(text(),'change role')]")), 30000).click();
       await roleSelectionField(driver);  
       await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Viewer')]")), 30000).click();
       await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Apply role')]")), 30000).click();
-      await waitForElementByXPath(driver,"//div[@data-analytics='list-item- rsylvester@phoenixcontact-sb.io']",5000);
-       await waitForElementByXPath(driver,"//div[@data-analytics='list-item- rsylvester@phoenixcontact-sb.io']",5000);
+      await waitForElementByXPath(driver,"//div[@data-analytics='list-item- rsylvester@phoenixcontact-sb.io']",10000);
        await assertText(driver,"xpath","//div[@id='outlet']/app-user-management/div/app-members/flex-col/flex-col/div/ng-scrollbar/div/div/div/div/div[4]/pc-list-item/div/div/div[3]/div[2]","Viewer");
       await logout(driver);
+      await loginToProtonMail(driver,vars);
+      await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Your role in the Proficloud.io organization Rooth Organization was changed.')]")), 30000).click();
+      await deleteAllEmails(driver);
+      await logOutFromProtonMail(driver);
+
+
 
 
 
