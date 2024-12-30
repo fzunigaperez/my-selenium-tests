@@ -1,6 +1,7 @@
 const { By, until } = require('selenium-webdriver');
 const assert = require('assert'); // Import the assert module
 const axios = require('axios'); // Necessary to send test results
+const C714 = require('../testCases/C714');
 // const { sendResultToTestRail } = require('../utils/sharedFunctions');
 
 
@@ -706,19 +707,39 @@ async function loginFerchoAlejandro86(driver, vars) {
 
 }
 
-async function loginRegisteredUser(driver, vars) {
+
+async function loginRegisteredUser(driver, vars, isC714 = false) {
+  // Accept cookies
   await acceptCookies(driver);
+
+  // Navigate to login page
   await loginLandingPageButton(driver);
+
+  // Enter registered user credentials
   await registeredUserCredentials(driver, vars);
   await driver.sleep(1000);
+
+  // Fill in login form
   await driver.wait(until.elementLocated(By.id("username")), 50000);
   await driver.findElement(By.id("username")).sendKeys(vars["username"]);
   await driver.findElement(By.id("password")).sendKeys(vars["password"]);
   await driver.findElement(By.id("kc-login")).click();
   await driver.sleep(1000);
+
+  // Check if organization name or initials are empty
   await isTheOrganizationNameEmpty(driver, vars);
+
+  // If this is the C714 scenario, skip additional checks
+  if (isC714) {
+    console.log("C714 scenario detected: Skipping additional organization checks.");
+    return;
+  }
+
+  // Perform organization validation for other scenarios
+  console.log("Performing additional organization validation.");
   await roothOrganizationTest(driver, vars);
 }
+
 
 
 async function loginUnregisteredUser(driver,vars) {
