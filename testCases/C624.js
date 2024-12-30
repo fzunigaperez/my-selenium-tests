@@ -29,11 +29,13 @@ const {
 
 async function C624() {
   try {
-    await testBase('C624_Sorting users by first name, last name, email, invited, role.', async (driver) => {
+    await testBase('C624_C677_Sorting users by first name, last name, email, invited, role. / ADMIN can access to USER MANAGEMENT', async (driver) => {
       let vars = {};
       await windowConfiguration(driver);
       await loginAdmin(driver, vars);
       await resetToOriginalUserNameInRoothOrganization(driver);
+      //C667 ADMIN can access to USER MANAGEMENT
+
       await userManagementMenu(driver);
       await removeOldMemberInvitationsRoothOrga(driver);
       await arrowSortByButton(driver);
