@@ -1,6 +1,6 @@
 //  Best Practice wait and click
 
-await driver.wait(until.elementLocated(By.id("registrationlink")), 30000).click();
+await driver.wait(until.elementLocated(By.xpath("registrationlink")), 30000).click();
 
 //❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
 
