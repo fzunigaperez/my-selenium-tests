@@ -60,7 +60,7 @@ const sessionNames = [
   { name: 'C613_C610_C882_C871_Invite member to an organization that is already registered to proficloud as ADMIN / Remove member from orgnization / Members cannot be invited more than 1 time to Proficloud / Inviting user to an organization of the same domain should be possible without data security message', func: C613 },
   { name: 'C681_C682_C683_C684_C695_C696_C679_C680_C632_C633_Inviting an user to an organization as EDITOR/VIEWER is not allowed and User Management menu is hidden / Remove member from organization not allowed as EDITOR / Change user roles is not allowed for EDITOR/VIEWER / Editor/Viewer can NOT access to User Management / Viewer/Editor rights check', func: C681 },
   { name: 'C609_Sorting users by first name, last name, email, invited, role.', func: C609 },
-  { name: 'C624_Change user roles is possible as an ADMIN', func: C624 },
+  { name: 'C624_C677_Sorting users by first name, last name, email, invited, role. / ADMIN can access to USER MANAGEMENT', func: C624 },
 
 
 ];
