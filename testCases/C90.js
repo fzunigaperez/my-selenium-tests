@@ -10,7 +10,6 @@ async function C90() {
             
       await windowConfiguration(driver);
       await loginAdmin(driver, vars);
-      await forceFailStatus(driver);
       await logout(driver);
     });
   } catch (error) {
