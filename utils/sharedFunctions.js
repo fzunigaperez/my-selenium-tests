@@ -52,6 +52,16 @@ async function sendResultToTestRail(testCaseId, status, comment = '', testRunId)
 }
 
 
+async function waitForUsersToLoad(driver) {
+
+await driver.sleep(1000);
+let usersPresent= await driver.wait(until.elementLocated(By.xpath("/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-user-management[1]/div[1]/app-members[1]/flex-col[1]/flex-col[1]/div[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/div[1]/pc-list-item[1]/div[1]/div[1]")), 30000);
+await driver.wait(until.elementIsVisible(usersPresent),5000);
+//await driver.sleep(3000);
+
+}
+
+
 // Function to log in to ProtonMail
 async function loginToProtonMail(driver,vars) {
   try {
@@ -1996,9 +2006,28 @@ async function viewerRoleReset(driver) {
 }
 
 async function roleSelectionField(driver) {
+  try {
+      // Locate the role selection field
+      console.log("Waiting for the 'Role' field to be present...");
+      let roleSelection = await driver.wait(
+          until.elementLocated(By.xpath("//mat-label[contains(.,'Role')]")),
+          30000
+      );
 
-  await driver.wait(until.elementLocated(By.xpath("//mat-label[contains(.,'Role')]")), 30000).click();
-  
+      // Ensure it is visible and interactive
+      console.log("Waiting for the 'Role' field to be visible...");
+      await driver.wait(until.elementIsVisible(roleSelection), 5000);
+
+      // Perform the click
+      console.log("Clicking on the 'Role' field...");
+      await roleSelection.click();
+
+      console.log("'Role' field selected successfully.");
+      return roleSelection;
+  } catch (error) {
+      console.error("Error interacting with the 'Role' field:", error.message);
+      throw error;
+  }
 }
 
 
@@ -2077,6 +2106,7 @@ module.exports = {
   viewerRoleReset,
   waitForXPathPresentTimeout,
   waitUntilXpathNotPresent,
+  waitForUsersToLoad,
   waitingLoadingRingProficloudToDissapear,
   windowConfiguration,
   
