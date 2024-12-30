@@ -57,7 +57,7 @@ async function waitForUsersToLoad(driver) {
 await driver.sleep(1000);
 let usersPresent= await driver.wait(until.elementLocated(By.xpath("/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-user-management[1]/div[1]/app-members[1]/flex-col[1]/flex-col[1]/div[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/div[1]/pc-list-item[1]/div[1]/div[1]")), 30000);
 await driver.wait(until.elementIsVisible(usersPresent),5000);
-//await driver.sleep(3000);
+await driver.sleep(1000);
 
 }
 
@@ -1241,50 +1241,48 @@ async function sortByFirstName(driver) {
  }
   
   
- async function resetToOriginalUserNameInRoothOrganization(driver,vars) {
+ async function resetToOriginalUserNameInRoothOrganization(driver, vars = {}) {
+  console.log("Vars object at the start:", vars);
 
   await userMenu(driver);  
   await accountSettingsMainMenu(driver);
   await accountSettingsTab(driver);
 
   try {
-    
-    vars["userName"] = await driver.findElement(By.xpath("//flex-col/div/div[2]/div[2]")).getText();
-    console.log(`The actual user Name is: ${vars["userName"]}`);
-    
-    if (vars["userName"] === 'Fernando Zuniga') {
-        console.log("The user name is the right one");
-    } else {
-        console.log("A change in the user name has to take place");
-
-      vars["originalName"] = "Fernando";
-      vars["originalSurname"] = "Zuniga";
-
-      await changeInformationButton(driver);
-      await driver.sleep(1000);
-      await driver.wait(until.elementLocated(By.xpath("//input[contains(@placeholder,'First name')]")), 30000);
+      vars["userName"] = await driver.findElement(By.xpath("//flex-col/div/div[2]/div[2]")).getText();
+      console.log(`The actual user Name is: ${vars["userName"]}`);
       
-      await driver.findElement(By.xpath("//input[contains(@placeholder,'First name')]")).clear();
-      await driver.findElement(By.xpath("//input[contains(@placeholder,'First name')]")).sendKeys(vars["originalName"]);
-      await driver.findElement(By.xpath("//input[contains(@placeholder,'Last name')]")).clear();
+      if (vars["userName"] === 'Fernando Zuniga') {
+          console.log("The user name is the right one");
+      } else {
+          console.log("A change in the user name has to take place");
 
-      await driver.findElement(By.xpath("//input[contains(@placeholder,'Last name')]")).sendKeys(vars["originalSurname"]);
-      await saveProfileDataButton(driver);
+          vars["originalName"] = "Fernando";
+          vars["originalSurname"] = "Zuniga";
 
-      // Asserting the precense of Success Message
-      await driver.sleep(1000);
-      await driver.wait(until.elementTextIs(driver.findElement(By.xpath('//pc-overlay/div/div[2]/div/div[2]/div')), "Your profile has been successfully updated."), 5000);
-      console.log("El texto esperado está presente!");
-      await modalClose(driver);
+          await changeInformationButton(driver);
+          await driver.sleep(1000);
+          await driver.wait(until.elementLocated(By.xpath("//input[contains(@placeholder,'First name')]")), 30000);
+          
+          await driver.findElement(By.xpath("//input[contains(@placeholder,'First name')]")).clear();
+          await driver.findElement(By.xpath("//input[contains(@placeholder,'First name')]")).sendKeys(vars["originalName"]);
+          await driver.findElement(By.xpath("//input[contains(@placeholder,'Last name')]")).clear();
+          await driver.findElement(By.xpath("//input[contains(@placeholder,'Last name')]")).sendKeys(vars["originalSurname"]);
+          await saveProfileDataButton(driver);
 
-      await driver.wait(until.elementTextIs(driver.findElement(By.xpath("//flex-col/div/div[2]/div[2]")), "Fernando Zuniga"), 5000);
-    }
-} catch (error) {
-    console.error("Error while fetching the user name:", error.message);
+          // Asserting the presence of Success Message
+          await driver.sleep(1000);
+          await driver.wait(until.elementTextIs(driver.findElement(By.xpath('//pc-overlay/div/div[2]/div/div[2]/div')), "Your profile has been successfully updated."), 5000);
+          console.log("Expected text is present!");
+          await modalClose(driver);
+
+          await driver.wait(until.elementTextIs(driver.findElement(By.xpath("//flex-col/div/div[2]/div[2]")), "Fernando Zuniga"), 5000);
+      }
+  } catch (error) {
+      console.error("Error while fetching the user name:", error.message);
+  }
 }
 
-  
-}
 
 
       async function forceFailStatus(driver) {
@@ -1635,15 +1633,13 @@ async function waitForXPathPresentTimeout(driver, xpath, timeout) {
 
 
 
-
-
 /**
- * Valida que el texto de un elemento identificado por un selector sea el esperado.
+ * Validates that the text of an element identified by a selector matches the expected value.
  * 
- * @param {WebDriver} driver - La instancia del WebDriver.
- * @param {string} locatorType - El tipo de localizador: 'xpath', 'css', 'id', 'name', 'class', 'tag'.
- * @param {string} locatorValue - El valor del selector.
- * @param {string} expectedText - El texto que se espera encontrar.
+ * @param {WebDriver} driver - The instance of the WebDriver.
+ * @param {string} locatorType - The type of locator: 'xpath', 'css', 'id', 'name', 'class', 'tag'.
+ * @param {string} locatorValue - The value of the selector.
+ * @param {string} expectedText - The text expected to be found.
  */
 async function assertText(driver, locatorType, locatorValue, expectedText) {
   try {
@@ -1668,23 +1664,24 @@ async function assertText(driver, locatorType, locatorValue, expectedText) {
         element = await driver.findElement(By.tagName(locatorValue));
         break;
       default:
-        throw new Error(`❌ Tipo de localizador no válido: "${locatorType}"`);
+        throw new Error(`❌ Invalid locator type: "${locatorType}"`);
     }
 
-    // Obtener el texto del elemento
+    // Get the text of the element
     let actualText = await element.getText();
 
-    // Comparar el texto real con el esperado
+    // Compare the actual text with the expected text
     if (actualText === expectedText) {
-      console.log(`✅ El texto coincide: "${actualText}"`);
+      console.log(`✅ The text matches: "${actualText}"`);
     } else {
-      throw new Error(`❌ El texto no coincide. Se esperaba: "${expectedText}", pero se obtuvo: "${actualText}"`);
+      throw new Error(`❌ The text does not match. Expected: "${expectedText}", but got: "${actualText}"`);
     }
   } catch (error) {
-    console.error(`Error al validar el texto: ${error.message}`);
+    console.error(`Error validating text: ${error.message}`);
     throw error;
   }
 }
+
 
 async function deviceManagementMenu(driver) {
 
@@ -1989,6 +1986,7 @@ async function viewerRoleReset(driver) {
 
       console.log("Viewer role different than VIEWER some changes has to be taken");
       await driver.findElement(By.css(".pc-list-item__action-button > .ng-star-inserted")).click();
+      await driver.sleep(1000);
       await driver.findElement(By.xpath("//div[contains(text(),\'change role\')]")).click();
       assert(await driver.findElement(By.css(".pc-overlay__title")).getText() == "Change members role");
       await roleSelectionField(driver);
@@ -2002,7 +2000,10 @@ async function viewerRoleReset(driver) {
       console.log("Viewer member has the viewer role :) ");
   }
   await driver.findElement(By.xpath("//input")).clear();
-  await reloadPage(driver);
+  await deviceManagementMenu(driver);
+  await userManagementMenu(driver);
+  await waitForUsersToLoad(driver);
+  
 }
 
 async function roleSelectionField(driver) {

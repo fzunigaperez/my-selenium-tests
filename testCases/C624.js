@@ -23,6 +23,7 @@ const {
   logOutFromProtonMail,
   waitForUsersToLoad,
   waitForXPathPresentTimeout,
+  waitingLoadingRingProficloudToDissapear,
 
 } = require('../utils/sharedFunctions'); // Importación de funciones reutilizables
 
@@ -38,7 +39,7 @@ async function C624() {
       await arrowSortByButton(driver);
       await lastNameButton(driver);
       await viewerRoleReset(driver);
-      await waitForUsersToLoad(driver);
+      
       //Click on the hamburger menu from viewer 
       await driver.wait(until.elementLocated(By.xpath("/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-user-management[1]/div[1]/app-members[1]/flex-col[1]/flex-col[1]/div[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/div[4]/pc-list-item[1]/div[1]/div[1]/div[4]/app-icon[1]/*[name()='svg'][1]")), 30000).click();
       await driver.sleep(1000);
@@ -46,41 +47,17 @@ async function C624() {
       await roleSelectionField(driver);
       await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Editor')]")), 30000).click();
       await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Apply role')]")), 30000).click();
-      await waitForUsersToLoad(driver);
-
-      //await driver.sleep(4000);
+      await waitingLoadingRingProficloudToDissapear(driver);
       await waitForXPathPresentTimeout(driver,"//div[@data-analytics='list-item- rsylvester@phoenixcontact-sb.io']",10000);
       await assertText(driver,"xpath","//div[@id='outlet']/app-user-management/div/app-members/flex-col/flex-col/div/ng-scrollbar/div/div/div/div/div[4]/pc-list-item/div/div/div[3]/div[2]","Editor");
-      await driver.wait(until.elementLocated(By.xpath("/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-user-management[1]/div[1]/app-members[1]/flex-col[1]/flex-col[1]/div[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/div[4]/pc-list-item[1]/div[1]/div[1]/div[4]/app-icon[1]/*[name()='svg'][1]")), 30000).click();
-      //await driver.sleep(1000);
-      await roleSelectionField(driver);  
-      await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Viewer')]")), 30000).click();
-      await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Apply role')]")), 30000).click();
-      //await waitForUsersToLoad(driver);
-
-      //await driver.sleep(2000);
-      await waitForXPathPresentTimeout(driver,"//div[@data-analytics='list-item- rsylvester@phoenixcontact-sb.io']",10000);
-       await assertText(driver,"xpath","//div[@id='outlet']/app-user-management/div/app-members/flex-col/flex-col/div/ng-scrollbar/div/div/div/div/div[4]/pc-list-item/div/div/div[3]/div[2]","Viewer");
+      await viewerRoleReset(driver);
       await logout(driver);
       await loginToProtonMail(driver,vars);
       await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Your role in the Proficloud.io organization Rooth Organization was changed.')]")), 30000).click();
       await deleteAllEmails(driver);
       await logOutFromProtonMail(driver);
-
-
-
-
-
-
-
-
-
-
-
       
       
-      
-
     });
   } catch (error) {
     throw new Error(`C624 failed: ${error.message}`);
@@ -88,15 +65,15 @@ async function C624() {
 }
 
 
-// Permite ejecutar este archivo directamente
+// Allows this file to be executed directly
 if (require.main === module) {
   (async () => {
     try {
-      console.log('🚀 Ejecutando el test C624...');
-      await C624(); // Cambia aquí el nombre del test si tienes varios
-      console.log('✅ Test completado con éxito.');
+      console.log('🚀 Running test C624...');
+      await C624(); // Change the test name here if you have multiple tests
+      console.log('✅ Test completed successfully.');
     } catch (error) {
-      console.error('❌ Error al ejecutar el test:', error.message);
+      console.error('❌ Error executing the test:', error.message);
       console.error(error.stack);
     }
   })();
