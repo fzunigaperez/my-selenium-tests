@@ -2130,6 +2130,6 @@ module.exports = {
   waitUntilXpathNotPresent,
   waitForUsersToLoad,
   waitingLoadingRingProficloudToDissapear,
-  windowConfiguration,
+  windowConfiguration
   
 };
