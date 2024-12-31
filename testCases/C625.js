@@ -29,6 +29,7 @@ async function C625() {
       await driver.sleep(1000);
       const rolesTabXPath = "//flex-row[@id='navigation-user-management-service-user-roles']/div";
       await driver.findElement(By.xpath(rolesTabXPath)).click();
+      await driver.sleep(2000);
 
       // Step 4: Validate the presence of role summaries
       const roleSummaryXPaths = {
