@@ -66,8 +66,8 @@ const sessionNames = [
   { name: 'C624_C677_Sorting users by first name, last name, email, invited, role. / ADMIN can access to USER MANAGEMENT', func: C624 },
  */ { name: 'C874_C646_Search for member works / Scroll Bars are present for users and roles', func: C874 },
  // { name: 'C625_Roles page shows a summary of numbers of Admins, Editors and Viewers.', func: C625 },
-  { name: 'C714 After deleting user invitation the invitation link should not be valid anymore NEW', func: C714 },
-  { name: 'C714 After deleting user invitation the invitation link should not be valid anymore NEW', func: C714 },
+  { name: 'C714_After deleting user invitation the invitation link should not be valid anymore NEW', func: C714 },
+   { name: 'C537_After deleting user invitation the invitation link should not be valid anymore NEW', func: C537 },
   { name: 'C90_Log out successfully', func: C90 },
 
  
