@@ -64,11 +64,13 @@ const sessionNames = [
   { name: 'C681_C682_C683_C684_C695_C696_C679_C680_C632_C633_Inviting an user to an organization as EDITOR/VIEWER is not allowed and User Management menu is hidden / Remove member from organization not allowed as EDITOR / Change user roles is not allowed for EDITOR/VIEWER / Editor/Viewer can NOT access to User Management / Viewer/Editor rights check', func: C681 },
   { name: 'C609_Sorting users by first name, last name, email, invited, role.', func: C609 },
   { name: 'C624_C677_Sorting users by first name, last name, email, invited, role. / ADMIN can access to USER MANAGEMENT', func: C624 },
- */ { name: 'C874_C646_Search for member works / Scroll Bars are present for users and roles', func: C874 },
- // { name: 'C625_Roles page shows a summary of numbers of Admins, Editors and Viewers.', func: C625 },
+  { name: 'C874_C646_Search for member works / Scroll Bars are present for users and roles', func: C874 },
+  { name: 'C625_Roles page shows a summary of numbers of Admins, Editors and Viewers.', func: C625 },
   { name: 'C714_After deleting user invitation the invitation link should not be valid anymore NEW', func: C714 },
    { name: 'C537_After deleting user invitation the invitation link should not be valid anymore NEW', func: C537 },
-  { name: 'C90_Log out successfully', func: C90 },
+  */{ name: 'C90_Log out successfully', func: C90 },
+  { name: 'C714_After deleting user invitation the invitation link should not be valid anymore NEW', func: C714 },
+
 
  
 
