@@ -1,9 +1,9 @@
-const { sendResultToTestRail, createTestRun } = require('./utils/sharedFunctions'); // Importa createTestRun
+const { sendResultToTestRail, createTestRun } = require('./utils/sharedFunctions'); // Import necessary functions
 
 // Sing Up
 const C13 = require('./testCases/C13');
 const C614 = require('./testCases/C614');
-// Login 
+// Login
 const C15 = require('./testCases/C15');
 const C655 = require('./testCases/C655');
 const C656 = require('./testCases/C656');
@@ -11,15 +11,15 @@ const C16 = require('./testCases/C16');
 const C18 = require('./testCases/C18');
 const C36 = require('./testCases/C36');
 const C580 = require('./testCases/C580');
-//Log out
+// Log out
 const C90 = require('./testCases/C90');
-//Profile Settings
+// Profile Settings
 const C19 = require('./testCases/C19');
 const C84 = require('./testCases/C84');
-//Billing account
+// Billing account
 const C537 = require('./testCases/C537');
 const C706 = require('./testCases/C706');
-//User Management
+// User Management
 const C608 = require('./testCases/C608');
 const C613 = require('./testCases/C613');
 const C681 = require('./testCases/C681');
@@ -30,15 +30,18 @@ const C625 = require('./testCases/C625');
 const C714 = require('./testCases/C714');
 
 
+// TestRail Project IDs
+const projectIds = {
+  "User Management Service": 9,
+  "Device Management Service": 3,
+  "Emma Service": 5,
+  "Charge Repay Service": 8,
+};
 
-// Función para extraer los Test IDs de sessionName
-function extractTestCaseIds(sessionName) {
-  const matches = sessionName.match(/C(\d+)/g); // Encuentra todas las coincidencias de C seguido de dígitos
-  return matches ? matches.map(id => parseInt(id.slice(1), 10)) : []; // Retorna los IDs como números
-}
+// Test cases grouped by project
+const projectsTests = {
+  "User Management Service": [
 
-// Construcción del array tests con el formato original
-const sessionNames = [
   //SignUp
   { name: 'C13_C575_C697_C22_C895_C1024 Sign up in the proficloud with valid email and password / Sign UP with an already existing E-Mail / Introduce a wrong password before user deletion / Delete user / If the user enter an invalid email, and correcte it later, it is should be possible to REGISTER to Proficloud or create Billing account / Check and uncheck the Terms and Licences Agreement should not alter the registered button', func:C13 },
   { name: 'C614_Sign UP if two passwords are not the same should not be possible', func: C614 },
@@ -69,59 +72,100 @@ const sessionNames = [
   { name: 'C537_After deleting user invitation the invitation link should not be valid anymore NEW', func: C537 },
   { name: 'C714_After deleting user invitation the invitation link should not be valid anymore NEW', func: C714 },
 
+  ],
+  "Device Management Service": [
+    // Add specific test cases for this project if any
+  ],
+  "Emma Service": [
+    // Add specific test cases for this project if any
+  ],
+  "Charge Repay Service": [
+    // Add specific test cases for this project if any
+  ],
+};
 
- 
+// Function to extract Test IDs from sessionName
+function extractTestCaseIds(sessionName) {
+  const matches = sessionName.match(/C(\d+)/g); // Finds all occurrences of C followed by digits
+  return matches ? matches.map(id => parseInt(id.slice(1), 10)) : []; // Returns IDs as numbers
+}
 
-];
+// Generate tests with extracted IDs
+for (const project in projectsTests) {
+  projectsTests[project] = projectsTests[project].map(({ name, func }) => ({
+    name,
+    func,
+    testCaseIds: extractTestCaseIds(name),
+  }));
+}
 
-const tests = sessionNames.map(({ name, func }) => ({
-  name,
-  func,
-  testCaseIds: extractTestCaseIds(name), // Extrae una lista de IDs
-}));
+const errors = []; // Array to store errors
 
-// Función para ejecutar una prueba
+// Function to execute a test
 async function runTest(testFunction, testName, testCaseIds, testRunId) {
   try {
     console.log(`Running test: ${testName}`);
-    await testFunction(); // Ejecuta la función del test
+    await testFunction(); // Execute the test function
     console.log(`${testName} completed successfully.`);
-    // Enviar resultados para todos los Test IDs asociados
+    // Send results for all associated Test IDs
     for (const testCaseId of testCaseIds) {
       await sendResultToTestRail(testCaseId, 1, 'Test passed successfully.', testRunId);
     }
   } catch (error) {
     console.error(`${testName} failed:`, error.message);
-    // Enviar resultados para todos los Test IDs asociados como fallidos
+    errors.push({ testName, error: error.message }); // Add the error to the array
+    // Send results for all associated Test IDs as failed
     for (const testCaseId of testCaseIds) {
       await sendResultToTestRail(testCaseId, 5, `Test failed: ${error.message}`, testRunId);
     }
   }
 }
 
-// Función para ejecutar todas las pruebas
-async function runAllTests() {
+// Function to execute all tests for a project
+async function runProjectTests(projectName) {
   try {
-    const projectId = 9; // ID del proyecto "User Management"
-    const today = new Date();
-    const testRunName = `Automated Test Run - ${today.toISOString().split('T')[0]}`; // Nombre basado en la fecha
+    const projectId = projectIds[projectName];
+    const tests = projectsTests[projectName];
+    
+    if (!tests || tests.length === 0) {
+      console.log(`No tests available for project: ${projectName}. Skipping.`);
+      return;
+    }
 
-    // Crear un nuevo Test Run en TestRail
-    console.log(`Creating Test Run in project ${projectId}...`);
+    const today = new Date();
+    const testRunName = `Automated Test Run - ${projectName} - ${today.toISOString().split('T')[0]}`;
+
+    // Create a new Test Run in TestRail
+    console.log(`Creating Test Run in project ${projectId} (${projectName})...`);
     const testRun = await createTestRun(projectId, testRunName, tests.flatMap(t => t.testCaseIds));
-    const testRunId = testRun.id; // Obtener el ID del nuevo Test Run
+    const testRunId = testRun.id; // Get the ID of the new Test Run
     console.log(`Test Run created successfully with ID: ${testRunId}`);
 
-    // Ejecutar todas las pruebas
+    // Execute all tests for the project
     for (const test of tests) {
       await runTest(test.func, test.name, test.testCaseIds, testRunId);
     }
 
-    console.log('All tests have been executed.');
+    console.log(`All tests for project "${projectName}" have been executed.`);
+
+    // Show error summary if any
+    if (errors.length) {
+      console.log(`Error summary for project "${projectName}":`);
+      errors.forEach(err => console.log(`- ${err.testName}: ${err.error}`));
+    } else {
+      console.log(`All tests for "${projectName}" were executed successfully.`);
+    }
   } catch (error) {
-    console.error('Error while executing tests:', error.message);
+    console.error(`Error while executing tests for project "${projectName}":`, error.message);
   }
 }
 
-// Ejecutar todas las pruebas
-runAllTests();
+// Function to execute tests for all projects
+async function runAllProjectsTests() {
+  for (const projectName in projectIds) {
+    await runProjectTests(projectName);
+  }
+}
+
+// Execute tests for all projects
+runAllProjectsTests();
