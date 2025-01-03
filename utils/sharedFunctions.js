@@ -604,6 +604,8 @@ async function userMenu(driver) {
   await driver.findElement(By.xpath("//div[@id='proficloud-user-icon']")).click();
 }
 
+
+
 async function windowConfiguration(driver) {
   await driver.get("https://proficloud.io/testrun");
   await driver.manage().window().maximize();
@@ -1614,41 +1616,45 @@ async function sortByFirstName(driver) {
     await driver.sleep(4000);
   }
   
-async function waitForXPathPresentTimeout(driver, xpath, timeout) {
-  const pollInterval = 1000; // Polling interval in milliseconds (1 second)
-  const endTime = Date.now() + timeout;
+  async function waitForXPathPresentTimeout(driver, xpath, timeout) {
+    const pollInterval = 1000; // Polling interval in milliseconds (1 second)
+    const endTime = Date.now() + timeout;
 
-  console.log(`Starting to wait for the element with XPath: "${xpath}" for up to ${timeout / 1000} seconds.`);
+    console.log(`Starting to wait for the element with XPath: "${xpath}" for up to ${timeout / 1000} seconds.`);
 
-  while (Date.now() < endTime) {
-    try {
-      const elementCount = await driver.executeScript((xp) => {
-        const result = document.evaluate(
-          xp,
-          document,
-          null,
-          XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
-          null
-        );
-        return result.snapshotLength;
-      }, xpath);
+    while (Date.now() < endTime) {
+        try {
+            const elementCount = await driver.executeScript((xp) => {
+                const result = document.evaluate(
+                    xp,
+                    document,
+                    null,
+                    XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+                    null
+                );
+                return result.snapshotLength;
+            }, xpath);
 
-      if (elementCount > 0) {
-        console.log(`Element with XPath: "${xpath}" found. Number of matches: ${elementCount}`);
-        return true; // The element was found
-      } else {
-        console.log(`Element with XPath: "${xpath}" not found. Checking again in ${pollInterval / 1000} second(s).`);
-      }
-    } catch (err) {
-      console.error(`Error during XPath evaluation: ${err}`);
+            if (elementCount > 0) {
+                console.log(`Element with XPath: "${xpath}" found. Number of matches: ${elementCount}`);
+                return true; // The element was found
+            } else {
+                console.log(`Element with XPath: "${xpath}" not found. Checking again in ${pollInterval / 1000} second(s).`);
+            }
+        } catch (err) {
+            console.error(`Error during XPath evaluation: ${err}`);
+        }
+
+        // Wait 1 second before checking again
+        await new Promise(resolve => setTimeout(resolve, pollInterval));
     }
 
-    // Wait 1 second before checking again
-    await new Promise(resolve => setTimeout(resolve, pollInterval));
-  }
+    console.log(`Timed out after ${timeout / 1000} seconds. The element with XPath: "${xpath}" was not found.`);
 
-  console.log(`Timed out after ${timeout / 1000} seconds. The element with XPath: "${xpath}" was not found.`);
-  return false; // The element was not found within the defined time
+    // Invoke the forceFailStatus function to stop the program
+    await forceFailStatus(driver);
+
+    return false; // The element was not found within the defined time
 }
 
 
@@ -1715,6 +1721,21 @@ async function userManagementMenu(driver) {
 await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'User Management Service')]")), 30000).click();
     
 }
+
+
+async function emmaMenu(driver) {
+  
+    const oldMenuCount = await countElementsByXPath(driver, "//flex-col[@id='energy-management-service']/div/div[2]/div");
+
+    if (oldMenuCount > 0) {
+      await driver.findElement(By.xpath("//flex-col[@id='energy-management-service']/div/div[2]/div")).click();
+    } else {
+      await arrowLeftSideMenu();
+      const energyServiceElement = await driver.findElement(By.xpath("//span[contains(.,'Energy Management Service')]"));
+      await energyServiceElement.click();
+    }
+  }
+
 
 async function arrowSortByButton(driver) {
   await driver.wait(until.elementLocated(By.css(".pc-icon-dropdown__right-icon > .ng-star-inserted")), 30000);
@@ -2053,6 +2074,15 @@ async function roleSelectionField(driver) {
 }
 
 
+async function dashboard(driver) {
+
+  await driver.wait(until.elementLocated(By.xpath("//span[@class='mdc-tab__content'][contains(.,'Dashboard')]")), 30000);
+  await driver.findElement(By.xpath("//span[@class='mdc-tab__content'][contains(.,'Dashboard')]")).click();
+  await driver.sleep(1000);
+  
+}
+
+
 module.exports = {
   acceptCookies,
   accountSettingsMainMenu,
@@ -2073,12 +2103,14 @@ module.exports = {
   confirmLinkUrlToggleIsOff,
   countElementsByXPath,
   createTestRun,
+  dashboard,
   deleteAllEmails,
   deleteUnregisteredUserInCaseOfExistence,
   deviceManagementMenu,
   editBillingAccountButton,
   emailNameButton,
   emailVerification,
+  emmaMenu,
   enterRegistrationData,
   firstNameButton,
   forceFailStatus,
