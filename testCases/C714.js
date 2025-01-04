@@ -22,6 +22,7 @@ const {
   waitingLoadingRingProficloudToDissapear,
   assertText,
   changeFrameAndClickonProficloudEmail,
+  waitForXPathPresentTimeout,
 } = require('../utils/sharedFunctions'); // Import reusable functions
 
 async function C714() {
@@ -78,7 +79,8 @@ async function C714() {
         // Attempt login with the invitation link
         
         await loginRegisteredUser(driver, vars, true);
-        await driver.sleep(10000);
+        await waitForXPathPresentTimeout(driver,"//div[contains(@class,'pc-status-overlay__icon-container')]",10000);
+        
 
         // Assert the invitation is invalid
         await assertText(
