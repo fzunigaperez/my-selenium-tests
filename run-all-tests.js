@@ -123,27 +123,28 @@ async function runProjectTests(projectName) {
     }
 
     console.log(`Creating Test Run in project ${projectId} (${projectName}) with cases:`, testCaseIds);
+
     const today = new Date();
     const testRunName = `Automated Test Run - ${projectName} - ${today.toISOString().split('T')[0]}`;
 
-    const testRun = await createTestRun(projectId, testRunName, testCaseIds);
-    const testRunId = testRun.id;
-    console.log(`Test Run created successfully with ID: ${testRunId}`);
+    try {
+      const testRun = await createTestRun(projectId, testRunName, testCaseIds);
+      console.log(`Test Run created successfully:`, testRun);
+      const testRunId = testRun.id;
 
-    for (const test of tests) {
-      await runTest(test.func, test.name, test.testCaseIds, testRunId);
+      for (const test of tests) {
+        await runTest(test.func, test.name, test.testCaseIds, testRunId);
+      }
+
+      console.log(`All tests for project "${projectName}" have been executed.`);
+    } catch (error) {
+      console.error(`Error creating test run for project "${projectName}":`, error.response?.data || error.message);
+      if (error.response?.data?.error === 'Field :case_ids contains unrecognized case IDs.') {
+        console.error(`Check the case IDs in TestRail and ensure they exist in the suite.`);
+      }
     }
-
-    console.log(`All tests for project "${projectName}" have been executed.`);
   } catch (error) {
-    console.error(`Error while executing tests for project "${projectName}":`, error.response?.data || error.message);
-  }
-}
-
-// Function to execute tests for all projects
-async function runAllProjectsTests() {
-  for (const projectName in projectIds) {
-    await runProjectTests(projectName);
+    console.error(`Error while executing tests for project "${projectName}":`, error.message);
   }
 }
 
