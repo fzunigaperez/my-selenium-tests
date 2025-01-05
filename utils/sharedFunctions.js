@@ -1434,9 +1434,66 @@ async function sortByFirstName(driver) {
     );
     await driver.wait(until.elementIsVisible(noMessagesFound), 30000);
   }
+
+
+  async function switchToExtraOrganizationAsAdmin(driver) {
+
+    await activeOrganization(driver);
+    await driver.findElement(By.xpath("(//div[@class=\'profile-menu_icon-text__text\'][contains(.,\'Leave this Organization\')])")).click();
+    await driver.wait(until.elementLocated(By.id("routeTitle")), 30000);
+    await driver.wait(until.elementLocated(By.xpath("//h4[contains(.,\'Leave this Organization\')]")), 30000);
+    
+  }
+
+  async function usersLeftMenu(driver) {
+
+    await driver.wait(until.elementLocated(By.id("navigation-user-management-service-users")), 30000).click();
+    
+  }
   
-   
+  async function eliminateExtraOrganizationsAdmin(driver) {
+
+    await activeOrganization(driver);
+    extraOrganization = await countElementsByXPath(driver,"(//div[@class='profile-menu_icon-text__text'][contains(.,'Leave this Organization')])");
+    await activeOrganization(driver);
+
+    while(extraOrganization > 0){
+
+
+      await switchToExtraOrganizationAsAdmin(driver);
+      await userManagementMenu(driver);
+      await usersLeftMenu(driver);
+      noDesiredUser = await countElementsByXPath(driver,"//div[@id='outlet']/app-user-management/div/app-members/flex-col/flex-col/div/ng-scrollbar/div/div/div/div/div[2]/pc-list-item/div/div");
+      
+      while (noDesiredUser > 0) {
+
+        console.log("An undesired user was found (✖╭╮✖)");
+        emailUndesiredUser = await getTextByLocator(driver,"xpath","//div[@id='outlet']/app-user-management/div/app-members/flex-col/flex-col/div/ng-scrollbar/div/div/div/div/div[2]/pc-list-item/div/div/div/div[2]");
+        await driver.wait(until.elementLocated(By.xpath("        /html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-account-management[1]/flex-col[1]/app-user-settings[1]/flex-col[1]/flex-col[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/mat-tab-group[1]/div[1]/mat-tab-body[1]/div[1]/div[1]/app-expandable-organisation[1]/div[1]/div[1]/flex-row[1]/flex-row[1]/div-relative[1]/app-icon[1]/*[name()='svg'][1]")), 30000).click();
+        await removeMemberButton(driver);
+        await driver.findElement(By.xpath("//input[contains(@placeholder,'email ')]")).clear();
+        await driver.findElement(By.xpath("//input[contains(@placeholder,'email ')]")).sendKeys(emailUndesiredUser);
+        await removeMemberButton2(driver);
+        await driver.sleep(6000);
+        noDesiredUser = await countElementsByXPath(driver,"//div[@id='outlet']/app-user-management/div/app-members/flex-col/flex-col/div/ng-scrollbar/div/div/div/div/div[2]/pc-list-item/div/div");  
+
+      }
+
+      await activeOrganization(driver);
+      await settings(driver);
+      
+      
+     
+
+
+
+
+
+    }
+
+  } 
   
+
   async function confirmLinkUrlToggleIsOff(driver) {
 
     
@@ -2108,6 +2165,7 @@ module.exports = {
   deleteUnregisteredUserInCaseOfExistence,
   deviceManagementMenu,
   editBillingAccountButton,
+  eliminateExtraOrganizationsAdmin,
   emailNameButton,
   emailVerification,
   emmaMenu,
@@ -2152,9 +2210,11 @@ module.exports = {
   sortByLastName,
   sortByRole,
   sortByInvitedStatus,
+  switchToExtraOrganizationAsAdmin,
   switchToOriginalOrganization,
   switchToPxcOrganization,
   unregisteredUserCredentials,
+  usersLeftMenu,
   userManagementMenu,
   userMenu,
   viewerRoleReset,
