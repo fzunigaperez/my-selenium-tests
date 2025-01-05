@@ -51,13 +51,10 @@ const projectIds = {
 
 // Test cases grouped by project
 const projectsTests = {
-  "User Management Service": [
-     //LogOut
-  { name: 'C90_Log out successfully', func: C90 },
-  ],
-  "Device Management Service": [
-    // Casos de prueba para Device Management...
-  ],
+
+
+
+  
   "Emma Service": [
     {
       name: 'C178_C179_C180_C646_C181_C184_Combined Dashboard Tests',
@@ -67,6 +64,12 @@ const projectsTests = {
   "Charge Repay Service": [
     // Casos de prueba para Charge Repay...
   ],
+
+    
+  "User Management Service": [
+    //LogOut
+ { name: 'C90_Log out successfully', func: C90 },
+ ],
 };
 
 // Function to extract Test IDs from sessionName
