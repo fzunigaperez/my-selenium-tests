@@ -148,5 +148,13 @@ async function runProjectTests(projectName) {
   }
 }
 
+
+// Function to execute tests for all projects
+async function runAllProjectsTests() {
+  for (const projectName in projectIds) {
+    await runProjectTests(projectName);
+  }
+}
+
 // Execute tests for all projects
 runAllProjectsTests();
