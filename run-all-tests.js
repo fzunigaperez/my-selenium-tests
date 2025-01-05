@@ -127,12 +127,18 @@ async function runProjectTests(projectName) {
       return;
     }
 
-    console.log(`Creating Test Run in project ${projectId} (${projectName}) with cases:`, testCaseIds);
+    console.log(`Preparing to create Test Run in project ${projectId} (${projectName}) with cases:`, testCaseIds);
 
     const today = new Date();
     const testRunName = `Automated Test Run - ${projectName} - ${today.toISOString().split('T')[0]}`;
 
     try {
+      console.log(`Payload for Test Run creation:`, {
+        project_id: projectId,
+        name: testRunName,
+        case_ids: testCaseIds,
+      });
+
       const testRun = await createTestRun(projectId, testRunName, testCaseIds);
       console.log(`Test Run created successfully:`, testRun);
       const testRunId = testRun.id;
@@ -152,6 +158,7 @@ async function runProjectTests(projectName) {
     console.error(`Error while executing tests for project "${projectName}":`, error.message);
   }
 }
+
 
 
 // Function to execute tests for all projects
