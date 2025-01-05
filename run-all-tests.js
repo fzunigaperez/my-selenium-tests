@@ -111,7 +111,6 @@ async function runTest(testFunction, testName, testCaseIds, testRunId) {
   }
 }
 
-// Function to execute all tests for a project
 async function runProjectTests(projectName) {
   try {
     const projectId = projectIds[projectName];
@@ -122,31 +121,27 @@ async function runProjectTests(projectName) {
       return;
     }
 
+    const testCaseIds = tests.flatMap(t => t.testCaseIds);
+    if (!testCaseIds || testCaseIds.length === 0) {
+      console.error(`No valid test case IDs for project ${projectName}. Skipping Test Run creation.`);
+      return;
+    }
+
+    console.log(`Creating Test Run in project ${projectId} (${projectName}) with cases:`, testCaseIds);
     const today = new Date();
     const testRunName = `Automated Test Run - ${projectName} - ${today.toISOString().split('T')[0]}`;
 
-    // Crea un nuevo Test Run en TestRail
-    console.log(`Creating Test Run in project ${projectId} (${projectName})...`);
-    const testRun = await createTestRun(projectId, testRunName, tests.flatMap(t => t.testCaseIds));
-    const testRunId = testRun.id; // Obtén el ID del nuevo Test Run
+    const testRun = await createTestRun(projectId, testRunName, testCaseIds);
+    const testRunId = testRun.id;
     console.log(`Test Run created successfully with ID: ${testRunId}`);
 
-    // Ejecuta todas las pruebas para el proyecto
     for (const test of tests) {
       await runTest(test.func, test.name, test.testCaseIds, testRunId);
     }
 
     console.log(`All tests for project "${projectName}" have been executed.`);
-
-    // Muestra resumen de errores si los hay
-    if (errors.length) {
-      console.log(`Error summary for project "${projectName}":`);
-      errors.forEach(err => console.log(`- ${err.testName}: ${err.error}`));
-    } else {
-      console.log(`All tests for "${projectName}" were executed successfully.`);
-    }
   } catch (error) {
-    console.error(`Error while executing tests for project "${projectName}":`, error.message);
+    console.error(`Error while executing tests for project "${projectName}":`, error.response?.data || error.message);
   }
 }
 
