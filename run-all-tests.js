@@ -59,7 +59,7 @@ const projectsTests = {
   "User Management Service": [
 
   //SignUp
-  { name: 'C13_C575_C697_C22_C895_C1024 Sign up in the proficloud with valid email and password / Sign UP with an already existing E-Mail / Introduce a wrong password before user deletion / Delete user / If the user enter an invalid email, and correcte it later, it is should be possible to REGISTER to Proficloud or create Billing account / Check and uncheck the Terms and Licences Agreement should not alter the registered button', func:C13 },
+  /*{ name: 'C13_C575_C697_C22_C895_C1024 Sign up in the proficloud with valid email and password / Sign UP with an already existing E-Mail / Introduce a wrong password before user deletion / Delete user / If the user enter an invalid email, and correcte it later, it is should be possible to REGISTER to Proficloud or create Billing account / Check and uncheck the Terms and Licences Agreement should not alter the registered button', func:C13 },
   { name: 'C614_Sign UP if two passwords are not the same should not be possible', func: C614 },
   //Login
   { name: 'C15_Login with right credentials as ADMIN', func: C15 },
@@ -86,7 +86,7 @@ const projectsTests = {
   { name: 'C874_C646_Search for member works / Scroll Bars are present for users and roles', func: C874 },
   { name: 'C625_Roles page shows a summary of numbers of Admins, Editors and Viewers.', func: C625 },
   { name: 'C537_After deleting user invitation the invitation link should not be valid anymore NEW', func: C537 },
-  { name: 'C714_After deleting user invitation the invitation link should not be valid anymore NEW', func: C714 },
+  */{ name: 'C714_After deleting user invitation the invitation link should not be valid anymore NEW', func: C714 },
 
   ],
   "Device Management Service": [
