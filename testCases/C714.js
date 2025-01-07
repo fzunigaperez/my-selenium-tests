@@ -79,7 +79,9 @@ async function C714() {
         // Attempt login with the invitation link
         
         await loginRegisteredUser(driver, vars, true);
-        await waitForXPathPresentTimeout(driver,"//div[contains(@class,'pc-status-overlay__icon-container')]",10000);
+        await driver.sleep(1000);
+        await driver.wait(until.elementLocated(By.css(".pc-status-overlay__message")), 10000);
+        
         
 
         // Assert the invitation is invalid

@@ -2101,7 +2101,7 @@ async function changeFrameAndClickonProficloudEmail(driver) {
 
 async function viewerRoleReset(driver) {
 
-  await driver.findElement(By.xpath("//input")).sendKeys("Viewer");
+  await driver.findElement(By.xpath("//input"),5000).sendKeys("Viewer");
   await driver.sleep(2000);
   let roleOfViewerUser = await driver.findElement(By.css(".pc-list-item__type")).getText();
   console.log("Role of viewer user at the beginning of the test:", roleOfViewerUser);

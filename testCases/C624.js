@@ -5,13 +5,10 @@ const baseCapabilities = require(path.resolve(__dirname, '../capabilities/capabi
 const testBase = require('./testBase');  //Common
 const {
   windowConfiguration,
-  loginEditor,
-  loginViewer,
   logout,
   viewerRoleReset,
   loginAdmin,
   resetToOriginalUserNameInRoothOrganization,
-  switchToPxcOrganization,
   userManagementMenu,
   arrowSortByButton,
   lastNameButton,
@@ -21,7 +18,6 @@ const {
   loginToProtonMail,
   deleteAllEmails,
   logOutFromProtonMail,
-  waitForUsersToLoad,
   waitForXPathPresentTimeout,
   waitingLoadingRingProficloudToDissapear,
 

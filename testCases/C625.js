@@ -9,6 +9,7 @@ const {
   logout,
   activeOrganization,
   settings,
+  viewerRoleReset,
 } = require('../utils/sharedFunctions'); // Reusable shared functions
 
 // Main test function for C625
@@ -26,6 +27,8 @@ async function C625() {
 
       // Step 3: Navigate to User Management and Roles page
       await userManagementMenu(driver);
+      await driver.sleep(2000);
+      await viewerRoleReset(driver);
       await driver.sleep(1000);
       const rolesTabXPath = "//flex-row[@id='navigation-user-management-service-user-roles']/div";
       await driver.findElement(By.xpath(rolesTabXPath)).click();
