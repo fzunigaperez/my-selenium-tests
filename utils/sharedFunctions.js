@@ -1246,7 +1246,17 @@ async function sortByFirstName(driver) {
   }
 }
 
+async function createOrganizationButton1(driver) {
 
+  await driver.wait(until.elementLocated(By.xpath("//div[@class='profile-menu_icon-text__text'][contains(.,'New organization')]")), 30000).click();
+
+  }
+
+  async function createOrganizationButton2(driver) {
+
+    await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Create')]")), 30000).click();
+  
+    }
 
  async function modalClose(driver) {
   await driver.wait(until.elementLocated(By.id("modal-close")), 5000).click();
@@ -1481,18 +1491,34 @@ async function sortByFirstName(driver) {
 
       await activeOrganization(driver);
       await settings(driver);
-      
-      
+      await driver.wait(until.elementLocated(By.xpath("/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-account-management[1]/flex-col[1]/app-user-settings[1]/flex-col[1]/flex-col[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/mat-tab-group[1]/div[1]/mat-tab-body[1]/div[1]/div[1]/app-expandable-organisation[1]/div[1]/div[1]/flex-row[1]/flex-row[1]/div-relative[1]/app-icon[1]/*[name()='svg'][1]")), 30000).click();
+      await waitingLoadingRingProficloudToDissapear(driver);
+      await driver.get("https://app.proficloud.io/services/account/user-settings");
+      await reloadPage(driver);
+      await driver.sleep(4000);
+      await activeOrganization(driver);
+      extraOrganization = await countElementsByXPath(driver,"(//div[@class='profile-menu_icon-text__text'][contains(.,'Leave this Organization')])");
+      await activeOrganization(driver);
+
      
-
-
-
-
-
     }
 
   } 
   
+
+  async function leaveOrganizationButton1(driver) {
+
+    await driver.wait(until.elementLocated(By.id("leave ")), 30000).click();
+
+    
+  }
+
+  async function leaveOrganizationButton2(driver) {
+
+    await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Leave Organization')]")), 30000).click();
+
+    
+  }
 
   async function confirmLinkUrlToggleIsOff(driver) {
 
@@ -2087,11 +2113,13 @@ async function viewerRoleReset(driver) {
       await driver.findElement(By.css(".pc-list-item__action-button > .ng-star-inserted")).click();
       await driver.sleep(1000);
       await driver.findElement(By.xpath("//div[contains(text(),\'change role\')]")).click();
+      await driver.sleep(1000);
       assert(await driver.findElement(By.css(".pc-overlay__title")).getText() == "Change members role");
       await roleSelectionField(driver);
       await driver.findElement(By.xpath("//span[contains(.,\'Viewer\')]")).click();
       await driver.findElement(By.xpath("//span[contains(.,\'Apply role\')]")).click();
       await waitingLoadingRingProficloudToDissapear(driver);
+      await driver.sleep(1000);
       assert(await driver.findElement(By.css(".pc-list-item__type")).getText() == "Viewer");
       
     } else {
@@ -2159,6 +2187,8 @@ module.exports = {
   confirmButton,
   confirmLinkUrlToggleIsOff,
   countElementsByXPath,
+  createOrganizationButton1,
+  createOrganizationButton2,
   createTestRun,
   dashboard,
   deleteAllEmails,
@@ -2178,6 +2208,8 @@ module.exports = {
   inviteMemberButton2,
   isTheOrganizationNameEmpty,
   lastNameButton,
+  leaveOrganizationButton1,
+  leaveOrganizationButton2,
   loginAdmin,
   loginAsUnregisteredUserAndDeleteAccount,
   loginChangeOrgaUserName,
