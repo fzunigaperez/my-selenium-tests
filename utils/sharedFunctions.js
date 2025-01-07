@@ -1649,8 +1649,11 @@ async function createOrganizationButton1(driver) {
       return result.snapshotLength;
     }, xpath);
   
+    console.log(`XPath: ${xpath}, Elements Found: ${elementCount}`);
+  
     return elementCount;
   }
+  
 
 
   async function assertXpathNotPresent(driver, xpath) {
@@ -1795,9 +1798,18 @@ async function assertText(driver, locatorType, locatorValue, expectedText) {
 
 async function deviceManagementMenu(driver) {
 
-await driver.wait(until.elementLocated(By.xpath("//span[normalize-space()='Device Management Service']")), 30000).click();
-  
+  const oldMenuCount = await countElementsByXPath(driver, "//span[contains(.,'Device Management Service')]");
+
+  if (oldMenuCount > 0) {
+    await driver.findElement(By.xpath("//span[contains(.,'Device Management Service')]")).click();
+  } else {
+    await arrowLeftSideMenu(driver);
+    const energyServiceElement = await driver.findElement(By.xpath("//span[contains(.,'Device Management Service')]"),5000);
+    await energyServiceElement.click();
+  }
 }
+
+
 
 async function userManagementMenu(driver) {
 
@@ -1813,12 +1825,18 @@ async function emmaMenu(driver) {
     if (oldMenuCount > 0) {
       await driver.findElement(By.xpath("//flex-col[@id='energy-management-service']/div/div[2]/div")).click();
     } else {
-      await arrowLeftSideMenu();
+      await arrowLeftSideMenu(driver);
       const energyServiceElement = await driver.findElement(By.xpath("//span[contains(.,'Energy Management Service')]"));
       await energyServiceElement.click();
     }
   }
 
+async function arrowLeftSideMenu(driver) {
+  arrowMinimized = await countElementsByXPath(driver,'//*[contains(concat(" ",normalize-space(@class)," ")," navigation_control-expand-icon--minimized ")]/*[contains(concat(" ",normalize-space(@class)," ")," ng-star-inserted ")]')
+  if (arrowMinimized > 0 ){
+    await driver.wait(until.elementLocated(By.css(".navigation_control-expand-icon--minimized > .ng-star-inserted")), 10000).click();
+  }
+}
 
 async function arrowSortByButton(driver) {
   await driver.wait(until.elementLocated(By.css(".pc-icon-dropdown__right-icon > .ng-star-inserted")), 30000);
@@ -2175,6 +2193,7 @@ module.exports = {
   activeOrganization,
   adminCredentials,
   agreeTerms,
+  arrowLeftSideMenu,
   arrowSortByButton,
   assertText,
   assertXpathNotPresent,
