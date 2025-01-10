@@ -68,7 +68,7 @@ async function loginToProtonMail(driver,vars) {
   try {
     // Navigate to the login URL
     await driver.get("https://mail.proton.me/");
-    await driver.sleep(10000);  // Remove this because of Zacualpan
+    await driver.sleep(1000);  // Remove this because of Zacualpan
 
     // Verify if the user is authenticated or needs to log in
     const xpath = "//button[contains(.,'New message')]";
@@ -92,7 +92,7 @@ async function loginToProtonMail(driver,vars) {
 
       const elementToClick = await driver.wait(
         until.elementLocated(By.xpath("//div[@class='text-ellipsis'][contains(.,'Proton Mail Plus')]")),
-        10000
+        5000
       );
 
       await driver.wait(until.elementIsVisible(elementToClick), 2000);
@@ -728,14 +728,15 @@ async function loginRegisteredUser(driver, vars, isC714 = false) {
   await driver.findElement(By.id("kc-login")).click();
   await driver.sleep(1000);
 
-  // Check if organization name or initials are empty
-  await isTheOrganizationNameEmpty(driver, vars);
+
 
   // If this is the C714 scenario, skip additional checks
   if (isC714) {
     console.log("C714 scenario detected: Skipping additional organization checks.");
     return;
   }
+    // Check if organization name or initials are empty
+    await isTheOrganizationNameEmpty(driver, vars);
 
   // Perform organization validation for other scenarios
   console.log("Performing additional organization validation.");
@@ -1451,6 +1452,9 @@ async function createOrganizationButton1(driver) {
     await activeOrganization(driver);
     await driver.findElement(By.xpath("(//div[@class=\'profile-menu_icon-text__text\'][contains(.,\'Leave this Organization\')])")).click();
     await driver.wait(until.elementLocated(By.id("routeTitle")), 30000);
+    await driver.sleep(1000);
+    await waitingLoadingRingProficloudToDissapear(driver);
+    await driver.wait(until.elementLocated(By.id("routeTitle")), 30000);
     await driver.wait(until.elementLocated(By.xpath("//h4[contains(.,\'Leave this Organization\')]")), 30000);
     
   }
@@ -1464,6 +1468,7 @@ async function createOrganizationButton1(driver) {
   async function eliminateExtraOrganizationsAdmin(driver) {
 
     await activeOrganization(driver);
+    await driver.sleep(1000);
     extraOrganization = await countElementsByXPath(driver,"(//div[@class='profile-menu_icon-text__text'][contains(.,'Leave this Organization')])");
     await activeOrganization(driver);
 
@@ -1492,11 +1497,14 @@ async function createOrganizationButton1(driver) {
       await activeOrganization(driver);
       await settings(driver);
       await driver.wait(until.elementLocated(By.xpath("/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-account-management[1]/flex-col[1]/app-user-settings[1]/flex-col[1]/flex-col[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/mat-tab-group[1]/div[1]/mat-tab-body[1]/div[1]/div[1]/app-expandable-organisation[1]/div[1]/div[1]/flex-row[1]/flex-row[1]/div-relative[1]/app-icon[1]/*[name()='svg'][1]")), 30000).click();
+      await leaveOrganizationButton1(driver);
+      await leaveOrganizationButton2(driver);
       await waitingLoadingRingProficloudToDissapear(driver);
       await driver.get("https://app.proficloud.io/services/account/user-settings");
       await reloadPage(driver);
       await driver.sleep(4000);
       await activeOrganization(driver);
+      await driver.sleep(1000);
       extraOrganization = await countElementsByXPath(driver,"(//div[@class='profile-menu_icon-text__text'][contains(.,'Leave this Organization')])");
       await activeOrganization(driver);
 
@@ -1508,7 +1516,7 @@ async function createOrganizationButton1(driver) {
 
   async function leaveOrganizationButton1(driver) {
 
-    await driver.wait(until.elementLocated(By.id("leave ")), 30000).click();
+    await driver.wait(until.elementLocated(By.id("leave")), 30000).click();
 
     
   }
@@ -1801,8 +1809,9 @@ async function deviceManagementMenu(driver) {
   const oldMenuCount = await countElementsByXPath(driver, "//span[contains(.,'Device Management Service')]");
 
   if (oldMenuCount > 0) {
-    await driver.findElement(By.xpath("//span[contains(.,'Device Management Service')]")).click();
+    await driver.findElement(By.xpath("//span[contains(.,'Device Management Service')]",10000)).click();
   } else {
+    console.log("The usal menu is hidden thus we have to give click in the arrow to expand it")
     await arrowLeftSideMenu(driver);
     const energyServiceElement = await driver.findElement(By.xpath("//span[contains(.,'Device Management Service')]"),5000);
     await energyServiceElement.click();

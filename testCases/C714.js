@@ -92,6 +92,7 @@ async function C714() {
           'There was a problem accepting the invitation.'
         );
         await modalClose(driver);
+        await driver.sleep(5000);
 
         // Step 8: Clean up emails and logout from ProtonMail
         await logout(driver);
