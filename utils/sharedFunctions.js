@@ -471,39 +471,40 @@ async function changeOrgaUserNameCredentials(driver, vars = {}) {
 }
 
 async function isTheOrganizationNameEmpty(driver, vars) {
-  let attempts = 0; // Contador de intentos
-  const maxAttempts = 10; // Número máximo de intentos
-  const waitTime = 2000; // Tiempo de espera entre intentos (2 segundos)
+  let attempts = 0; // Counter for attempts
+  const maxAttempts = 10; // Maximum number of attempts
+  const waitTime = 1000; // Wait time between attempts (1 second)
 
   while (attempts < maxAttempts) {
-    console.log(`Intento ${attempts + 1} de ${maxAttempts}`);
+    console.log(`Attempt ${attempts + 1} of ${maxAttempts}`);
 
     try {
-      // Espera hasta que el elemento esté visible en la página
+      // Wait until the element is visible on the page
       const element = await driver.wait(until.elementLocated(By.xpath("//h4")), waitTime);
       vars["emptyName"] = await element.getText();
-      console.log(`Organización encontrada: ${vars["emptyName"]}`);
+      console.log(`Organization found: ${vars["emptyName"]}`);
 
-      // Si el texto no está vacío, termina la función
+      // If the text is not empty, end the function
       if (vars["emptyName"] && vars["emptyName"] !== "") {
-        console.log("Nombre de la organización encontrado.");
+        console.log("Organization name found.");
         return vars["emptyName"];
       }
     } catch (error) {
-      console.log("El elemento no está disponible en este intento. Intentando nuevamente...");
+      console.log("The element is not available in this attempt. Trying again...");
     }
 
-    // Incrementa el contador de intentos y espera antes del siguiente intento
+    // Increment the attempt counter and wait before the next attempt
     attempts++;
     if (attempts < maxAttempts) {
       await driver.sleep(waitTime);
     }
   }
 
-  // Si no se encuentra un texto válido después de 10 intentos, devuelve un mensaje
-  console.log("No se pudo encontrar el nombre de la organización después de 10 intentos.");
-  return null; // Retorna null si no encuentra un valor válido
+  // If no valid text is found after 10 attempts, return a message
+  console.log("Could not find the organization name after 10 attempts.");
+  return null; // Return null if no valid value is found
 }
+
 
 
 async function roothOrganizationTest(driver, vars) {
@@ -1450,7 +1451,7 @@ async function createOrganizationButton1(driver) {
   async function switchToExtraOrganizationAsAdmin(driver) {
 
     await activeOrganization(driver);
-    await driver.findElement(By.xpath("(//div[@class=\'profile-menu_icon-text__text\'][contains(.,\'Leave this Organization\')])")).click();
+    await driver.findElement(By.xpath("//div[contains(@title,'Leave this Organization')]")).click();
     await driver.wait(until.elementLocated(By.id("routeTitle")), 30000);
     await driver.sleep(1000);
     await waitingLoadingRingProficloudToDissapear(driver);
@@ -1484,7 +1485,7 @@ async function createOrganizationButton1(driver) {
 
         console.log("An undesired user was found (✖╭╮✖)");
         emailUndesiredUser = await getTextByLocator(driver,"xpath","//div[@id='outlet']/app-user-management/div/app-members/flex-col/flex-col/div/ng-scrollbar/div/div/div/div/div[2]/pc-list-item/div/div/div/div[2]");
-        await driver.wait(until.elementLocated(By.xpath("        /html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-account-management[1]/flex-col[1]/app-user-settings[1]/flex-col[1]/flex-col[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/mat-tab-group[1]/div[1]/mat-tab-body[1]/div[1]/div[1]/app-expandable-organisation[1]/div[1]/div[1]/flex-row[1]/flex-row[1]/div-relative[1]/app-icon[1]/*[name()='svg'][1]")), 30000).click();
+        await driver.wait(until.elementLocated(By.xpath("/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-user-management[1]/div[1]/app-members[1]/flex-col[1]/flex-col[1]/div[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/div[3]/pc-list-item[1]/div[1]/div[1]/div[4]/app-icon[1]/*[name()='svg'][1]")), 30000).click();
         await removeMemberButton(driver);
         await driver.findElement(By.xpath("//input[contains(@placeholder,'email ')]")).clear();
         await driver.findElement(By.xpath("//input[contains(@placeholder,'email ')]")).sendKeys(emailUndesiredUser);
@@ -1516,15 +1517,16 @@ async function createOrganizationButton1(driver) {
 
   async function leaveOrganizationButton1(driver) {
 
-    await driver.wait(until.elementLocated(By.id("leave")), 30000).click();
+    button1= await driver.wait(until.elementLocated(By.id("leave")), 2000);
+    await driver.wait(until.elementIsVisible(button1),2000).click();
 
     
   }
 
   async function leaveOrganizationButton2(driver) {
 
-    await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Leave Organization')]")), 30000).click();
-
+    button2= await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Leave Organization')]")), 2000);
+    await driver.wait(until.elementIsVisible(button2),2000).click();
     
   }
 
@@ -1882,7 +1884,7 @@ async function invitedNameButton(driver) {
 
 
 async function removeMemberButton(driver) {
-  await driver.findElement(By.xpath("//div[contains(text(),'remove member')]")).click();
+  await driver.findElement(By.xpath("//div[contains(text(),'remove member')]",2000)).click();
   await driver.sleep(2000);
   await driver.wait(until.elementLocated(By.xpath("//div[@data-analytics='modal headline'][contains(.,'Remove Member')]")), 30000);
 }
@@ -1912,7 +1914,38 @@ async function roleSelectionDropDownMenu(driver) {
   
 }
 
+async function inviteMember(driver, mail, role) {
+  try {
 
+      await userManagementMenu(driver);
+
+      // Click the "Invite Member" button
+      await inviteMemberButton(driver);
+
+      // Clear the email input field and enter the provided email
+      const emailInput = await driver.findElement(By.xpath("//input[@placeholder='Email']"));
+      await driver.wait(until.elementIsVisible(emailInput), 2000);
+      await emailInput.clear();
+      await emailInput.sendKeys(mail);
+
+      // Select the role from the dropdown menu
+      await roleSelectionDropDownMenu(driver);
+      const roleElement = await driver.findElement(By.xpath(`//span[contains(.,'${role}')]`));
+      await driver.wait(until.elementIsVisible(roleElement), 2000);
+      await roleElement.click();
+
+      // Click the second button to send the invitation
+      await inviteMemberButton2(driver);
+
+      // Wait for the loading spinner to disappear
+      await waitingLoadingRingProficloudToDissapear(driver);
+
+      console.log(`Member successfully invited with email: ${mail} and role: ${role}`);
+  } catch (error) {
+      console.error(`Error inviting member with email: ${mail} and role: ${role} - ${error.message}`);
+      throw error; // Rethrow the error for the caller to handle
+  }
+}
 
 
 
@@ -1966,6 +1999,11 @@ async function clickFirstMail(driver){
 
 await driver.wait(until.elementLocated(By.css(".item-subject > .inline-block")), 60000).click();
 }
+
+async function clickSecondMail(driver){
+
+  await driver.wait(until.elementLocated(By.css(".item-container-wrapper:nth-child(2) > .flex-1")), 60000).click();
+  }
 
 
 async function removeRegisteredUserNew(driver, vars) {
@@ -2212,6 +2250,7 @@ module.exports = {
   changeOrgaUserNameCredentials,
   checkFailedLoginEmail,
   clickFirstMail,
+  clickSecondMail,
   confirmButton,
   confirmLinkUrlToggleIsOff,
   countElementsByXPath,
@@ -2232,6 +2271,7 @@ module.exports = {
   forceFailStatus,
   getTextByLocator,
   invitedNameButton,
+  inviteMember,
   inviteMemberButton,
   inviteMemberButton2,
   isTheOrganizationNameEmpty,
