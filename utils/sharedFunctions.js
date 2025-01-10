@@ -427,16 +427,16 @@ async function acceptCookies(driver) {
 
 async function loginLandingPageButton(driver) {
   try {
-    // Wait for the button to be located and visible (max wait time: 5 seconds)
-    const loginButton = await driver.wait(
-      until.elementLocated(By.id("login-button")),
-      5000 // Maximum wait time in milliseconds
-    );
+
+    
+    // Wait for the button to be located and visible (max wait time: 2 seconds)
+    await driver.sleep(2000);
+    loginButton = await countElementsByXPath(driver,"//a[@id='login-button']");
 
     // Check if the button is displayed
-    if (await loginButton.isDisplayed()) {
+    if (loginButton > 0) {
       // Click the button
-      await loginButton.click();
+      await driver.wait(until.elementLocated(By.id("login-button")), 2000).click();
       console.log("The 'Land page login-button' was clicked successfully.");
     }
   } catch (error) {
