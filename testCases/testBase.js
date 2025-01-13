@@ -5,6 +5,7 @@ const baseCapabilities = require(path.resolve(__dirname, '../capabilities/capabi
 async function testBase(sessionName, testSteps) {
   let driver;
 
+  // Helper function to format and filter the error stack trace
   const formatErrorStack = (error) => {
     const stackLines = error.stack.split('\n');
     // Filter lines relevant to test files
@@ -13,34 +14,110 @@ async function testBase(sessionName, testSteps) {
     );
   };
 
-  try {
+  // Selector for local or BrowserStack execution
+  const selectLocal = "OFF";
+
+  if (selectLocal === "ON") {
     console.log("Local execution enabled.");
-    driver = await new Builder().forBrowser('chrome').build();
 
-    console.log(`🚀 Starting test: ${sessionName}`);
-    await testSteps(driver);
+    try {
+      // Configure the driver for local Chrome execution
+      driver = await new Builder().forBrowser('chrome').build();
 
-    console.log(`✅ Test '${sessionName}' completed successfully.`);
-  } catch (error) {
-    console.error(`❌ Test '${sessionName}' failed: ${error.message}`);
-    console.error('🔍 Relevant error stack:');
+      console.log(`🚀 Starting local test: ${sessionName}`);
+      await testSteps(driver);
 
-    // Log only relevant lines from the stack trace
-    const focusedStack = formatErrorStack(error);
-    focusedStack.forEach((line) => console.error(line));
+      console.log(`✅ Test '${sessionName}' completed successfully.`);
+    } catch (error) {
+      console.error(`❌ Test '${sessionName}' failed: ${error.message}`);
+      console.error('🔍 Relevant error stack:');
 
-    // Highlight the first relevant line
-    if (focusedStack.length > 0) {
-      console.error(`🛑 Error likely occurred at: ${focusedStack[0]}`);
-    } else {
-      console.error('🛑 No relevant stack trace found.');
+      // Log only relevant lines from the stack trace
+      const focusedStack = formatErrorStack(error);
+      focusedStack.forEach((line) => console.error(line));
+
+      // Highlight the first relevant line
+      if (focusedStack.length > 0) {
+        console.error(`🛑 Error likely occurred at: ${focusedStack[0]}`);
+      } else {
+        console.error('🛑 No relevant stack trace found.');
+      }
+
+      throw error; // Re-throw for debugging
+    } finally {
+      if (driver) {
+        await driver.quit();
+        console.log('🗝️  Driver session closed.');
+      }
     }
+  } else {
+    console.log("BrowserStack execution enabled.");
 
-    throw error; // Re-throw for further debugging
-  } finally {
-    if (driver) {
-      await driver.quit();
-      console.log('🗝️  Driver session closed.');
+    const capabilities = {
+      ...baseCapabilities,
+      'bstack:options': {
+        ...baseCapabilities['bstack:options'],
+        sessionName,
+      },
+    };
+
+    try {
+      // Configure the driver for BrowserStack
+      driver = await new Builder()
+        .usingServer('https://hub-cloud.browserstack.com/wd/hub')
+        .forBrowser('chrome')
+        .withCapabilities(capabilities)
+        .build();
+
+      console.log(`🚀 Starting test on BrowserStack: ${sessionName}`);
+      await testSteps(driver);
+
+      // Mark the session as passed
+      const passedStatus = JSON.stringify({
+        action: 'setSessionStatus',
+        arguments: {
+          status: 'passed',
+          reason: `${sessionName} test passed successfully`,
+        },
+      });
+      await driver.executeScript(`browserstack_executor: ${passedStatus}`);
+      console.log(`✅ ${sessionName} test passed successfully.`);
+    } catch (error) {
+      console.error(`❌ Test '${sessionName}' failed: ${error.message}`);
+      console.error('🔍 Relevant error stack:');
+
+      // Log only relevant lines from the stack trace
+      const focusedStack = formatErrorStack(error);
+      focusedStack.forEach((line) => console.error(line));
+
+      // Highlight the first relevant line
+      if (focusedStack.length > 0) {
+        console.error(`🛑 Error likely occurred at: ${focusedStack[0]}`);
+      } else {
+        console.error('🛑 No relevant stack trace found.');
+      }
+
+      // Mark the session as failed
+      const failedStatus = JSON.stringify({
+        action: 'setSessionStatus',
+        arguments: {
+          status: 'failed',
+          reason: `Test failed: ${error.message}`,
+        },
+      });
+
+      try {
+        await driver.executeScript(`browserstack_executor: ${failedStatus}`);
+      } catch (executorError) {
+        console.error('❌ Failed to update BrowserStack session status:', executorError.message);
+      }
+
+      throw error; // Re-throw for debugging
+    } finally {
+      if (driver) {
+        await driver.quit();
+        console.log('🗝️  Driver session closed.');
+      }
     }
   }
 }

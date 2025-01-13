@@ -32,6 +32,8 @@ const C624 = require('./testCases/C624');
 const C874 = require('./testCases/C874');
 const C625 = require('./testCases/C625');
 const C714 = require('./testCases/C714');
+// Organization General
+const C611 = require('./testCases/C611');
 
 
 
@@ -87,6 +89,7 @@ const projectsTests = {
   { name: 'C625_Roles page shows a summary of numbers of Admins, Editors and Viewers.', func: C625 },
   { name: 'C537_After deleting user invitation the invitation link should not be valid anymore NEW', func: C537 },
   { name: 'C714_After deleting user invitation the invitation link should not be valid anymore NEW', func: C714 },
+  { name: 'C611_643_C626_C699_C892_Leave organization / It should not be possible to leave its root organization as admin if at least another admin is present / Switch organization / Create orga as ADMIN / Message about what characters are allowed in the name of organization has to be displayed', func: C611 },
 
   ],
   "Device Management Service": [
