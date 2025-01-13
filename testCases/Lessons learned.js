@@ -2,6 +2,10 @@
 
 await driver.wait(until.elementLocated(By.xpath("registrationlink")), 30000).click();
 
+//Writing text
+ await driver.findElement(By.xpath("//input[@placeholder='Last Name']")).clear();
+    await driver.findElement(By.xpath("//input[@placeholder='Last Name']")).sendKeys("Zuniga");
+
 //❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
 
 //XPATH SOLUTION for being fast using JAvA SCRIPT 

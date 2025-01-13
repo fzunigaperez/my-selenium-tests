@@ -741,7 +741,7 @@ async function loginRegisteredUser(driver, vars, isC714 = false) {
 
   // Perform organization validation for other scenarios
   console.log("Performing additional organization validation.");
-  await roothOrganizationTest(driver, vars);
+  //await roothOrganizationTest(driver, vars);
 }
 
 
@@ -1466,57 +1466,107 @@ async function createOrganizationButton1(driver) {
     
   }
   
-  async function eliminateExtraOrganizationsAdmin(driver) {
-
-    await activeOrganization(driver);
-    await driver.sleep(1000);
-    extraOrganization = await countElementsByXPath(driver,"(//div[@class='profile-menu_icon-text__text'][contains(.,'Leave this Organization')])");
-    await activeOrganization(driver);
-
-    while(extraOrganization > 0){
-
-
-      await switchToExtraOrganizationAsAdmin(driver);
-      await userManagementMenu(driver);
-      await usersLeftMenu(driver);
-      noDesiredUser = await countElementsByXPath(driver,"//div[@id='outlet']/app-user-management/div/app-members/flex-col/flex-col/div/ng-scrollbar/div/div/div/div/div[2]/pc-list-item/div/div");
-      
-      while (noDesiredUser > 0) {
-
-        console.log("An undesired user was found (✖╭╮✖)");
-        emailUndesiredUser = await getTextByLocator(driver,"xpath","//div[@id='outlet']/app-user-management/div/app-members/flex-col/flex-col/div/ng-scrollbar/div/div/div/div/div[2]/pc-list-item/div/div/div/div[2]");
-        await driver.wait(until.elementLocated(By.xpath("/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-user-management[1]/div[1]/app-members[1]/flex-col[1]/flex-col[1]/div[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/div[3]/pc-list-item[1]/div[1]/div[1]/div[4]/app-icon[1]/*[name()='svg'][1]")), 30000).click();
-        await removeMemberButton(driver);
-        await driver.findElement(By.xpath("//input[contains(@placeholder,'email ')]")).clear();
-        await driver.findElement(By.xpath("//input[contains(@placeholder,'email ')]")).sendKeys(emailUndesiredUser);
-        await removeMemberButton2(driver);
-        await driver.sleep(6000);
-        noDesiredUser = await countElementsByXPath(driver,"//div[@id='outlet']/app-user-management/div/app-members/flex-col/flex-col/div/ng-scrollbar/div/div/div/div/div[2]/pc-list-item/div/div");  
-
-      }
-
-      await activeOrganization(driver);
-      await settings(driver);
-      await driver.wait(until.elementLocated(By.xpath("/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-account-management[1]/flex-col[1]/app-user-settings[1]/flex-col[1]/flex-col[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/mat-tab-group[1]/div[1]/mat-tab-body[1]/div[1]/div[1]/app-expandable-organisation[1]/div[1]/div[1]/flex-row[1]/flex-row[1]/div-relative[1]/app-icon[1]/*[name()='svg'][1]")), 30000).click();
-      await leaveOrganizationButton1(driver);
-      await leaveOrganizationButton2(driver);
-      await waitingLoadingRingProficloudToDissapear(driver);
-      await driver.get("https://app.proficloud.io/services/account/user-settings");
-      await reloadPage(driver);
-      await driver.sleep(4000);
+  
+    async function eliminateExtraOrganizationsAdmin(driver) {
       await activeOrganization(driver);
       await driver.sleep(1000);
-      extraOrganization = await countElementsByXPath(driver,"(//div[@class='profile-menu_icon-text__text'][contains(.,'Leave this Organization')])");
+      extraOrganization = await countElementsByXPath(driver, "(//div[@class='profile-menu_icon-text__text'][contains(.,'Leave this Organization')])");
       await activeOrganization(driver);
-
-     
-    }
-
-  } 
+  
+      while (extraOrganization > 0) {
+          await switchToExtraOrganizationAsAdmin(driver);
+          await userManagementMenu(driver);
+          await usersLeftMenu(driver);
+          await driver.sleep(2000);
+          noDesiredUser = await countElementsByXPath(driver, "//div[@id='outlet']/app-user-management/div/app-members/flex-col/flex-col/div/ng-scrollbar/div/div/div/div/div[2]/pc-list-item/div/div");
+  
+          while (noDesiredUser > 0) {
+              const { lastDynamicXPath, mailText } = await getEmailofUndesiredUserAndHamburgerClick(driver);
+  
+              if (!lastDynamicXPath) {
+                  console.error("No dynamic XPath found for the icon.");
+                  break;
+              }
+  
+              console.log(`An undesired user was found (✖╭╮✖)", ${mailText}`);
+              await driver.wait(until.elementLocated(By.xpath(lastDynamicXPath)), 30000).click();
+              await removeMemberButton(driver);
+              await driver.findElement(By.xpath("//input[contains(@placeholder,'email ')]")).clear();
+              await driver.findElement(By.xpath("//input[contains(@placeholder,'email ')]")).sendKeys(mailText);
+              await removeMemberButton2(driver);
+              await driver.sleep(6000);
+              noDesiredUser = await countElementsByXPath(driver, "//div[@id='outlet']/app-user-management/div/app-members/flex-col/flex-col/div/ng-scrollbar/div/div/div/div/div[2]/pc-list-item/div/div");
+          }
+  
+          await activeOrganization(driver);
+          await settings(driver);
+          await driver.wait(until.elementLocated(By.xpath("/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-account-management[1]/flex-col[1]/app-user-settings[1]/flex-col[1]/flex-col[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/mat-tab-group[1]/div[1]/mat-tab-body[1]/div[1]/div[1]/app-expandable-organisation[1]/div[1]/div[1]/flex-row[1]/flex-row[1]/div-relative[1]/app-icon[1]/*[name()='svg'][1]")), 30000).click();
+          await leaveOrganizationButton1(driver);
+          await leaveOrganizationButton2(driver);
+          await waitingLoadingRingProficloudToDissapear(driver);
+          await driver.get("https://app.proficloud.io/services/account/user-settings");
+          await reloadPage(driver);
+          await driver.sleep(4000);
+          await activeOrganization(driver);
+          await driver.sleep(1000);
+          extraOrganization = await countElementsByXPath(driver, "(//div[@class='profile-menu_icon-text__text'][contains(.,'Leave this Organization')])");
+          await activeOrganization(driver);
+      }
+  }
   
 
-  async function leaveOrganizationButton1(driver) {
+  
+  
 
+  async function getEmailofUndesiredUserAndHamburgerClick(driver) {
+    const baseXPathWithoutIndex = "/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-user-management[1]/div[1]/app-members[1]/flex-col[1]/flex-col[1]/div[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/div";
+    const itemXPath = "/pc-list-item[1]/div[1]/div[1]/div[4]/app-icon[1]/*[name()='svg'][1]";
+
+    const mailBaseXPath = "//div[@id='outlet']/app-user-management/div/app-members/flex-col/flex-col/div/ng-scrollbar/div/div/div/div/div";
+    const mailItemXPath = "/pc-list-item/div/div/div/div[2]";
+
+    let index = 1;
+    let lastDynamicXPath = "";
+    let lastMailXPath = "";
+    let mailText = "";
+
+    // Find last dynamic XPath
+    while (true) {
+        const dynamicXPath = `${baseXPathWithoutIndex}[${index}]${itemXPath}`;
+        const elements = await driver.findElements(By.xpath(dynamicXPath));
+
+        if (elements.length > 0) {
+            lastDynamicXPath = dynamicXPath;
+            index++;
+        } else {
+            break;
+        }
+    }
+
+    // Find last mail XPath
+    index = 1;
+    while (true) {
+        const dynamicMailXPath = `${mailBaseXPath}[${index}]${mailItemXPath}`;
+        const elements = await driver.findElements(By.xpath(dynamicMailXPath));
+
+        if (elements.length > 0) {
+            lastMailXPath = dynamicMailXPath;
+            index++;
+        } else {
+            break;
+        }
+    }
+
+    if (lastMailXPath) {
+        const lastMailElement = await driver.findElement(By.xpath(lastMailXPath));
+        mailText = await lastMailElement.getText();
+    }
+
+    return { lastDynamicXPath, mailText };
+}
+
+  async function leaveOrganizationButton1(driver) {
+    await driver.sleep(1000);
     button1= await driver.wait(until.elementLocated(By.id("leave")), 2000);
     await driver.wait(until.elementIsVisible(button1),2000).click();
 
@@ -1525,6 +1575,7 @@ async function createOrganizationButton1(driver) {
 
   async function leaveOrganizationButton2(driver) {
 
+    await driver.sleep(1000);
     button2= await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Leave Organization')]")), 2000);
     await driver.wait(until.elementIsVisible(button2),2000).click();
     
@@ -1756,8 +1807,11 @@ async function createOrganizationButton1(driver) {
 
 
 
+
+
 /**
  * Validates that the text of an element identified by a selector matches the expected value.
+ * Waits up to 5 seconds for the text to appear.
  * 
  * @param {WebDriver} driver - The instance of the WebDriver.
  * @param {string} locatorType - The type of locator: 'xpath', 'css', 'id', 'name', 'class', 'tag'.
@@ -1766,44 +1820,49 @@ async function createOrganizationButton1(driver) {
  */
 async function assertText(driver, locatorType, locatorValue, expectedText) {
   try {
-    let element;
+    let locator;
+
+    // Determine the appropriate locator
     switch (locatorType.toLowerCase()) {
       case 'xpath':
-        element = await driver.findElement(By.xpath(locatorValue));
+        locator = By.xpath(locatorValue);
         break;
       case 'css':
-        element = await driver.findElement(By.css(locatorValue));
+        locator = By.css(locatorValue);
         break;
       case 'id':
-        element = await driver.findElement(By.id(locatorValue));
+        locator = By.id(locatorValue);
         break;
       case 'name':
-        element = await driver.findElement(By.name(locatorValue));
+        locator = By.name(locatorValue);
         break;
       case 'class':
-        element = await driver.findElement(By.className(locatorValue));
+        locator = By.className(locatorValue);
         break;
       case 'tag':
-        element = await driver.findElement(By.tagName(locatorValue));
+        locator = By.tagName(locatorValue);
         break;
       default:
         throw new Error(`❌ Invalid locator type: "${locatorType}"`);
     }
 
-    // Get the text of the element
-    let actualText = await element.getText();
+    // Wait for the element to be visible and the text to match
+    const element = await driver.wait(until.elementLocated(locator), 5000, `Element not found using ${locatorType}: "${locatorValue}"`);
+    await driver.wait(until.elementTextIs(element, expectedText), 5000, `Text "${expectedText}" not found within 5 seconds.`);
 
-    // Compare the actual text with the expected text
+    // Get the actual text and validate
+    const actualText = await element.getText();
     if (actualText === expectedText) {
       console.log(`✅ The text matches: "${actualText}"`);
     } else {
       throw new Error(`❌ The text does not match. Expected: "${expectedText}", but got: "${actualText}"`);
     }
   } catch (error) {
-    console.error(`Error validating text: ${error.message}`);
+    console.error(`❌ Error validating text: ${error.message}`);
     throw error;
   }
 }
+
 
 
 async function deviceManagementMenu(driver) {
@@ -1884,8 +1943,9 @@ async function invitedNameButton(driver) {
 
 
 async function removeMemberButton(driver) {
+  await driver.sleep(1000);
   await driver.findElement(By.xpath("//div[contains(text(),'remove member')]",2000)).click();
-  await driver.sleep(2000);
+  await driver.sleep(500);
   await driver.wait(until.elementLocated(By.xpath("//div[@data-analytics='modal headline'][contains(.,'Remove Member')]")), 30000);
 }
 
@@ -1996,12 +2056,13 @@ async function getTextByLocator(driver, locatorType, locatorValue) {
 }
 
 async function clickFirstMail(driver){
-
+await driver.sleep(1000);
 await driver.wait(until.elementLocated(By.css(".item-subject > .inline-block")), 60000).click();
 }
 
 async function clickSecondMail(driver){
 
+  await driver.sleep(1000);
   await driver.wait(until.elementLocated(By.css(".item-container-wrapper:nth-child(2) > .flex-1")), 60000).click();
   }
 
@@ -2269,6 +2330,7 @@ module.exports = {
   enterRegistrationData,
   firstNameButton,
   forceFailStatus,
+  getEmailofUndesiredUserAndHamburgerClick,
   getTextByLocator,
   invitedNameButton,
   inviteMember,

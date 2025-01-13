@@ -12,29 +12,37 @@ const { eliminateExtraOrganizationsAdmin,
   waitForXPathPresentTimeout,
   waitingLoadingRingProficloudToDissapear,
   switchToExtraOrganizationAsAdmin,
+  countElementsByXPath,
   inviteMember,
   loginToProtonMail,
   clickSecondMail,
   clickFirstMail,
   changeFrameAndClickonProficloudEmail,
-  isTheOrganizationNameEmpty,
   loginRegisteredUser,
   settings,
+  leaveOrganizationButton1,
+  leaveOrganizationButton2,
+  assertText,
+  deleteAllEmails,
+  logOutFromProtonMail,
+  modalClose,
+  userManagementMenu,
   
 
-} = require('../utils/sharedFunctions'); // Reusable shared functions
+} =   require('../utils/sharedFunctions'); // Reusable shared functions
 
 // Main test function for C611
 async function C611() {
 
   try {
-    await testBase('C611_C179_C180_C646_C181_C184_Introducing a Dashboard name / Maximize the whole Dashboard Editing a Dashboard name / Introducing a Dashboard name with a maximum length of 27 characters Introducing a Dashboard description / Editing a Dashboard description', async (driver) => {
+    await testBase('C611_643_C626_C699_C892_Leave organization / It should not be possible to leave its root organization as admin if at least another admin is present / Switch organization / Create orga as ADMIN / Message about what characters are allowed in the name of organization has to be displayed', async (driver) => {
       let vars = {}; // Initialize variables container
 
-
-      await windowConfiguration(driver);
+      //Eliminate the leave organization for Registered user account in case a test may failed
+        await windowConfiguration(driver);
       await loginAdmin(driver, vars);
       await eliminateExtraOrganizationsAdmin(driver);
+
       //Create organization as ADMIN C699
       await roothOrganizationTest(driver);
       await activeOrganization(driver);
@@ -65,6 +73,7 @@ async function C611() {
       await loginToProtonMail(driver,vars);
       await clickSecondMail(driver);
       await changeFrameAndClickonProficloudEmail(driver);
+
        // Fill in login form
       await driver.wait(until.elementLocated(By.id("username")), 50000);
       await driver.findElement(By.id("username")).sendKeys("testingpxc@proton.me");
@@ -97,6 +106,7 @@ async function C611() {
       await loginRegisteredUser(driver,vars);
       await activeOrganization(driver);
       await settings(driver);
+      await driver.sleep(2000);
       leaveOrga = await countElementsByXPath(driver,"//h4[contains(.,'Leave this Organization')]");
       zzOrga = await countElementsByXPath(driver,"//h4[contains(text(), 'Z Z')]");
 
@@ -105,31 +115,51 @@ async function C611() {
         console.log("We do not need to change the orga since we are in the leave organization / Z Z  Orga");
         
       } else {
+
         await activeOrganization(driver);
         await driver.wait(until.elementLocated(By.xpath("//div[@class='profile-menu_icon-text__text'][contains(.,'Leave this Organization')]")), 30000).click();
         await waitingLoadingRingProficloudToDissapear(driver);
         
       }
 
-    
-
-
-
-    
-     
-
-
-
-
-
-     
-
-
-
-
-      
-             
+      await driver.wait(until.elementLocated(By.xpath("/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-account-management[1]/flex-col[1]/app-user-settings[1]/flex-col[1]/flex-col[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/mat-tab-group[1]/div[1]/mat-tab-body[1]/div[1]/div[1]/app-expandable-organisation[1]/div[1]/div[1]/flex-row[1]/flex-row[1]/div-relative[1]/app-icon[1]/*[name()='svg'][1]")), 30000).click();
+      await leaveOrganizationButton1(driver);
+      await leaveOrganizationButton2(driver);
+      await waitingLoadingRingProficloudToDissapear(driver);
       await logout(driver);
+
+      await loginToProtonMail(driver,vars);
+      await clickFirstMail(driver);
+      await assertText(driver,"css",".item-container-wrapper:nth-child(1) .item-subject > .inline-block","You have been removed from the Proficloud.io organization Leave this Organization");
+      await deleteAllEmails(driver);
+      await logOutFromProtonMail(driver);
+
+      // C643 It should not be possible to leave its root organization as admin if at least another admin is present.
+
+      await windowConfiguration(driver);
+      await loginAdmin(driver,vars);
+      await activeOrganization(driver);
+      await settings(driver);
+      await areWeInLeaveOrga(driver);
+      await driver.wait(until.elementLocated(By.xpath("/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-account-management[1]/flex-col[1]/app-user-settings[1]/flex-col[1]/flex-col[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/mat-tab-group[1]/div[1]/mat-tab-body[1]/div[1]/div[1]/app-expandable-organisation[1]/div[1]/div[1]/flex-row[1]/flex-row[1]/div-relative[1]/app-icon[1]/*[name()='svg'][1]")), 30000).click();
+      await leaveOrganizationButton1(driver);
+      await leaveOrganizationButton2(driver);
+      await waitForXPathPresentTimeout(driver,"//span[contains(.,'There was a problem leaving the organization. You are the last administrator. If you want to delete your organization, please get in contact with us and we will help you.')]",5000);
+      await modalClose(driver);
+
+      //Delete Editor from "Leave Organization"   ______ Admin now is able to leave the "Leave Organization" since is the last admin inside
+
+      await userManagementMenu(driver);
+      await eliminateExtraOrganizationsAdmin(driver);
+      await logout(driver);
+
+      await loginToProtonMail(driver,vars);
+      await clickFirstMail(driver);
+      await waitForXPathPresentTimeout(driver,"//*[contains(text(),'You have been removed from the Proficloud.io organization Leave this Organization')]",10000);
+      await deleteAllEmails(driver);
+      await logOutFromProtonMail(driver);
+                
+
     });
   } catch (error) {
     throw new Error(`C611 failed: ${error.message}`);
@@ -146,7 +176,25 @@ async function introduceOrganizationName(driver,orgaName) {
   
 }
   
+async function areWeInLeaveOrga(driver) {
 
+  await activeOrganization(driver);
+  await settings(driver);
+      leaveOrga = await countElementsByXPath(driver,"//h4[contains(.,'Leave this Organization')]");
+      zzOrga = await countElementsByXPath(driver,"//h4[contains(text(), 'Z Z')]");
+
+      if (leaveOrga > 0 || zzOrga > 0) {
+
+        console.log("We do not need to change the orga since we are in the leave organization / Z Z  Orga");
+        
+      } else {
+        await activeOrganization(driver);
+        await driver.wait(until.elementLocated(By.xpath("//div[@class='profile-menu_icon-text__text'][contains(.,'Leave this Organization')]")), 30000).click();
+        await waitingLoadingRingProficloudToDissapear(driver);
+        
+      }
+  
+}
 
 // Allow this file to be executed directly
 if (require.main === module) {
