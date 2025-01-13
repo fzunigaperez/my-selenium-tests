@@ -130,7 +130,7 @@ async function C611() {
 
       await loginToProtonMail(driver,vars);
       await clickFirstMail(driver);
-      await assertText(driver,"css",".item-container-wrapper:nth-child(1) .item-subject > .inline-block","You have been removed from the Proficloud.io organization Leave this Organization");
+      await waitForXPathPresentTimeout(driver,"//*[contains(text(),'You have been removed from the Proficloud.io organization Leave this Organization')]",10000);
       await deleteAllEmails(driver);
       await logOutFromProtonMail(driver);
 
