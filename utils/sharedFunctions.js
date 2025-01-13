@@ -122,7 +122,7 @@ async function loginToProtonMail(driver,vars) {
       try {
         console.log("Waiting for 'Proton Mail Plus' to be available...");
 
-        const maxWaitTime = 5000; // 5 seconds
+        const maxWaitTime = 1000; // 5 seconds
         const pollInterval = 1000; // Check every 1 second
         let elapsedTime = 0;
         let elementToClick = null;
@@ -1751,16 +1751,17 @@ async function createOrganizationButton1(driver) {
   async function waitUntilXpathNotPresent(driver, xpathName) {
     // Espera hasta que el elemento no esté presente
     await driver.wait(async () => {
-      const desiredXpath = await driver.findElements(By.xpath(xpathName)); // Busca el elemento usando el xpath proporcionado
-      return desiredXpath.length === 0; // Si el número de elementos es 0, entonces no está presente
+      const elementCount = await countElementsByXPath(driver, xpathName); // Usa countElementsByXPath para contar los elementos
+      return elementCount === 0; // Si el número de elementos es 0, entonces no está presente
     }, 15000); // Esperar hasta 15 segundos
+  
     console.log(`El elemento con XPath "${xpathName}" ya no está presente en la página.`);
   }
 
   async function waitingLoadingRingProficloudToDissapear(driver) {
 
     await waitUntilXpathNotPresent(driver, "//div[contains(@class,'pc-status-overlay__icon-container')]");  
-    await driver.sleep(4000);
+    await driver.sleep(2000);
   }
   
   async function waitForXPathPresentTimeout(driver, xpath, timeout) {
@@ -1805,6 +1806,46 @@ async function createOrganizationButton1(driver) {
 }
 
 
+async function waitForXPathPresentTimeoutNoStop(driver, xpath, timeout) {
+  const pollInterval = 1000; // Polling interval in milliseconds (1 second)
+  const endTime = Date.now() + timeout;
+
+  console.log(`Starting to wait for the element with XPath: "${xpath}" for up to ${timeout / 1000} seconds.`);
+
+  while (Date.now() < endTime) {
+      try {
+          const elementCount = await driver.executeScript((xp) => {
+              const result = document.evaluate(
+                  xp,
+                  document,
+                  null,
+                  XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+                  null
+              );
+              return result.snapshotLength;
+          }, xpath);
+
+          if (elementCount > 0) {
+              console.log(`Element with XPath: "${xpath}" found. Number of matches: ${elementCount}`);
+              return true; // The element was found
+          } else {
+              console.log(`Element with XPath: "${xpath}" not found. Checking again in ${pollInterval / 1000} second(s).`);
+          }
+      } catch (err) {
+          console.error(`Error during XPath evaluation: ${err}`);
+      }
+
+      // Wait 1 second before checking again
+      await new Promise(resolve => setTimeout(resolve, pollInterval));
+  }
+
+  console.log(`Timed out after ${timeout / 1000} seconds. The element with XPath: "${xpath}" was not found.`);
+
+  // Invoke the forceFailStatus function to stop the program
+ // await forceFailStatus(driver);
+
+  //return false; // The element was not found within the defined time
+}
 
 
 
@@ -2381,6 +2422,7 @@ module.exports = {
   userMenu,
   viewerRoleReset,
   waitForXPathPresentTimeout,
+  waitForXPathPresentTimeoutNoStop,
   waitUntilXpathNotPresent,
   waitForUsersToLoad,
   waitingLoadingRingProficloudToDissapear,
