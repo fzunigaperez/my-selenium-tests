@@ -356,6 +356,7 @@ async function reloadPage(driver) {
 
     // Reload (refresh) the page
     await driver.navigate().refresh();
+    await waitForXPathPresentTimeoutNoStop(driver,"//h4",10000);
   
 }
 
