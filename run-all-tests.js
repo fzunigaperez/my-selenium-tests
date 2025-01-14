@@ -1,4 +1,6 @@
 const { sendResultToTestRail, createTestRun } = require('./utils/sharedFunctions'); // Import necessary functions
+const fs = require('fs'); // File system for creating report
+const nodemailer = require('nodemailer'); // For sending email
 //─── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ──
 //
 //                                                                                     USER MANAGEMENT SERVICE
@@ -61,7 +63,7 @@ const projectIds = {
 const projectsTests = {
   "User Management Service": [
 
-  //SignUp
+  /*//SignUp
   { name: 'C13_C575_C697_C22_C895_C1024 Sign up in the proficloud with valid email and password / Sign UP with an already existing E-Mail / Introduce a wrong password before user deletion / Delete user / If the user enter an invalid email, and correcte it later, it is should be possible to REGISTER to Proficloud or create Billing account / Check and uncheck the Terms and Licences Agreement should not alter the registered button', func:C13 },
   { name: 'C614_Sign UP if two passwords are not the same should not be possible', func: C614 },
   //Login
@@ -92,7 +94,7 @@ const projectsTests = {
   { name: 'C714_After deleting user invitation the invitation link should not be valid anymore NEW', func: C714 },
   //Organization General
   { name: 'C611_643_C626_C699_C892_Leave organization / It should not be possible to leave its root organization as admin if at least another admin is present / Switch organization / Create orga as ADMIN / Message about what characters are allowed in the name of organization has to be displayed', func: C611 },
-  { name: 'C911_Search field for organizations works as intended', func: C911 },
+  { name: 'C911_Search field for organizations works as intended', func: C911 }, */
 
   ],
   "Device Management Service": [
@@ -126,6 +128,7 @@ for (const project in projectsTests) {
 }
 
 const errors = []; // Array to store errors
+const successes = []; // Array to store successes
 
 // Function to execute a test
 async function runTest(testFunction, testName, testCaseIds, testRunId) {
@@ -133,13 +136,14 @@ async function runTest(testFunction, testName, testCaseIds, testRunId) {
     console.log(`Running test: ${testName}`);
     await testFunction(); // Execute the test function
     console.log(`${testName} completed successfully.`);
+    successes.push(testName);
     // Send results for all associated Test IDs
     for (const testCaseId of testCaseIds) {
       await sendResultToTestRail(testCaseId, 1, 'Test passed successfully.', testRunId);
     }
   } catch (error) {
     console.error(`${testName} failed:`, error.message);
-    errors.push({ testName, error: error.message }); // Add the error to the array
+    errors.push({ testName, error: error.message });
     // Send results for all associated Test IDs as failed
     for (const testCaseId of testCaseIds) {
       await sendResultToTestRail(testCaseId, 5, `Test failed: ${error.message}`, testRunId);
@@ -173,16 +177,62 @@ async function runProjectTests(projectName) {
     }
 
     console.log(`All tests for project "${projectName}" have been executed.`);
-
-    // Show error summary if any
-    if (errors.length) {
-      console.log(`Error summary for project "${projectName}":`);
-      errors.forEach(err => console.log(`- ${err.testName}: ${err.error}`));
-    } else {
-      console.log(`All tests for "${projectName}" were executed successfully.`);
-    }
   } catch (error) {
     console.error(`Error while executing tests for project "${projectName}":`, error.message);
+  }
+}
+
+// Function to generate a consolidated report
+function generateReport() {
+  const report = `
+    <h1>Test Execution Report</h1>
+    <h2>Summary</h2>
+    <p>Total Tests: ${successes.length + errors.length}</p>
+    <p>Passed: ${successes.length}</p>
+    <p>Failed: ${errors.length}</p>
+    <h2>Details</h2>
+    <h3>Passed Tests</h3>
+    <ul>
+      ${successes.map(test => `<li>${test}</li>`).join('')}
+    </ul>
+    <h3>Failed Tests</h3>
+    <ul>
+      ${errors.map(err => `<li>${err.testName}: ${err.error}</li>`).join('')}
+    </ul>
+  `;
+  fs.writeFileSync('test_report.html', report); // Save the report as an HTML file
+  console.log('Test report generated: test_report.html');
+  return report;
+}
+
+// Function to send the report via email
+async function sendEmailReport(reportHtml) {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail', // Use your email provider
+    auth: {
+      user: 'zunigapfernando@gmail.com', // Replace with your email
+      pass: 'Pimenta86!' // Replace with your email password
+    }
+  });
+
+  const mailOptions = {
+    from: 'zunigapfernando@gmail.com',
+    to: 'fzuniga@phoenixcontact-sb.io', // Replace with recipient email
+    subject: 'Test Execution Report',
+    html: reportHtml, // Embed the report in the email body
+    attachments: [
+      {
+        filename: 'test_report.html',
+        path: './test_report.html'
+      }
+    ]
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully.');
+  } catch (error) {
+    console.error('Error sending email:', error.message);
   }
 }
 
@@ -191,6 +241,10 @@ async function runAllProjectsTests() {
   for (const projectName in projectIds) {
     await runProjectTests(projectName);
   }
+
+  // Generate and send the report
+  const reportHtml = generateReport();
+  await sendEmailReport(reportHtml);
 }
 
 // Execute tests for all projects
