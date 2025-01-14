@@ -15,7 +15,7 @@ async function testBase(sessionName, testSteps) {
   };
 
   // Selector for local or BrowserStack execution
-  const selectLocal = "ON";
+  const selectLocal = "OFF";
 
   if (selectLocal === "ON") {
     console.log("Local execution enabled.");
