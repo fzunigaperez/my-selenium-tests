@@ -22,7 +22,7 @@ async function C620() {
     await testBase('C620_Create a recurring Report', async (driver) => {
       let vars = {}; // Initialize variables container
 
-      await driver.get("https://drive.proton.me/urls/B9DKF88WYG#TxOEgbX5OFpH");
+      await driver.get("https://drive.proton.me/urls/2AMGC31V1W#iLYHvxozVMMA");
       await driver.wait(until.elementLocated(By.xpath("//button[@data-testid='scan-download-button']")), 30000).click();
       await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Download finished') or contains(.,'Download abgeschlossen') ]")), 30000);
 
