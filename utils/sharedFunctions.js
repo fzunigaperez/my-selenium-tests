@@ -350,8 +350,15 @@ async function sortByInvitedStatus(driver) {
   }
 }
 
+async function reports(driver) {
 
-
+  await scrollToElementByXPath(driver,"//div[@role='tab'][contains(.,'Reports')]");
+  await driver.wait(until.elementLocated(By.xpath("//span[@class='mdc-tab__content'][contains(.,'Reports')]")), 5000).click();
+  await driver.sleep(1000);
+  
+  
+  
+}
 async function reloadPage(driver) {
 
     // Reload (refresh) the page
@@ -608,10 +615,24 @@ async function userMenu(driver) {
 
 
 
-async function windowConfiguration(driver) {
-  await driver.get("https://proficloud.io/testrun");
+async function windowConfiguration(driver, service) {
+  // Define the URLs based on the service
+  const urls = {
+    DMS: "https://proficloud.io/testrun",
+    EMMA: "https://proficloud-staging.io/testrun/"
+  };
+
+  // Set the default URL if no service is provided or service is unknown
+  const defaultUrl = "https://proficloud.io/testrun";
+
+  // Navigate to the corresponding URL or the default URL
+  const targetUrl = urls[service] || defaultUrl;
+  await driver.get(targetUrl);
+
+  // Maximize the browser window
   await driver.manage().window().maximize();
 }
+
 
 async function loginAdmin(driver, vars) {
   await acceptCookies(driver);
@@ -685,6 +706,18 @@ async function loginViewer(driver, vars) {
   await roothOrganizationTest(driver, vars);
 }
 
+async function scrollToElementByXPath(driver,xpath) {
+  const element = await driver.findElement(By.xpath(xpath),5000);
+
+  // Ensure the element is visible
+  await driver.executeScript("arguments[0].scrollIntoView({ behavior: 'smooth', block: 'center' });", element);
+
+  // Wait until the element is visible
+  await driver.wait(until.elementIsVisible(element), 10000);
+
+  await driver.sleep(1000);
+  
+}
 
 async function loginFerchoAlejandro86(driver, vars) {
   await acceptCookies(driver);
@@ -871,6 +904,47 @@ console.log('Cantidad de elementos encontrados para "Invalid username or passwor
   await isTheOrganizationNameEmpty(driver, vars);
   await roothOrganizationTest(driver, vars);
 }
+
+
+async function deleteManualReports(driver) {
+
+  manualReportPresent = await countElementsByXPath(driver,"//div[@class='ng-star-inserted']//div[1]//flex-row[1]//div[2]//app-icon[1]//*[name()='svg']");
+  while (manualReportPresent > 0){
+
+    console.log("There is at least one manualReport and therefore we need to delete them")
+    await driver.wait(until.elementLocated(By.xpath("//div[@class='ng-star-inserted']//div[1]//flex-row[1]//div[2]//app-icon[1]//*[name()='svg']")), 30000).click();
+    await emmaDeleteButton(driver);
+    await waitingLoadingRingProficloudToDissapear(driver);
+    manualReportPresent = await countElementsByXPath(driver,"//div[@class='ng-star-inserted']//div[1]//flex-row[1]//div[2]//app-icon[1]//*[name()='svg']");
+  }
+  
+}
+
+async function cleanDashboard(driver) {
+
+  widgetPresent = await countElementsByXPath(driver,'.//*[contains(concat(" ",normalize-space(@class)," ")," topbar-item ")]//*[contains(concat(" ",normalize-space(@class)," ")," mat-mdc-menu-trigger ")]/*[contains(concat(" ",normalize-space(@class)," ")," ng-star-inserted ")]');
+  while (widgetPresent > 0){
+
+    console.log(`There are this number of widget(s) present: ${widgetPresent}.....proceding to delete`);
+    await driver.wait(until.elementLocated(By.xpath('.//*[contains(concat(" ",normalize-space(@class)," ")," topbar-item ")]//*[contains(concat(" ",normalize-space(@class)," ")," mat-mdc-menu-trigger ")]/*[contains(concat(" ",normalize-space(@class)," ")," ng-star-inserted ")]')), 30000).click();
+    await emmaDeleteButton(driver);
+    await driver.wait(until.elementLocated(By.xpath("//div[@data-analytics='modal headline'][contains(.,'Delete Widget')]")), 5000);
+    await confirmButton(driver);
+    await driver.sleep(500);
+    widgetPresent = await countElementsByXPath(driver,'.//*[contains(concat(" ",normalize-space(@class)," ")," topbar-item ")]//*[contains(concat(" ",normalize-space(@class)," ")," mat-mdc-menu-trigger ")]/*[contains(concat(" ",normalize-space(@class)," ")," ng-star-inserted ")]');
+    
+   
+  }
+  
+}
+
+async function reportActionsButton(driver) {
+  await driver.wait(until.elementLocated(By.xpath('//pc-button[@mattooltip="Report actions"]')), 30000).click();
+    
+  
+}
+
+
 
     async function deleteUnregisteredUserInCaseOfExistence(driver, vars) {
     await windowConfiguration(driver);  
@@ -1929,6 +2003,13 @@ await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'User Managem
     
 }
 
+async function emmaDeleteButton(driver) {
+
+  await driver.wait(until.elementLocated(By.xpath("//span[@class='mat-mdc-menu-item-text'][contains(.,'Delete')]")), 30000).click();
+
+  
+}
+
 
 async function emmaMenu(driver) {
   
@@ -1941,6 +2022,7 @@ async function emmaMenu(driver) {
       const energyServiceElement = await driver.findElement(By.xpath("//span[contains(.,'Energy Management Service')]"));
       await energyServiceElement.click();
     }
+    await driver.wait(until.elementLocated(By.xpath("//div[@role='tab'][contains(.,'Dashboard')]")), 10000);
   }
 
 async function arrowLeftSideMenu(driver) {
@@ -2335,6 +2417,33 @@ async function dashboard(driver) {
   
 }
 
+async function clearAndWrite(driver, selectorType, selectorValue, text) {
+  let element;
+
+  // Select element based on selector type
+  switch (selectorType) {
+    case "xpath":
+      element = await driver.findElement(By.xpath(selectorValue));
+      break;
+    case "id":
+      element = await driver.findElement(By.id(selectorValue));
+      break;
+    case "css":
+      element = await driver.findElement(By.css(selectorValue));
+      break;
+    case "name":
+      element = await driver.findElement(By.name(selectorValue));
+      break;
+    default:
+      throw new Error("Unsupported selector type: " + selectorType);
+  }
+
+  // Clear the element and write the text
+  await element.clear();
+  await element.sendKeys(text);
+}
+
+
 
 module.exports = {
   acceptCookies,
@@ -2352,6 +2461,8 @@ module.exports = {
   changeInformationButton,
   changeOrgaUserNameCredentials,
   checkFailedLoginEmail,
+  cleanDashboard,
+  clearAndWrite,
   clickFirstMail,
   clickSecondMail,
   confirmButton,
@@ -2362,12 +2473,14 @@ module.exports = {
   createTestRun,
   dashboard,
   deleteAllEmails,
+  deleteManualReports,
   deleteUnregisteredUserInCaseOfExistence,
   deviceManagementMenu,
   editBillingAccountButton,
   eliminateExtraOrganizationsAdmin,
   emailNameButton,
   emailVerification,
+  emmaDeleteButton,
   emmaMenu,
   enterRegistrationData,
   firstNameButton,
@@ -2400,6 +2513,8 @@ module.exports = {
   removeMemberButton2,
   removeOldMemberInvitationsRoothOrga,
   removeRegisteredUserNew,
+  reports,
+  reportActionsButton,
   resetBillingAccountInformation,
   resetToOriginalUserNameInRoothOrganization,
   roleNameButton,
@@ -2407,6 +2522,7 @@ module.exports = {
   roleSelectionField,
   roothOrganizationTest,
   saveProfileDataButton,
+  scrollToElementByXPath,
   sendResultToTestRail,
   settings,
   sortByEmails,
