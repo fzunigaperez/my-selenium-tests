@@ -63,7 +63,7 @@ const projectIds = {
 const projectsTests = {
   "User Management Service": [
 
-  /*//SignUp
+  //SignUp
   { name: 'C13_C575_C697_C22_C895_C1024 Sign up in the proficloud with valid email and password / Sign UP with an already existing E-Mail / Introduce a wrong password before user deletion / Delete user / If the user enter an invalid email, and correcte it later, it is should be possible to REGISTER to Proficloud or create Billing account / Check and uncheck the Terms and Licences Agreement should not alter the registered button', func:C13 },
   { name: 'C614_Sign UP if two passwords are not the same should not be possible', func: C614 },
   //Login
@@ -94,7 +94,7 @@ const projectsTests = {
   { name: 'C714_After deleting user invitation the invitation link should not be valid anymore NEW', func: C714 },
   //Organization General
   { name: 'C611_643_C626_C699_C892_Leave organization / It should not be possible to leave its root organization as admin if at least another admin is present / Switch organization / Create orga as ADMIN / Message about what characters are allowed in the name of organization has to be displayed', func: C611 },
-  { name: 'C911_Search field for organizations works as intended', func: C911 }, */
+  { name: 'C911_Search field for organizations works as intended', func: C911 },
 
   ],
   "Device Management Service": [
