@@ -36,7 +36,7 @@ async function C620() {
       await deleteManualReports(driver);
       await reportActionsButton(driver);
       await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Create Recurring Report')]")), 3000).click();
-      await uploadFile(driver, '.file-input', 'local', 'testimlogo.jpg');
+      await uploadFile(driver, '.file-input', 'BS', 'testimlogo.jpg');
 
 
       
