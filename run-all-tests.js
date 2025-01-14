@@ -211,7 +211,7 @@ async function sendEmailReport(reportHtml) {
     service: 'gmail', // Use your email provider
     auth: {
       user: 'zunigapfernando@gmail.com', // Replace with your email
-      pass: 'Pimenta86!' // Replace with your email password
+      pass: 'zhbh scmf ljaz fflv' // Replace with your email password
     }
   });
 
