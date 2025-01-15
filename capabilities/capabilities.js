@@ -2,7 +2,7 @@ module.exports = {
   'bstack:options': {
     'os': 'Windows',
     'osVersion': '10',
-    'local': 'true', // Habilitar BrowserStack Local para redirigir descargas a tu máquina local
+    'local': 'false', // Habilitar BrowserStack Local para redirigir descargas a tu máquina local
     'seleniumVersion': '4.21.0', // Asegúrate de usar una versión compatible
     'userName': process.env.BROWSERSTACK_USERNAME,
     'accessKey': process.env.BROWSERSTACK_ACCESS_KEY,
