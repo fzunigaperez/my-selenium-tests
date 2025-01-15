@@ -1,6 +1,7 @@
 const { By, until } = require('selenium-webdriver');
 const assert = require('assert'); // Import the assert module
 const axios = require('axios'); // Necessary to send test results
+const path = require('path');
 //const C714 = require('../testCases/C714');  NEVER NEVER NEVER DECLARE HERE A TEST CASE otherwhise couses a lot of problems
 // const { sendResultToTestRail } = require('../utils/sharedFunctions');
 
@@ -634,6 +635,21 @@ async function windowConfiguration(driver, service) {
 }
 
 
+/**
+ * Gets the current date in the specified format with a customizable separator.
+ * @param {string} separator - The separator to use between day, month, and year (e.g., '/' or '.').
+ * @returns {string} Date in the format DD/MM/YYYY or DD.MM.YYYY depending on the separator.
+ */
+function getCurrentDate(separator = '/') {
+  const today = new Date();
+  const day = String(today.getDate()).padStart(2, '0'); // Add leading zero if necessary
+  const month = String(today.getMonth() + 1).padStart(2, '0'); // Months start at 0
+  const year = today.getFullYear();
+  return `${day}${separator}${month}${separator}${year}`;
+}
+
+
+
 async function loginAdmin(driver, vars) {
   await acceptCookies(driver);
   await loginLandingPageButton(driver);
@@ -919,6 +935,22 @@ async function deleteManualReports(driver) {
   }
   
 }
+
+async function deleteRecurringReports(driver) {
+
+  recurringReportPresent = await countElementsByXPath(driver,"//flex-col[@class='reports__existing']//flex-col//flex-col[1]//flex-row[1]//div[4]//app-icon[1]//*[name()='svg']");
+  while (recurringReportPresent > 0){
+
+    console.log("There is at least one manualReport and therefore we need to delete them")
+    await driver.wait(until.elementLocated(By.xpath("//flex-col[@class='reports__existing']//flex-col//flex-col[1]//flex-row[1]//div[4]//app-icon[1]//*[name()='svg']")), 30000).click();
+    await emmaDeleteButton(driver);
+    await waitingLoadingRingProficloudToDissapear(driver);
+    recurringReportPresent = await countElementsByXPath(driver,"//flex-col[@class='reports__existing']//flex-col//flex-col[1]//flex-row[1]//div[4]//app-icon[1]//*[name()='svg']");
+
+  }
+  
+}
+
 
 async function cleanDashboard(driver) {
 
@@ -2420,7 +2452,7 @@ async function dashboard(driver) {
 async function clearAndWrite(driver, selectorType, selectorValue, text) {
   let element;
 
-  // Select element based on selector type
+  // Select the element based on the selector type
   switch (selectorType) {
     case "xpath":
       element = await driver.findElement(By.xpath(selectorValue));
@@ -2441,7 +2473,174 @@ async function clearAndWrite(driver, selectorType, selectorValue, text) {
   // Clear the element and write the text
   await element.clear();
   await element.sendKeys(text);
+
+  // Wait for the element's value to match the input text
+  await driver.wait(async () => {
+    const value = await element.getAttribute("value");
+    return value === text;
+  }, 50000, `Text '${text}' was not written within the timeout`);
 }
+
+
+async function dataDisplayedCheck(driver) {
+
+  await driver.wait(until.elementLocated(By.id("chartRendered")), 60000)
+  
+}
+
+async function editButton(driver) {
+
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Edit')]")), 3000).click();
+
+  }
+
+async function previewButton(driver) {
+
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Preview')]")), 3000).click();
+  
+}
+
+
+async function downloadButton(driver) {
+
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Download')]")), 3000).click();
+  
+}
+
+
+async function createChart(driver, initials) {
+  try {
+
+    await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'New Widget')]")), 30000).click();
+
+    // Step 1: Select "Unit"
+    await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Unit')]")), 2000).click();
+    if (initials.startsWith('E')) {
+      await driver.wait(until.elementLocated(By.xpath("//mat-option[contains(.,'Energy')]")), 2000).click();
+    } else if (initials.startsWith('P')) {
+      await driver.wait(until.elementLocated(By.xpath("//mat-option[contains(.,'Power')]")), 2000).click();
+    }
+
+    // Step 2: Select "Graph Type"
+    await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Graph Type')]")), 2000).click();
+    const graphType = initials.slice(1, 3);
+
+    const graphOptions = {
+      BC: "//mat-option[contains(.,'Bar chart')]",
+      PC: "//mat-option[contains(.,'Pie chart')]",
+      PA: "//mat-option[contains(.,'Pareto chart')]",
+      HM: "//mat-option[contains(.,'Heat map')]",
+      LDC: "//mat-option[contains(.,'Load Duration Curve')]",
+      LC: "//mat-option[contains(.,'Line chart')]"
+    };
+
+    if (graphOptions[graphType]) {
+      await driver.wait(until.elementLocated(By.xpath(graphOptions[graphType])), 2000).click();
+    } else {
+      throw new Error("Invalid graph type");
+    }
+
+    // Step 3: Select "Comparison Type" (skip if Heat Map)
+    if (graphType !== 'HM') {
+      await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Comparison Type')]")), 2000).click();
+      const comparisonType = initials.slice(3, 6);
+
+      if (graphType === 'PA') {
+        const paretoOptions = {
+          RBD: "//mat-option[contains(.,'Ranked by Data Source')]",
+          RBT: "//mat-option[contains(.,'Ranked by Time Period')]"
+        };
+
+        if (paretoOptions[comparisonType]) {
+          await driver.wait(until.elementLocated(By.xpath(paretoOptions[comparisonType])), 2000).click();
+        } else {
+          throw new Error("Invalid comparison type for Pareto Chart");
+        }
+      } else {
+        const comparisonOptions = {
+          DSC: "//mat-option[contains(.,'Data source comparison')]",
+          TPC: "//mat-option[contains(.,'Time period comparison')]"
+        };
+
+        if (comparisonOptions[comparisonType]) {
+          await driver.wait(until.elementLocated(By.xpath(comparisonOptions[comparisonType])), 2000).click();
+        } else {
+          throw new Error("Invalid comparison type");
+        }
+      }
+    }
+
+    // Step 4: Select "Data Source(s)"
+    await driver.wait(until.elementLocated(By.xpath("//input[@placeholder='Data Source(s)']")), 2000).click();
+
+    if (graphType === 'HM') {
+      // For Heat Map, only select the specific data source
+      await driver.wait(until.elementLocated(By.xpath("//flex-row[contains(.,'PH 1 Machine Park 1 - Ea+ electrical-energy')]")), 2000).click();
+    } else {
+      const comparisonType = initials.slice(3, 6);
+      if (comparisonType === 'DSC') {
+        if (initials.startsWith('E')) {
+          await driver.wait(until.elementLocated(By.xpath("//flex-row[contains(.,'PH 1 Machine Park 1 - Ea+ electrical-energy')]")), 2000).click();
+          await driver.wait(until.elementLocated(By.xpath("//flex-row[contains(.,'PH 1 Machine Park 2 - Ea+ electrical-energy')]")), 2000).click();
+        } else if (initials.startsWith('P')) {
+          await driver.wait(until.elementLocated(By.xpath("//flex-row[contains(.,'PH 1 Machine Park 1 - P electrical-power')]")), 2000).click();
+          await driver.wait(until.elementLocated(By.xpath("//flex-row[contains(.,'PH 1 Machine Park 2 - P electrical-power')]")), 2000).click();
+        }
+      } else if (comparisonType === 'TPC') {
+        if (initials.startsWith('E')) {
+          await driver.wait(until.elementLocated(By.xpath("//flex-row[contains(.,'PH 1 Machine Park 1 - Ea+ electrical-energy')]")), 2000).click();
+        } else if (initials.startsWith('P')) {
+          await driver.wait(until.elementLocated(By.xpath("//flex-row[contains(.,'PH 1 Machine Park 1 - P electrical-power')]")), 2000).click();
+        }
+      } else if (comparisonType === 'RBT' || comparisonType === 'RBD') {
+        await driver.wait(until.elementLocated(By.xpath("//span[@class='group-header'][contains(.,'All')]")), 2000).click();
+      }
+    }
+
+    // In case of comparison type is not Time Period comparison we need to click on DONE
+    if (graphType !== 'HM') {
+      const comparisonType = initials.slice(3, 6);
+      if (comparisonType === 'DSC' || comparisonType === 'RBT' || comparisonType === 'RBD') {
+        await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'Done')]")), 3000).click();
+      }
+    }
+
+    // Step 5: Create the widget
+    await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Create Widget')]")), 2000).click();
+    await waitingLoadingRingProficloudToDissapear(driver);
+    await dataDisplayedCheck(driver);
+
+    console.log(`Chart successfully created: ${initials}`);
+  } catch (error) {
+    throw new Error(`Error in createChart(${initials}): ${error.message}`);
+  }
+}
+
+
+/**
+ * Uploads a file to a file input field.
+ * 
+ * @param {object} driver - WebDriver instance.
+ * @param {string} fileInputSelector - Selector for the file input field.
+ * @param {string} mode - Execution mode ('BS' for BrowserStack, 'local' for local execution).
+ * @param {string} fileName - Name of the file to upload.
+ */
+async function uploadFile(driver, fileInputSelector, mode, fileName) {
+  // Generate the base path according to the mode
+  const basePath = mode === 'BS'
+      ? 'C:\\Users\\hello\\Downloads' // Path for BrowserStack
+      : 'C:/Users/Fernando/OneDrive - Phoenix Contact Smart Business GmbH/Testing/Selenium Tests/Test Data'; // Local path
+
+  // Combine the base path with the file name
+  const filePath = path.join(basePath, fileName);
+
+  // Locate the file input field and upload the file
+  const fileInput = await driver.findElement(By.css(fileInputSelector));
+  await fileInput.sendKeys(filePath);
+
+  console.log(`File "${fileName}" successfully uploaded from mode: ${mode}`);
+}
+
 
 
 
@@ -2468,14 +2667,19 @@ module.exports = {
   confirmButton,
   confirmLinkUrlToggleIsOff,
   countElementsByXPath,
+  createChart,
   createOrganizationButton1,
   createOrganizationButton2,
   createTestRun,
   dashboard,
+  dataDisplayedCheck,
   deleteAllEmails,
   deleteManualReports,
+  deleteRecurringReports,
   deleteUnregisteredUserInCaseOfExistence,
   deviceManagementMenu,
+  downloadButton,
+  editButton,
   editBillingAccountButton,
   eliminateExtraOrganizationsAdmin,
   emailNameButton,
@@ -2485,6 +2689,7 @@ module.exports = {
   enterRegistrationData,
   firstNameButton,
   forceFailStatus,
+  getCurrentDate,
   getEmailofUndesiredUserAndHamburgerClick,
   getTextByLocator,
   invitedNameButton,
@@ -2508,6 +2713,7 @@ module.exports = {
   logOutFromProtonMail,
   logout,
   modalClose,
+  previewButton,
   reloadPage,
   removeMemberButton,
   removeMemberButton2,
@@ -2533,6 +2739,7 @@ module.exports = {
   switchToExtraOrganizationAsAdmin,
   switchToOriginalOrganization,
   switchToPxcOrganization,
+  uploadFile,
   unregisteredUserCredentials,
   usersLeftMenu,
   userManagementMenu,
