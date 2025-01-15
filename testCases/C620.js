@@ -129,7 +129,7 @@ async function C620() {
     
     console.log('Archivo descargado en el navegador remoto.');
 
-      await handleBlobReportDownloadBs(driver);
+      await handleBlobReportDownloadBS(driver);
 
 
       
@@ -225,58 +225,45 @@ async function handleBlobReportDownload(driver) {
 }
 
 
-async function handleBlobReportDownloadBs(driver) {
+async function handleBlobReportDownloadBS(driver) {
   try {
+      // Obtener el manejador de ventanas
       const originalWindow = await driver.getWindowHandle();
       const newWindow = await driver.wait(async () => {
           const handles = await driver.getAllWindowHandles();
           return handles.length > 1 ? handles.find(handle => handle !== originalWindow) : null;
       }, 10000);
 
+      // Cambiar al nuevo contexto
       await driver.switchTo().window(newWindow);
 
+      // Esperar a que la página cargue completamente
       await driver.wait(
           async () => {
               const readyState = await driver.executeScript('return document.readyState;');
               return readyState === 'complete';
           },
-          20000
+          20000 // Tiempo aumentado
       );
 
+      // Verificar si el Blob URL es directamente accesible
       const currentUrl = await driver.getCurrentUrl();
       if (!currentUrl.startsWith('blob:')) {
           throw new Error('No se encontró un Blob URL válido.');
       }
       console.log(`Blob URL directo: ${currentUrl}`);
 
-      // Extraer el contenido del Blob
-      const pdfContent = await driver.executeAsyncScript(async (blobUrl, callback) => {
-          try {
-              const response = await fetch(blobUrl);
-              if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-              const blob = await response.blob();
-
-              if (blob.size === 0) {
-                  callback({ error: 'El Blob está vacío.' });
-                  return;
-              }
-
-              const arrayBuffer = await blob.arrayBuffer();
-              const byteArray = Array.from(new Uint8Array(arrayBuffer));
-              callback({ data: byteArray });
-          } catch (err) {
-              callback({ error: err.message });
-          }
+      // Ejecutar la descarga directamente desde el Blob URL
+      await driver.executeScript(async (blobUrl) => {
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = 'reporte.pdf';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
       }, currentUrl);
 
-      if (pdfContent.error) {
-          throw new Error(`Error al descargar el Blob: ${pdfContent.error}`);
-      }
-
-      // Guardar el archivo localmente
-      const buffer = Buffer.from(pdfContent.data);
-      fs.writeFileSync('reporte.pdf', buffer);
-      console.log('Archivo descargado localmente como reporte.pdf');
+      console.log('El archivo debería descargarse en la carpeta predeterminada.');
   } catch (error) {
       console.error(`Error: ${error.message}`);
   }
