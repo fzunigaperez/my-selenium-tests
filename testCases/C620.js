@@ -106,6 +106,29 @@ async function C620() {
       await waitForXPathPresentTimeout(driver,"//span[contains(.,'Report is ready for download.')]",60000);
       await downloadButton(driver);
 
+      await driver.executeAsyncScript(async (blobUrl, callback) => {
+        try {
+            const response = await fetch(blobUrl);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const blob = await response.blob();
+    
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'reporte.pdf';
+            document.body.appendChild(a);
+            a.click();
+    
+            URL.revokeObjectURL(url);
+            a.remove();
+            callback({ success: true });
+        } catch (err) {
+            callback({ error: err.message });
+        }
+    }, currentUrl);
+    
+    console.log('Archivo descargado en el navegador remoto.');
+
       await handleBlobReportDownloadBs(driver);
 
 
