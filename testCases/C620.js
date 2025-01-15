@@ -60,7 +60,7 @@ async function C620() {
       await deleteRecurringReports(driver);
       await reportActionsButton(driver);
       await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Create Recurring Report')]")), 3000).click();
-      await uploadFile(driver, '.file-input', 'local', 'reportHeader.png');
+      await uploadFile(driver, '.file-input', 'BS', 'reportHeader.png');
 
 
       reportTitle = "Phoenix Contact Recurring Report";
