@@ -36,6 +36,7 @@ async function C911() {
       await waitUntilXpathNotPresent(driver,"//div[@class='profile-menu_icon-text__text'][contains(.,'Phoenix Contact Smart Bus...')]");
       await waitUntilXpathNotPresent(driver,"//div[normalize-space()='Available organizations']//following::div[contains(text(),'Rooth Organization')]");
       await reloadPage(driver);
+      await driver.sleep(5000);
 
       await switchToPxcOrganization(driver);
       await switchToOriginalOrganization(driver);
