@@ -2,6 +2,8 @@ const { By, until } = require('selenium-webdriver');
 const assert = require('assert'); // Import the assert module
 const axios = require('axios'); // Necessary to send test results
 const path = require('path');
+const fs = require('fs');
+const os = require('os');
 //const C714 = require('../testCases/C714');  NEVER NEVER NEVER DECLARE HERE A TEST CASE otherwhise couses a lot of problems
 // const { sendResultToTestRail } = require('../utils/sharedFunctions');
 
@@ -2617,6 +2619,121 @@ async function createChart(driver, initials) {
 }
 
 
+async function handleBlobReportDownload(driver, fileName) {
+  try {
+      // Get the window handler
+      const originalWindow = await driver.getWindowHandle();
+      const newWindow = await driver.wait(async () => {
+          const handles = await driver.getAllWindowHandles();
+          return handles.length > 1 ? handles.find(handle => handle !== originalWindow) : null;
+      }, 10000);
+
+      // Switch to the new context
+      await driver.switchTo().window(newWindow);
+
+      // Wait for the page to fully load
+      await driver.wait(
+          async () => {
+              const readyState = await driver.executeScript('return document.readyState;');
+              return readyState === 'complete';
+          },
+          20000 // Increased timeout
+      );
+
+      // Verify if the Blob URL is directly accessible
+      const currentUrl = await driver.getCurrentUrl();
+      if (!currentUrl.startsWith('blob:')) {
+          throw new Error('No valid Blob URL found.');
+      }
+      console.log(`Direct Blob URL: ${currentUrl}`);
+
+      // Extract and process the blob content within the browser
+      const pdfContent = await driver.executeAsyncScript(async (blobUrl, callback) => {
+          try {
+              const response = await fetch(blobUrl);
+              if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+              const blob = await response.blob();
+
+              if (blob.size === 0) {
+                  callback({ error: 'The Blob is empty.' });
+                  return;
+              }
+
+              console.log(`Blob size: ${blob.size} bytes`);
+
+              // Convert Blob to ArrayBuffer
+              const arrayBuffer = await blob.arrayBuffer();
+              const byteArray = Array.from(new Uint8Array(arrayBuffer));
+              callback({ data: byteArray });
+          } catch (err) {
+              callback({ error: err.message });
+          }
+      }, currentUrl);
+
+      if (pdfContent.error) {
+          throw new Error(`Error downloading the Blob: ${pdfContent.error}`);
+      }
+
+      // Convert ArrayBuffer data into a Buffer and save the file
+      const buffer = Buffer.from(pdfContent.data);
+
+      // Determine the user's downloads folder
+      const downloadsFolder = path.join(os.homedir(), 'Downloads');
+      const filePath = path.join(downloadsFolder, fileName);
+
+      fs.writeFileSync(filePath, buffer);
+      console.log(`PDF file saved at ${filePath}`);
+  } catch (error) {
+      console.error(`Error: ${error.message}`);
+  }
+}
+
+async function handleBlobReportDownloadBs(driver, fileName) {
+  try {
+      // Get the window handle
+      const originalWindow = await driver.getWindowHandle();
+      const newWindow = await driver.wait(async () => {
+          const handles = await driver.getAllWindowHandles();
+          return handles.length > 1 ? handles.find(handle => handle !== originalWindow) : null;
+      }, 10000);
+
+      // Switch to the new context
+      await driver.switchTo().window(newWindow);
+
+      // Wait for the page to fully load
+      await driver.wait(
+          async () => {
+              const readyState = await driver.executeScript('return document.readyState;');
+              return readyState === 'complete';
+          },
+          20000 // Increased timeout
+      );
+
+      // Verify if the Blob URL is directly accessible
+      const currentUrl = await driver.getCurrentUrl();
+      if (!currentUrl.startsWith('blob:')) {
+          throw new Error('No valid Blob URL found.');
+      }
+      console.log(`Direct Blob URL: ${currentUrl}`);
+
+      // Execute the download directly from the Blob URL
+      await driver.executeScript(async (blobUrl, fileName) => {
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = fileName;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+      }, currentUrl, fileName);
+
+      console.log(`The file should be downloaded as ${fileName} to the default folder.`);
+  } catch (error) {
+      console.error(`Error: ${error.message}`);
+  }
+}
+
+
+
 /**
  * Uploads a file to a file input field.
  * 
@@ -2692,6 +2809,8 @@ module.exports = {
   getCurrentDate,
   getEmailofUndesiredUserAndHamburgerClick,
   getTextByLocator,
+  handleBlobReportDownload,
+  handleBlobReportDownloadBs,
   invitedNameButton,
   inviteMember,
   inviteMemberButton,

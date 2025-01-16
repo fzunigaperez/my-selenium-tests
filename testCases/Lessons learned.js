@@ -1,6 +1,6 @@
 //  Best Practice wait and click
 
-await driver.wait(until.elementLocated(By.xpath("registrationlink")), 30000).click();
+await driver.wait(until.elementLocated(By.xpath("")), 30000).click();
 
 //Writing text
  await driver.findElement(By.xpath("//input[@placeholder='Last Name']")).clear();

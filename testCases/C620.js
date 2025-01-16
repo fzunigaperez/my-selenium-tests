@@ -1,9 +1,9 @@
 const { Builder, By, until } = require('selenium-webdriver'); // Selenium WebDriver essentials
 const assert = require('assert'); // Assertion module for validations
 const testBase = require('./testBase'); // Common test setup
-const path = require('path');
-const fs = require('fs');
-const os = require('os');
+//const path = require('path');
+//const fs = require('fs');
+//const os = require('os');
 const {
   windowConfiguration,
   loginAdmin,
@@ -23,6 +23,8 @@ const {
   waitForXPathPresentTimeout,
   downloadButton,
   logout,
+  handleBlobReportDownloadBs,
+  handleBlobReportDownload,
   
 } = require('../utils/sharedFunctions'); // Reusable shared functions
 
@@ -32,8 +34,14 @@ async function C620() {
     await testBase('C620_Create a recurring Report', async (driver) => {
       let vars = {}; // Initialize variables container
 
-      //Downloading the testim logo for being used later in reports
+      //Downloading the report header for being used later in reports
       await driver.get("https://drive.proton.me/urls/JYFCSERXA8#NjpWqhWe0J8q");
+      await driver.wait(until.elementLocated(By.xpath("//button[@data-testid='scan-download-button']")), 30000).click();
+      await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Download finished') or contains(.,'Download abgeschlossen') ]")), 30000);
+
+      
+      //Downloading the report logo for being used later in reports
+      await driver.get("https://drive.proton.me/urls/Z4RYVB8HG8#4gJvRmcoqgN1");
       await driver.wait(until.elementLocated(By.xpath("//button[@data-testid='scan-download-button']")), 30000).click();
       await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Download finished') or contains(.,'Download abgeschlossen') ]")), 30000);
 
@@ -60,7 +68,7 @@ async function C620() {
       await deleteRecurringReports(driver);
       await reportActionsButton(driver);
       await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Create Recurring Report')]")), 3000).click();
-      await uploadFile(driver, '.file-input', 'BS', 'reportHeader.png');
+      await uploadFile(driver, '.file-input', 'local', 'reportHeader.png');
 
 
       reportTitle = "Phoenix Contact Recurring Report";
@@ -76,6 +84,7 @@ async function C620() {
       await clearAndWrite(driver,"xpath","//input[@ng-reflect-placeholder='Subtitle']",reportSubtitle);
       await clearAndWrite(driver,"xpath","//textarea[@placeholder='Description']", reportDescription);
       await driver.sleep(2000);
+      await uploadFile(driver, '.file-input', 'local', 'pxcLogo.jpg');
       
      // await driver.wait(until.elementLocated(By.xpath(`(//div[@data-analytics="modal"]//div[@class='bf' and contains(@style, 'background-color: var(--background-content);')])[1]`)), 3000).click();
       //await driver.wait(until.elementLocated(By.xpath("(//*[@class='bf'])[1]")), 3000).click();
@@ -105,10 +114,10 @@ async function C620() {
       await previewButton(driver);
       await waitForXPathPresentTimeout(driver,"//span[contains(.,'Report is ready for download.')]",60000);
       await downloadButton(driver);
+      //await handleBlobReportDownloadBs(driver);
 
-   
 
-      await handleBlobReportDownloadBS(driver);
+
 
 
       
@@ -134,74 +143,7 @@ async function C620() {
 
 
 
-async function handleBlobReportDownload(driver) {
-    try {
-        // Obtener el manejador de ventanas
-        const originalWindow = await driver.getWindowHandle();
-        const newWindow = await driver.wait(async () => {
-            const handles = await driver.getAllWindowHandles();
-            return handles.length > 1 ? handles.find(handle => handle !== originalWindow) : null;
-        }, 10000);
 
-        // Cambiar al nuevo contexto
-        await driver.switchTo().window(newWindow);
-
-        // Esperar a que la página cargue completamente
-        await driver.wait(
-            async () => {
-                const readyState = await driver.executeScript('return document.readyState;');
-                return readyState === 'complete';
-            },
-            20000 // Tiempo aumentado
-        );
-
-        // Verificar si el Blob URL es directamente accesible
-        const currentUrl = await driver.getCurrentUrl();
-        if (!currentUrl.startsWith('blob:')) {
-            throw new Error('No se encontró un Blob URL válido.');
-        }
-        console.log(`Blob URL directo: ${currentUrl}`);
-
-        // Extraer y procesar el contenido del blob dentro del navegador
-        const pdfContent = await driver.executeAsyncScript(async (blobUrl, callback) => {
-            try {
-                const response = await fetch(blobUrl);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const blob = await response.blob();
-
-                if (blob.size === 0) {
-                    callback({ error: 'El Blob está vacío.' });
-                    return;
-                }
-
-                console.log(`Tamaño del Blob: ${blob.size} bytes`);
-
-                // Convertir Blob a ArrayBuffer
-                const arrayBuffer = await blob.arrayBuffer();
-                const byteArray = Array.from(new Uint8Array(arrayBuffer));
-                callback({ data: byteArray });
-            } catch (err) {
-                callback({ error: err.message });
-            }
-        }, currentUrl);
-
-        if (pdfContent.error) {
-            throw new Error(`Error al descargar el Blob: ${pdfContent.error}`);
-        }
-
-        // Convertir los datos del ArrayBuffer en un Buffer y guardar el archivo
-        const buffer = Buffer.from(pdfContent.data);
-
-        // Determinar la carpeta de descargas del usuario
-        const downloadsFolder = path.join(os.homedir(), 'Downloads');
-        const filePath = path.join(downloadsFolder, 'reporte.pdf');
-
-        fs.writeFileSync(filePath, buffer);
-        console.log(`Archivo PDF guardado en ${filePath}`);
-    } catch (error) {
-        console.error(`Error: ${error.message}`);
-    }
-}
 
 
 async function handleBlobReportDownloadBS(driver) {
