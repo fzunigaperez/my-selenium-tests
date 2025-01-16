@@ -53,6 +53,7 @@ console.log('Number of elements found:', numElements);
 
 await driver.sleep(1000);
 await driver.wait(until.elementLocated(By.id("username")), 30000);
+await driver.wait(until.elementLocated(By.id("username")), 30000);
 
 //❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤
 //xpathCount Function 

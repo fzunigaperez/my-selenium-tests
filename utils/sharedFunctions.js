@@ -2727,10 +2727,15 @@ async function handleBlobReportDownloadBs(driver, fileName) {
       }, currentUrl, fileName);
 
       console.log(`The file should be downloaded as ${fileName} to the default folder.`);
+
+      // Switch back to the original window
+      await driver.switchTo().window(originalWindow);
+      console.log('Regresado a la ventana original.');
   } catch (error) {
       console.error(`Error: ${error.message}`);
   }
 }
+
 
 
 
