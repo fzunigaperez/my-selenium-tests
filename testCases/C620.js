@@ -1,8 +1,7 @@
+
 const { Builder, By, until } = require('selenium-webdriver'); // Selenium WebDriver essentials
 const assert = require('assert'); // Assertion module for validations
 const testBase = require('./testBase'); // Common test setup
-const fetch = (await import('node-fetch')).default;
-const fs = require('fs');
 
 const {
   windowConfiguration,
@@ -34,9 +33,6 @@ async function C620() {
     await testBase('C620_C651_C1053_Create a recurring Report_Delete a recurring and manual report_Preview of a recurring report creates and downloads a manual report', async (driver) => {
       let vars = {}; // Initialize variables container
 
-
-      await processOCR(driver);
-
       // Downloading the report header to use later in reports
       await driver.get("https://drive.proton.me/urls/JYFCSERXA8#NjpWqhWe0J8q");
       await driver.wait(until.elementLocated(By.xpath("//button[@data-testid='scan-download-button']")), 30000).click();
@@ -67,7 +63,7 @@ async function C620() {
       await waitingLoadingRingProficloudToDissapear(driver);
       await driver.wait(until.elementLocated(By.xpath("(//*[@name='comments'])[1]")), 3000).click();
       await clearAndWrite(driver, "xpath", "//textarea[@placeholder='Comments']", "This comment should be in the report");
-     // await driver.sleep(30000);
+      await driver.sleep(30000);
 
       // Get chart information
       const chartTitle1 = await getTextByLocator(driver, "xpath", "(//div[contains(@class,'description ng-star-inserted')])[1]");
@@ -153,7 +149,7 @@ async function C620() {
         await driver.wait(until.elementLocated(By.linkText("Start OCR!")), 3000).click();
         await driver.wait(until.elementLocated(By.id("sucOrErrMessage")), 30000);
         await driver.sleep(5000);
-        await driver.sleep(120000);
+        await driver.sleep(60000);
 
 
         const searchStrings = {
@@ -269,42 +265,6 @@ async function extractDynamicTableText(driver) {
   tableData.splice(4, 2);
   return tableData;
 }
-
-
-
-
-
-async function processOCR() {
-
-  const apiKey = 'K89359125888957'; // Reemplaza con tu clave API de OCR.space
-  const filePath = 'C:/Users/Fernando/Downloads/testingReport.pdf'; // Ruta al archivo que quieres procesar
-
-  const formData = new FormData();
-  formData.append('apikey', apiKey);
-  formData.append('file', fs.createReadStream(filePath)); // Para archivos locales
-  formData.append('language', 'eng'); // Idioma del texto en la imagen (por defecto: inglés)
-
-  try {
-    const response = await fetch('https://api.ocr.space/parse/image', {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error en la solicitud: ${response.statusText}`);
-    }
-
-    const result = await response.json();
-    console.log('Texto extraído:', result.ParsedResults[0].ParsedText);
-  } catch (error) {
-    console.error('Error al procesar la imagen:', error.message);
-  }
-}
-
-
-
-
-
 
 if (require.main === module) {
   (async () => {
