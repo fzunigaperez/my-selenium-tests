@@ -6,6 +6,7 @@ module.exports = {
     'seleniumVersion': '4.21.0', // Asegúrate de usar una versión compatible
     'userName': process.env.BROWSERSTACK_USERNAME,
     'accessKey': process.env.BROWSERSTACK_ACCESS_KEY,
+    'idleTimeout': 300, // Establece el tiempo de espera a 300 segundos (5 minutos)
   },
   'browserName': 'Chrome',
   'browserVersion': 'latest',
@@ -14,10 +15,10 @@ module.exports = {
   'browserstack.networkLogs': true, // Capturar logs de red
   'goog:chromeOptions': {
     prefs: {
-      
       'download.prompt_for_download': false,         // Deshabilitar los diálogos de descarga
       'download.directory_upgrade': true,
       'safebrowsing.enabled': true                   // Permitir descargas automáticas de archivos
     }
   }
 };
+
