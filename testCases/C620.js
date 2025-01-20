@@ -136,7 +136,7 @@ async function C620() {
       await driver.wait(until.elementLocated(By.xpath("//h4[contains(.,'API Access Points')]")), 30000);
       const ocrStatus = await getTextByLocator(driver, "xpath", './/*[contains(concat(" ",normalize-space(@class)," ")," systems ")][(count(preceding-sibling::*)+1) = 3]//tr[(count(preceding-sibling::*)+1) = 1]/*[contains(concat(" ",normalize-space(@class)," ")," tb_b_right ")][(count(preceding-sibling::*)+1) = 3]');
 
-      if (ocrStatus === "ON") {
+      if (ocrStatus === "UP") {
         console.log("The OCR service is available, the text can proceed for OCR identification.");
 
         await driver.get("https://ocr.space/");
