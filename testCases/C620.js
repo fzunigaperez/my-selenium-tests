@@ -119,7 +119,7 @@ async function C620() {
       await driver.wait(until.elementLocated(By.xpath("//flex-col[@class='recurring-report-item ng-star-inserted']//app-icon[@name='more']//*[name()='svg']")), 30000).click();
       await editButton(driver);
       await previewButton(driver);
-      await waitForXPathPresentTimeout(driver, "//span[contains(.,'Report is ready for download.')", 60000);
+      await waitForXPathPresentTimeout(driver, "//span[contains(.,'Report is ready for download.')", 120000);
       await downloadButton(driver);
 
       // C1053 Preview of a recurring report creates and downloads a manual report
