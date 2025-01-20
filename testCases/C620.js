@@ -1,6 +1,8 @@
 const { Builder, By, until } = require('selenium-webdriver'); // Selenium WebDriver essentials
 const assert = require('assert'); // Assertion module for validations
 const testBase = require('./testBase'); // Common test setup
+const fetch = require('node-fetch');
+const fs = require('fs');
 
 const {
   windowConfiguration,
@@ -31,6 +33,9 @@ async function C620() {
   try {
     await testBase('C620_C651_C1053_Create a recurring Report_Delete a recurring and manual report_Preview of a recurring report creates and downloads a manual report', async (driver) => {
       let vars = {}; // Initialize variables container
+
+
+      await processOCR(driver);
 
       // Downloading the report header to use later in reports
       await driver.get("https://drive.proton.me/urls/JYFCSERXA8#NjpWqhWe0J8q");
@@ -264,6 +269,42 @@ async function extractDynamicTableText(driver) {
   tableData.splice(4, 2);
   return tableData;
 }
+
+
+
+
+
+async function processOCR() {
+
+  const apiKey = 'K89359125888957'; // Reemplaza con tu clave API de OCR.space
+  const filePath = 'C:/Users/Fernando/Downloads/testingReport.pdf'; // Ruta al archivo que quieres procesar
+
+  const formData = new FormData();
+  formData.append('apikey', apiKey);
+  formData.append('file', fs.createReadStream(filePath)); // Para archivos locales
+  formData.append('language', 'eng'); // Idioma del texto en la imagen (por defecto: inglés)
+
+  try {
+    const response = await fetch('https://api.ocr.space/parse/image', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error en la solicitud: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    console.log('Texto extraído:', result.ParsedResults[0].ParsedText);
+  } catch (error) {
+    console.error('Error al procesar la imagen:', error.message);
+  }
+}
+
+
+
+
+
 
 if (require.main === module) {
   (async () => {
