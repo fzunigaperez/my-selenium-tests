@@ -119,7 +119,6 @@ async function C620() {
       await driver.wait(until.elementLocated(By.xpath("//flex-col[@class='recurring-report-item ng-star-inserted']//app-icon[@name='more']//*[name()='svg']")), 30000).click();
       await editButton(driver);
       await previewButton(driver);
-      //await waitForXPathPresentTimeout(driver, "//span[contains(.,'Report is ready for download.')", 120000);
       await waitForXPathPresentTimeout(driver, "//span[contains(.,\"Report is ready for download.\")]", 120000);
 
       await downloadButton(driver);
@@ -143,6 +142,7 @@ async function C620() {
         await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Free Online OCR - Convert images and PDF to text (Powered by the OCR API)')]")), 30000);
         await uploadFile(driver, "#imageFile", "BS", "recurringReport.pdf");
         await driver.wait(until.elementLocated(By.id("chkIsDetectOrientation")), 3000).click();
+        await driver.wait(until.elementLocated(By.id("chkIsOneColumnOnly")), 3000).click();
         await driver.wait(until.elementLocated(By.id("engine5")), 3000).click();
         await driver.wait(until.elementLocated(By.linkText("Start OCR!")), 3000).click();
         await driver.wait(until.elementLocated(By.id("sucOrErrMessage")), 30000);
