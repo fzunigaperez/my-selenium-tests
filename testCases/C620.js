@@ -62,7 +62,7 @@ async function C620() {
       await waitingLoadingRingProficloudToDissapear(driver);
       await driver.wait(until.elementLocated(By.xpath("(//*[@name='comments'])[1]")), 3000).click();
       await clearAndWrite(driver, "xpath", "//textarea[@placeholder='Comments']", "This comment should be in the report");
-      await driver.sleep(30000);
+     // await driver.sleep(30000);
 
       // Get chart information
       const chartTitle1 = await getTextByLocator(driver, "xpath", "(//div[contains(@class,'description ng-star-inserted')])[1]");
