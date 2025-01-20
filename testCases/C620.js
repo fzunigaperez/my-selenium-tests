@@ -1,7 +1,7 @@
 const { Builder, By, until } = require('selenium-webdriver'); // Selenium WebDriver essentials
 const assert = require('assert'); // Assertion module for validations
 const testBase = require('./testBase'); // Common test setup
-const fetch = require('node-fetch');
+const fetch = (await import('node-fetch')).default;
 const fs = require('fs');
 
 const {
