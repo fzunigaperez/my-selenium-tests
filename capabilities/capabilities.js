@@ -2,22 +2,25 @@ module.exports = {
   'bstack:options': {
     'os': 'Windows',
     'osVersion': '10',
-    'local': 'false', // Habilitar BrowserStack Local para redirigir descargas a tu máquina local
-    'seleniumVersion': '4.21.0', // Asegúrate de usar una versión compatible
+    'local': 'false', // Enable BrowserStack Local to redirect downloads to your local machine
+    'seleniumVersion': '4.21.0', // Ensure you are using a compatible version
     'userName': process.env.BROWSERSTACK_USERNAME,
     'accessKey': process.env.BROWSERSTACK_ACCESS_KEY,
+    'debug': true, // Enable visual recording
+    'consoleLogs': 'info', // Capture browser console logs
+    'networkLogs': true, // Capture network logs
+    'screenshots': true, // Enable screenshots during test runs
   },
   'browserName': 'Chrome',
   'browserVersion': 'latest',
-  'browserstack.debug': true,      // Habilitar la grabación visual
-  'browserstack.console': 'info',  // Capturar logs de la consola del navegador
-  'browserstack.networkLogs': true, // Capturar logs de red
+  'browserstack.debug': true,      // Enable visual recording
+  'browserstack.console': 'info',  // Capture browser console logs
+  'browserstack.networkLogs': true, // Capture network logs
   'goog:chromeOptions': {
     prefs: {
-      
-      'download.prompt_for_download': false,         // Deshabilitar los diálogos de descarga
+      'download.prompt_for_download': false,         // Disable download dialogs
       'download.directory_upgrade': true,
-      'safebrowsing.enabled': true                   // Permitir descargas automáticas de archivos
+      'safebrowsing.enabled': true                   // Allow automatic file downloads
     }
   }
 };
