@@ -148,7 +148,7 @@ async function C620() {
         await driver.wait(until.elementLocated(By.linkText("Start OCR!")), 3000).click();
         await driver.wait(until.elementLocated(By.id("sucOrErrMessage")), 30000);
         await driver.sleep(5000);
-        await drivser.sleep(120000);
+        await driver.sleep(120000);
 
 
         const searchStrings = {
