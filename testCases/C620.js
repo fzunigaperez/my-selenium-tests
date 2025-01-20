@@ -25,8 +25,10 @@ const {
   downloadButton,
   logout,
   handleBlobReportDownloadBs,
-  handleBlobReportDownload,
+ 
   modalClose,
+  getTextByLocator,
+  
   
 } = require('../utils/sharedFunctions'); // Reusable shared functions
 
@@ -37,7 +39,7 @@ async function C620() {
       let vars = {}; // Initialize variables container
 
 
-      //Downloading the report header for being used later in reports
+      // Downloading the report header for being used later in reports
       await driver.get("https://drive.proton.me/urls/JYFCSERXA8#NjpWqhWe0J8q");
       await driver.wait(until.elementLocated(By.xpath("//button[@data-testid='scan-download-button']")), 30000).click();
       await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Download finished') or contains(.,'Download abgeschlossen') ]")), 30000);
@@ -55,10 +57,19 @@ async function C620() {
       await loginAdmin(driver, vars);
       await emmaMenu(driver);
      await cleanDashboard(driver);
-       //await createChart(driver, 'EPARBT'); // Energy Pareto Chart Ranked by Time Period
+
+    
       await createChart(driver, 'EPCTPC'); // Energy Pie Chart Time Period Comparison
       await createChart(driver, 'EBCDSC'); // Energy Bar Chart Data Source Comparison
       await createChart(driver,'EHMDSC');// Energy Heat Map Data Source Comparison  
+
+      //We choose Yesterday in orther to avoid values probles
+
+      await driver.wait(until.elementLocated(By.xpath("(//app-icon[contains(@name,'calendar')])[2]")), 30000).click();
+      await driver.wait(until.elementLocated(By.xpath("//div[@class='range-item ng-star-inserted'][contains(.,'Yesterday')]")), 30000).click();
+
+
+
       //Statistics activated  
       await driver.sleep(3000);
       await driver.wait(until.elementLocated(By.xpath("//*[name()='div' and @id='profi-select-placeholder']//preceding::*[name()='svg'][@class='mdc-switch__icon mdc-switch__icon--off']")), 2000).click();
@@ -66,11 +77,24 @@ async function C620() {
       await driver.wait(until.elementLocated(By.xpath("(//*[@name='comments'])[1]")), 3000).click();
       await clearAndWrite(driver,"xpath","//textarea[@placeholder='Comments']","This comment should be in the report");
 
-      tableData = await extractTableData(driver);
+      //Getting some chart information
+
+      chartTitle1 = await getTextByLocator(driver,"xpath","(//div[contains(@class,'description ng-star-inserted')])[1]");
+      chartTitle2 = await getTextByLocator(driver,"xpath","(//div[contains(@class,'description ng-star-inserted')])[2]");
+      chartTitle3 = await getTextByLocator(driver,"xpath","(//div[contains(@class,'description ng-star-inserted')])[3]");
+      deviceName1 = await getTextByLocator(driver,"xpath","//div[@title='PH 1 Machine Park 1 - Ea+'][normalize-space()='PH 1 Machine Park 1 - Ea+']");
+      deviceName2 = await getTextByLocator(driver,"xpath","//div[@title='PH 1 Machine Park 2 - Ea+'][normalize-space()='PH 1 Machine Park 2 - Ea+']");
 
 
 
- 
+
+
+
+
+      const tableData = await extractDynamicTableText(driver);
+        
+      console.log('Table Data:');
+      console.table(tableData);
      
  
       await reports(driver);
@@ -78,7 +102,7 @@ async function C620() {
       await deleteRecurringReports(driver);
       await reportActionsButton(driver);
       await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Create Recurring Report')]")), 3000).click();
-      await uploadFile(driver, '.file-input', 'local', 'reportHeader.png');
+      await uploadFile(driver, '.file-input', 'BS', 'reportHeader.png');
 
 
       reportTitle = "Phoenix Contact Recurring Report";
@@ -94,10 +118,9 @@ async function C620() {
       await clearAndWrite(driver,"xpath","//input[@ng-reflect-placeholder='Subtitle']",reportSubtitle);
       await clearAndWrite(driver,"xpath","//textarea[@placeholder='Description']", reportDescription);
       await driver.sleep(2000);
-      await uploadFile(driver, '#logo-upload-container .file-input', 'local', 'pxcLogo.jpg');
+      await uploadFile(driver, '#logo-upload-container .file-input', 'BS', 'pxcLogo.jpg');
       
-     // await driver.wait(until.elementLocated(By.xpath(`(//div[@data-analytics="modal"]//div[@class='bf' and contains(@style, 'background-color: var(--background-content);')])[1]`)), 3000).click();
-      //await driver.wait(until.elementLocated(By.xpath("(//*[@class='bf'])[1]")), 3000).click();
+    
       await driver.wait(until.elementLocated(By.id("dateFormat")), 3000).click();
       // Selecting american date format
       await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'DD/MM/YYYY')]")), 30000).click();
@@ -131,28 +154,30 @@ async function C620() {
 
       await logout(driver);
 
+      await driver.get("https://status.ocr.space/");
+      await driver.wait(until.elementLocated(By.xpath("//h4[contains(.,'API Access Points')]")), 30000);
+      ocrStatus = await getTextByLocator(driver,"xpath",'.//*[contains(concat(" ",normalize-space(@class)," ")," systems ")][(count(preceding-sibling::*)+1) = 3]//tr[(count(preceding-sibling::*)+1) = 1]/*[contains(concat(" ",normalize-space(@class)," ")," tb_b_right ")][(count(preceding-sibling::*)+1) = 3]');
+      
+      if (ocrStatus = "ON") {
+        console.log("The OCR service is available, thus the text cann go for OCR identification")
+ 
+      await driver.get("https://ocr.space/");
+      await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Free Online OCR - Convert images and PDF to text (Powered by the OCR API)')]")), 30000);
+      await uploadFile(driver,"#imageFile","local","recurringReport.pdf");
+      await driver.wait(until.elementLocated(By.id("chkIsDetectOrientation")), 3000).click();
+      await driver.wait(until.elementLocated(By.id("engine5")), 3000).click();
+      await driver.wait(until.elementLocated(By.linkText("Start OCR!")), 3000).click();
+      await driver.wait(until.elementLocated(By.id("sucOrErrMessage")), 30000);
+    //  await driver.wait(until.elementLocated(By.xpath("//a[contains(.,'Json')]")), 3000).click();
+      await driver.sleep(5000);
 
-        await driver.get("https://ocr.space/");
-        await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Free Online OCR - Convert images and PDF to text (Powered by the OCR API)')]")), 30000);
-        await uploadFile(driver,"#imageFile","local","recurringReport.pdf");
-        await driver.wait(until.elementLocated(By.id("chkIsDetectOrientation")), 3000).click();
-        await driver.wait(until.elementLocated(By.id("engine5")), 3000).click();
-        await driver.wait(until.elementLocated(By.linkText("Start OCR!")), 3000).click();
-        await driver.wait(until.elementLocated(By.id("sucOrErrMessage")), 30000);
-      //  await driver.wait(until.elementLocated(By.xpath("//a[contains(.,'Json')]")), 3000).click();
-        await driver.sleep(5000);
 
-
-        const searchStrings = {
-          //Title: reportTitle,
-          Subtitle: "Testing Subtitle",
-          Description: "At absolute zero temperature, the system is in the state with the minimum thermal energy, the ground state. The constant value (not necessarily zero) of entropy at this point is called the residual entropy of the system. With the exception of non-crystalline solids (e.g. glass) the residual entropy of a system is typically close to zero.",
-          Company: "Apple Company",
-          Author: "Fernando Alejandro Zuniga Perez",
-          WidgetComment: "This comment should be in the report",
-          TableData1: tableData[0] ? tableData[0].join(", ") : "",  // Asume que la primera fila será TableData1
-          TableData2: tableData[1] ? tableData[1].join(", ") : ""   // Asume que la segunda fila será TableData2
-        };
+    const searchStrings = {
+      reportTitle,reportSubtitle,reportDescription,reportCompany,reportAuthor,dateOfToday,chartTitle1,chartTitle2,chartTitle3,
+      deviceName1,deviceName2,
+    
+    
+    };
 
   // Esperamos a que el <textarea> esté presente en la página
   const textarea = await driver.findElement(By.id('txtAreaParsedResult'));
@@ -162,10 +187,36 @@ async function C620() {
 
   // Normalizamos el texto completo
   const normalizedFullText = normalizeText(fullText);
+  console.log (normalizedFullText);
 
   await searchTextInTextarea(driver, searchStrings, normalizedFullText); 
+
+
+
+  // Convertir la tabla en un objeto de búsqueda
+  const searchStrings2 = {};
+  tableData.forEach((row, rowIndex) => {
+    row.forEach((cell, colIndex) => {
+      const key = `Row${rowIndex + 1}_Col${colIndex + 1}`;
+      searchStrings2[key] = cell;
+    });
+  });
+
  
-  
+
+  console.log('Search Strings:', searchStrings2);
+  console.log (normalizedFullText);
+
+
+
+  await searchTextInTextarea(driver, searchStrings2, normalizedFullText); 
+
+}
+else{
+
+  console.log('The OCR identificaction service is not available')
+    
+}
 
     });
   } catch (error) {
@@ -179,46 +230,102 @@ function normalizeText(text) {
 }
 
 async function searchTextInTextarea(driver, searchStrings, normalizedFullText) {
-  // Recorremos las cadenas que queremos buscar
+  let totalSearchStrings = Object.entries(searchStrings).length;
+  let matchesCount = 0;
+
+  // Iterate through the strings we want to search
   for (const [key, value] of Object.entries(searchStrings)) {
-    // Normalizamos las cadenas a buscar
-    const normalizedSearchString = normalizeText(value);
+      const normalizedSearchString = normalizeText(value);
 
-    if (normalizedFullText.includes(normalizedSearchString)) {
-      console.log(`Found ${key}:`, value);
-    } else {
-      console.log(`${key} not found`);
-    }
-  }
-}
-
-
-async function extractTableData(driver) {
-  const allData = [];
-
-  // Espera a que la tabla esté presente
-  await driver.wait(until.elementLocated(By.id('statistics')), 10000);
-
-  // Obtiene todas las filas de la tabla
-  const rows = await driver.findElements(By.css('#statistics tr'));
-
-  // Recorre cada fila y extrae los datos
-  for (let row of rows) {
-    const cells = await row.findElements(By.css('td'));
-    if (cells.length > 0) {
-      const rowData = [];
-      for (let cell of cells) {
-        const text = await cell.getText();
-        rowData.push(text.trim());
+      if (normalizedFullText.includes(normalizedSearchString)) {
+          matchesCount++;
+          console.log(`Found ${key}:`, value);
+      } else {
+          console.log(`${key} not found`);
       }
-      allData.push(rowData);  // Guardamos los datos extraídos
-    }
   }
 
-  return allData;  // Asegúrate de devolver los datos extraídos
+  const matchPercentage = (matchesCount / totalSearchStrings) * 100;
+  console.log(`Matches found: ${matchesCount}/${totalSearchStrings} (${matchPercentage.toFixed(2)}%)`);
+
+  if (matchPercentage >= 80) {
+      console.log("At least 80% of the strings were found.");
+      return true; // Success
+  } else {
+      console.error("Less than 80% of the strings were found. Failing...");
+      throw new Error("Search criteria not met: At least 80% of the strings were not found.");
+  }
 }
 
-module.exports = uploadFile;
+
+
+
+/**
+ * Extracts the text from all cells of a table using XPath format,
+ * processes specific values (rounding, removing commas and units), and removes certain rows.
+ * @param {WebDriver} driver - The Selenium WebDriver instance.
+ * @returns {Promise<Array<Array<string>>>} A two-dimensional array with the table's text content.
+ */
+async function extractDynamicTableText(driver) {
+  let tableData = [];
+  
+  // Calculate the number of rows
+  const rows = await driver.findElements(By.xpath('//tr'));
+  const rowCount = rows.length;
+
+  // Calculate the number of columns in the first row
+  const firstRowColumns = await driver.findElements(By.xpath('//tr[1]//td | //tr[1]//th'));
+  const columnCount = firstRowColumns.length;
+
+  // Iterate over each row and column to extract the data
+  for (let rowIndex = 2; rowIndex <= rowCount; rowIndex++) { // Start from row 2
+      let rowData = [];
+      
+      for (let colIndex = 2; colIndex <= columnCount; colIndex++) { // Start from column 2
+          const cellXPath = `//tr[${rowIndex}]//td[${colIndex}]//div[1]`;
+
+          try {
+              const cellElement = await driver.findElement(By.xpath(cellXPath));
+              const cellText = await cellElement.getText();
+              rowData.push(cellText);
+          } catch (error) {
+              // Handle empty or non-existent cells
+              rowData.push('');
+          }
+      }
+
+      tableData.push(rowData);
+  }
+
+  // Process the table: round, clean, and remove rows as requested
+  tableData = tableData.map((row, index) => {
+      return row.map(value => {
+          // Process row 8 (zero-based index 7)
+          if (index === 7 || index === 8) {
+              // Remove commas and 'kWh', then round to 2 decimals
+              const cleanedValue = value.replace(/[\s,]*kWh/g, '').replace(/,/g, '');
+            const numericValue = parseFloat(cleanedValue);
+            return !isNaN(numericValue) ? numericValue.toFixed(2) : value;
+          }
+
+          // Round values for rows 1-4 and 7
+          if ([0, 1, 2, 3, 6].includes(index)) {
+              const numericValue = parseFloat(value.replace(/,/g, ''));
+              return !isNaN(numericValue) ? numericValue.toFixed(2) : value;
+          }
+
+          // Return unmodified for other rows
+          return value;
+      });
+  });
+
+  // Remove rows 5 and 6 (indices 4 and 5 in zero-based indexing)
+  tableData.splice(4, 2);
+
+  return tableData;
+}
+
+
 
 
 

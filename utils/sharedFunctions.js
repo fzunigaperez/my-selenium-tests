@@ -2038,7 +2038,7 @@ await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'User Managem
 }
 
 async function emmaDeleteButton(driver) {
-
+  await driver.sleep(500);
   await driver.wait(until.elementLocated(By.xpath("//span[@class='mat-mdc-menu-item-text'][contains(.,'Delete')]")), 30000).click();
 
   
@@ -2751,7 +2751,7 @@ async function uploadFile(driver, fileInputSelector, mode, fileName) {
   // Generate the base path according to the mode
   const basePath = mode === 'BS'
       ? 'C:\\Users\\hello\\Downloads' // Path for BrowserStack
-      : 'C:/Users/Fernando/OneDrive - Phoenix Contact Smart Business GmbH/Testing/Selenium Tests/Test Data'; // Local path
+      : 'C:/Users/Fernando/Downloads'; // Local path
 
   // Combine the base path with the file name
   const filePath = path.join(basePath, fileName);
