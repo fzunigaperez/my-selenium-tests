@@ -1,4 +1,4 @@
-const { Builder, By, until } = require('selenium-webdriver'); // Importación completa
+const { Builder, By, until } = require('selenium-webdriver');
 const path = require('path');
 const assert = require('assert');
 const testBase = require('./testBase'); // Lógica común para la ejecución de pruebas
