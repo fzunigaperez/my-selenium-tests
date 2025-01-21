@@ -148,8 +148,7 @@ async function C620() {
         await driver.wait(until.elementLocated(By.id("engine5")), 3000).click();
         await driver.wait(until.elementLocated(By.linkText("Start OCR!")), 3000).click();
         await driver.wait(until.elementLocated(By.id("sucOrErrMessage")), 30000);
-        await driver.sleep(5000);
-        await driver.sleep(60000);
+       
 
 
         const searchStrings = {
@@ -161,20 +160,20 @@ async function C620() {
         const fullText = await textarea.getAttribute('value');
         const normalizedFullText = normalizeText(fullText);
 
-        console.log(normalizedFullText);
-        await searchTextInTextarea(driver, searchStrings, normalizedFullText);
+        // console.log(normalizedFullText);
+        // await searchTextInTextarea(driver, searchStrings, normalizedFullText);
 
-        const searchStrings2 = {};
-        tableData.forEach((row, rowIndex) => {
-          row.forEach((cell, colIndex) => {
-            const key = `Row${rowIndex + 1}_Col${colIndex + 1}`;
-            searchStrings2[key] = cell;
-          });
-        });
+        // const searchStrings2 = {};
+        // tableData.forEach((row, rowIndex) => {
+        //   row.forEach((cell, colIndex) => {
+        //     const key = `Row${rowIndex + 1}_Col${colIndex + 1}`;
+        //     searchStrings2[key] = cell;
+        //   });
+        // });
 
-        console.log('Search Strings:', searchStrings2);
-        console.log(normalizedFullText);
-        await searchTextInTextarea(driver, searchStrings2, normalizedFullText);
+        // console.log('Search Strings:', searchStrings2);
+        // console.log(normalizedFullText);
+        // await searchTextInTextarea(driver, searchStrings2, normalizedFullText);
 
       } else {
         console.log('The OCR identification service is not available.');
