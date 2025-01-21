@@ -4,6 +4,8 @@ const axios = require('axios'); // Necessary to send test results
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
+require('dotenv').config(); // Cargar variables de entorno
+
 //const C714 = require('../testCases/C714');  NEVER NEVER NEVER DECLARE HERE A TEST CASE otherwhise couses a lot of problems
 // const { sendResultToTestRail } = require('../utils/sharedFunctions');
 
@@ -618,22 +620,18 @@ async function userMenu(driver) {
 
 
 
-async function windowConfiguration(driver, service) {
-  // Define the URLs based on the service
+async function windowConfiguration(driver, service = process.env.TEST_ENV) {
   const urls = {
-    DMS: "https://proficloud.io/testrun",
-    EMMA: "https://proficloud-staging.io/testrun/"
+    PROD: process.env.PROD_URL,
+    STG: process.env.STG_URL,
+    DEV: process.env.DEV_URL,
   };
 
-  // Set the default URL if no service is provided or service is unknown
-  const defaultUrl = "https://proficloud.io/testrun";
+  const targetUrl = urls[service] || urls.PROD; // PROD as default
+  console.log(`🌍Executing in the environment: ${service} (${targetUrl})`);
 
-  // Navigate to the corresponding URL or the default URL
-  const targetUrl = urls[service] || defaultUrl;
-  await driver.get(targetUrl);
-
-  // Maximize the browser window
-  await driver.manage().window().maximize();
+  await driver.get(targetUrl); // Navegar al URL
+  await driver.manage().window().maximize(); // Maximizar la ventana del navegador
 }
 
 

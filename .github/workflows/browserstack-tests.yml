@@ -9,6 +9,10 @@ on:
         description: "Specify the test case(s) to run (e.g., C90, C15 or all for all test cases)"
         required: true
         default: "all"
+      environment:
+        description: "Specify the environment (e.g., PROD, STG, DEV)"
+        required: true
+        default: "DEV" # Valor por defecto si no se especifica
 
 jobs:
   run-selenium-tests:
@@ -28,12 +32,14 @@ jobs:
 
       - name: Run specified test cases
         env:
+          TEST_ENV: ${{ github.event.inputs.environment }}
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
           TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USERNAME }}
           TESTRAIL_API_KEY: ${{ secrets.TESTRAIL_API_KEY }}
         run: |
           TEST_CASES="${{ github.event.inputs.test_case || 'all' }}" # Default to 'all' if no input
+          echo "Executing in environment: $TEST_ENV"
           echo "Test case(s) input: $TEST_CASES"
           
           ERRORS=0
