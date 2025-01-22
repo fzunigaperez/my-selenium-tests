@@ -37,6 +37,8 @@ const C714 = require('./testCases/C714');
 // Organization General
 const C611 = require('./testCases/C611');
 const C911 = require('./testCases/C911');
+// Organozation Menu
+const C911 = require('./testCases/C700');
 
 
 
@@ -97,6 +99,9 @@ const projectsTests = {
   //Organization General
   { name: 'C611_643_C626_C699_C892_Leave organization / It should not be possible to leave its root organization as admin if at least another admin is present / Switch organization / Create orga as ADMIN / Message about what characters are allowed in the name of organization has to be displayed', func: C611 },
   { name: 'C911_Search field for organizations works as intended', func: C911 },
+  //Organization menu
+  { name: 'C700_C701 Create an organization as EDITOR/VIEWER', func: C700 },
+
 
   ],
   "Device Management Service": [

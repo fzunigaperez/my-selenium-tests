@@ -996,7 +996,7 @@ async function reportActionsButton(driver) {
 
 
     async function deleteUnregisteredUserInCaseOfExistence(driver, vars) {
-    await windowConfiguration(driver);  
+    await windowConfiguration(driver,"UMS");  
     await loginUnregisteredUser(driver, vars); 
     await driver.sleep(2000);
     invalidUser = await countElementsByXPath(driver,"//span[@class='kc-feedback-text'][contains(.,'Invalid username or password.')]");
@@ -1572,17 +1572,15 @@ async function createOrganizationButton1(driver) {
   }
 
 
-  async function switchToExtraOrganizationAsAdmin(driver) {
-
+  async function switchToExtraOrganization(driver, organizationName) {
     await activeOrganization(driver);
-    await driver.findElement(By.xpath("//div[contains(@title,'Leave this Organization')]")).click();
+    await driver.findElement(By.xpath(`//div[contains(@title,'${organizationName}')]`)).click();
     await driver.wait(until.elementLocated(By.id("routeTitle")), 30000);
     await driver.sleep(1000);
     await waitingLoadingRingProficloudToDissapear(driver);
     await driver.wait(until.elementLocated(By.id("routeTitle")), 30000);
-    await driver.wait(until.elementLocated(By.xpath("//h4[contains(.,\'Leave this Organization\')]")), 30000);
-    
-  }
+    await driver.wait(until.elementLocated(By.xpath(`//h4[contains(.,'${organizationName}')]`)), 30000);
+}
 
   async function usersLeftMenu(driver) {
 
@@ -1598,7 +1596,7 @@ async function createOrganizationButton1(driver) {
       await activeOrganization(driver);
   
       while (extraOrganization > 0) {
-          await switchToExtraOrganizationAsAdmin(driver);
+          await switchToExtraOrganization(driver,"Leave this Organization");
           await userManagementMenu(driver);
           await usersLeftMenu(driver);
           await driver.sleep(2000);
@@ -1638,7 +1636,100 @@ async function createOrganizationButton1(driver) {
       }
   }
   
+  async function eliminateExtraOrganizationsEditor(driver) {
+    await activeOrganization(driver);
+    await driver.sleep(1000);
+    extraOrganization = await countElementsByXPath(driver, "(//div[@class='profile-menu_icon-text__text'][contains(.,'Z Z')])[1]");
+    await activeOrganization(driver);
 
+    while (extraOrganization > 0) {
+        await switchToExtraOrganization(driver,"Z Z");
+        await userManagementMenu(driver);
+        await usersLeftMenu(driver);
+        await driver.sleep(2000);
+        noDesiredUser = await countElementsByXPath(driver, "//div[@id='outlet']/app-user-management/div/app-members/flex-col/flex-col/div/ng-scrollbar/div/div/div/div/div[2]/pc-list-item/div/div");
+
+        while (noDesiredUser > 0) {
+            const { lastDynamicXPath, mailText } = await getEmailofUndesiredUserAndHamburgerClick(driver);
+
+            if (!lastDynamicXPath) {
+                console.error("No dynamic XPath found for the icon.");
+                break;
+            }
+
+            console.log(`An undesired user was found (✖╭╮✖)", ${mailText}`);
+            await driver.wait(until.elementLocated(By.xpath(lastDynamicXPath)), 30000).click();
+            await removeMemberButton(driver);
+            await driver.findElement(By.xpath("//input[contains(@placeholder,'email ')]")).clear();
+            await driver.findElement(By.xpath("//input[contains(@placeholder,'email ')]")).sendKeys(mailText);
+            await removeMemberButton2(driver);
+            await driver.sleep(6000);
+            noDesiredUser = await countElementsByXPath(driver, "//div[@id='outlet']/app-user-management/div/app-members/flex-col/flex-col/div/ng-scrollbar/div/div/div/div/div[2]/pc-list-item/div/div");
+        }
+
+        await activeOrganization(driver);
+        await settings(driver);
+        await driver.wait(until.elementLocated(By.xpath("/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-account-management[1]/flex-col[1]/app-user-settings[1]/flex-col[1]/flex-col[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/mat-tab-group[1]/div[1]/mat-tab-body[1]/div[1]/div[1]/app-expandable-organisation[1]/div[1]/div[1]/flex-row[1]/flex-row[1]/div-relative[1]/app-icon[1]/*[name()='svg'][1]")), 30000).click();
+        await leaveOrganizationButton1(driver);
+        await leaveOrganizationButton2(driver);
+        await waitingLoadingRingProficloudToDissapear(driver);
+        await driver.get("https://app.proficloud.io/services/account/user-settings");
+        await reloadPage(driver);
+        await driver.sleep(4000);
+        await activeOrganization(driver);
+        await driver.sleep(1000);
+        extraOrganization = await countElementsByXPath(driver, "(//div[@class='profile-menu_icon-text__text'][contains(.,'Z Z')])[1]");
+        await activeOrganization(driver);
+    }
+}
+
+
+async function eliminateExtraOrganizationsEditor(driver) {
+    await activeOrganization(driver);
+    await driver.sleep(1000);
+    extraOrganization = await countElementsByXPath(driver, "(//div[@class='profile-menu_icon-text__text'][contains(.,'Z Z')])[1]");
+    await activeOrganization(driver);
+
+    while (extraOrganization > 0) {
+        await switchToExtraOrganization(driver,"Z Z");
+        await userManagementMenu(driver);
+        await usersLeftMenu(driver);
+        await driver.sleep(2000);
+        noDesiredUser = await countElementsByXPath(driver, "//div[@id='outlet']/app-user-management/div/app-members/flex-col/flex-col/div/ng-scrollbar/div/div/div/div/div[2]/pc-list-item/div/div");
+
+        while (noDesiredUser > 0) {
+            const { lastDynamicXPath, mailText } = await getEmailofUndesiredUserAndHamburgerClick(driver);
+
+            if (!lastDynamicXPath) {
+                console.error("No dynamic XPath found for the icon.");
+                break;
+            }
+
+            console.log(`An undesired user was found (✖╭╮✖)", ${mailText}`);
+            await driver.wait(until.elementLocated(By.xpath(lastDynamicXPath)), 30000).click();
+            await removeMemberButton(driver);
+            await driver.findElement(By.xpath("//input[contains(@placeholder,'email ')]")).clear();
+            await driver.findElement(By.xpath("//input[contains(@placeholder,'email ')]")).sendKeys(mailText);
+            await removeMemberButton2(driver);
+            await driver.sleep(6000);
+            noDesiredUser = await countElementsByXPath(driver, "//div[@id='outlet']/app-user-management/div/app-members/flex-col/flex-col/div/ng-scrollbar/div/div/div/div/div[2]/pc-list-item/div/div");
+        }
+
+        await activeOrganization(driver);
+        await settings(driver);
+        await driver.wait(until.elementLocated(By.xpath("/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-account-management[1]/flex-col[1]/app-user-settings[1]/flex-col[1]/flex-col[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/mat-tab-group[1]/div[1]/mat-tab-body[1]/div[1]/div[1]/app-expandable-organisation[1]/div[1]/div[1]/flex-row[1]/flex-row[1]/div-relative[1]/app-icon[1]/*[name()='svg'][1]")), 30000).click();
+        await leaveOrganizationButton1(driver);
+        await leaveOrganizationButton2(driver);
+        await waitingLoadingRingProficloudToDissapear(driver);
+        await driver.get("https://app.proficloud.io/services/account/user-settings");
+        await reloadPage(driver);
+        await driver.sleep(4000);
+        await activeOrganization(driver);
+        await driver.sleep(1000);
+        extraOrganization = await countElementsByXPath(driver, "(//div[@class='profile-menu_icon-text__text'][contains(.,'Z Z')])[1]");
+        await activeOrganization(driver);
+    }
+}
   
   
 
@@ -2818,6 +2909,7 @@ module.exports = {
   downloadButton,
   editButton,
   editBillingAccountButton,
+  eliminateExtraOrganizationsEditor,
   eliminateExtraOrganizationsAdmin,
   emailNameButton,
   emailVerification,
@@ -2875,7 +2967,7 @@ module.exports = {
   sortByLastName,
   sortByRole,
   sortByInvitedStatus,
-  switchToExtraOrganizationAsAdmin,
+  switchToExtraOrganization,
   switchToOriginalOrganization,
   switchToPxcOrganization,
   uploadFile,
