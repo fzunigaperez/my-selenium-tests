@@ -47,6 +47,8 @@ const C911 = require('./testCases/C911');
 //─── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ──
 
 const C178 = require('./testCases/C178');
+const C178 = require('./testCases/C620');
+const C620 = require('./testCases/C620');
 
 
 
@@ -105,6 +107,8 @@ const projectsTests = {
   // Dashboards
   { name: 'C178_C179_C180_C946_C181_C184_Introducing a Dashboard name / Maximize the whole Dashboard Editing a Dashboard name / Introducing a Dashboard name with a maximum length of 27 characters Introducing a Dashboard description / Editing a Dashboard description', func: C178 },
   // Reports
+  { name: 'C620_C651_C1053_Create a recurring Report_Delete a recurring and manual report_Preview of a recurring report creates and downloads a manual report', func: C620 },
+ 
   
 
     
