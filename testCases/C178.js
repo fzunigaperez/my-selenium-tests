@@ -21,7 +21,7 @@ async function C178() {
       let vars = {}; // Initialize variables container
 
 
-      await windowConfiguration(driver);
+      await windowConfiguration(driver,"EMMA");
       await loginAdmin(driver, vars);
       await emmaMenu(driver);
       await dashboard(driver);
