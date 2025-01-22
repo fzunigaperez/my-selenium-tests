@@ -11,8 +11,8 @@ on:
         default: "all"
       environment:
         description: "Specify the environment (e.g., PROD, STG, DEV)"
-        required: true
-        default: "DEV" # Valor por defecto si no se especifica
+        required: false
+        default: "" # Default to an empty string if not specified
 
 jobs:
   run-selenium-tests:
@@ -30,9 +30,39 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Set default environments
+        id: set-defaults
+        run: |
+          # Define default environments for services
+          DEFAULT_ENV="STG"               # General default
+          EMMA_DEFAULT_ENV="STG"         # EMMA's default environment
+          UMS_DEFAULT_ENV="PROD"         # User Management Service default
+
+          # Use input environment if specified; otherwise, use defaults
+          if [[ -n "${{ github.event.inputs.environment }}" ]]; then
+            TEST_ENV="${{ github.event.inputs.environment }}"
+          else
+            TEST_ENV=$DEFAULT_ENV
+          fi
+
+          # Environment-specific overrides for services
+          if [[ "${{ github.event.inputs.environment }}" != "" ]]; then
+            EMMA_ENV="${{ github.event.inputs.environment }}"
+            UMS_ENV="${{ github.event.inputs.environment }}"
+          else
+            EMMA_ENV=$EMMA_DEFAULT_ENV
+            UMS_ENV=$UMS_DEFAULT_ENV
+          fi
+
+          echo "TEST_ENV=$TEST_ENV" >> $GITHUB_ENV
+          echo "EMMA_ENV=$EMMA_ENV" >> $GITHUB_ENV
+          echo "UMS_ENV=$UMS_ENV" >> $GITHUB_ENV
+
       - name: Run specified test cases
         env:
-          TEST_ENV: ${{ github.event.inputs.environment }}
+          TEST_ENV: ${{ env.TEST_ENV }}
+          EMMA_ENV: ${{ env.EMMA_ENV }}
+          UMS_ENV: ${{ env.UMS_ENV }}
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
           TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USERNAME }}
@@ -40,10 +70,12 @@ jobs:
         run: |
           TEST_CASES="${{ github.event.inputs.test_case || 'all' }}" # Default to 'all' if no input
           echo "Executing in environment: $TEST_ENV"
+          echo "EMMA is running in environment: $EMMA_ENV"
+          echo "User Management Service (UMS) is running in environment: $UMS_ENV"
           echo "Test case(s) input: $TEST_CASES"
           
           ERRORS=0
-          
+
           if [ -z "$TEST_CASES" ] || [ "$TEST_CASES" = "all" ]; then
             echo "Running all tests..."
             node run-all-tests.js || ERRORS=$((ERRORS+1))
@@ -63,7 +95,7 @@ jobs:
               fi
             done
           fi
-          
+
           if [ $ERRORS -ne 0 ]; then
             echo "$ERRORS test(s) failed."
             exit 1
