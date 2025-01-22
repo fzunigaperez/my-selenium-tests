@@ -38,7 +38,8 @@ const C714 = require('./testCases/C714');
 const C611 = require('./testCases/C611');
 const C911 = require('./testCases/C911');
 // Organozation Menu
-const C911 = require('./testCases/C700');
+const C700 = require('./testCases/C700');
+const C631 = require('./testCases/C631');
 
 
 
@@ -101,6 +102,7 @@ const projectsTests = {
   { name: 'C911_Search field for organizations works as intended', func: C911 },
   //Organization menu
   { name: 'C700_C701 Create an organization as EDITOR/VIEWER', func: C700 },
+  { name: 'C631_C702_C703_Rename organization as admin / Rename organization for EDITOR / VIEWER is not allowed', func: C631 },
 
 
   ],
