@@ -1,1 +1,2 @@
-testCases/testBase.js
+# Ignorar archivo de configuración local
+config.json
