@@ -935,9 +935,30 @@ console.log('Cantidad de elementos encontrados para "Invalid username or passwor
   }
 
   await isTheOrganizationNameEmpty(driver, vars);
+  await resetTOriginalNameOrganization(driver);
   await roothOrganizationTest(driver, vars);
 }
 
+async function resetTOriginalNameOrganization(driver) {
+
+  resetOrganizationName = await getTextByLocator(driver,"xpath","//div[@id='active-organization']/h4");
+  if (resetOrganizationName !== 'Change Orga Name') {
+      await activeOrganization(driver);
+      await settings(driver);
+      await driver.wait(until.elementLocated(By.css("#settings-organization-settings-icon-245afd95-c3fb-442e-b27e-07238babc5d8 > .ng-star-inserted .ng-star-inserted")), 3000).click();
+      await renameOrganizationButton1(driver);
+      await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'Organization Name')]")), 3000).click();
+      await clearAndWrite(driver,"xpath","//input[@placeholder='Organization Name']","Rooth Organization");
+      await renameOrganizationButton2(driver);
+      await waitingLoadingRingProficloudToDissapear(driver);
+
+  }
+  else{
+      console.log("The name of the orga is Change Orga Name:) Verified");
+
+  }
+  await deviceManagementMenu(driver);
+}
 
 async function deleteManualReports(driver) {
 
@@ -2560,34 +2581,47 @@ async function dashboard(driver) {
 async function clearAndWrite(driver, selectorType, selectorValue, text) {
   let element;
 
-  // Select the element based on the selector type
-  switch (selectorType) {
-    case "xpath":
-      element = await driver.findElement(By.xpath(selectorValue));
-      break;
-    case "id":
-      element = await driver.findElement(By.id(selectorValue));
-      break;
-    case "css":
-      element = await driver.findElement(By.css(selectorValue));
-      break;
-    case "name":
-      element = await driver.findElement(By.name(selectorValue));
-      break;
-    default:
-      throw new Error("Unsupported selector type: " + selectorType);
+  try {
+    // Select the element based on the selector type
+    switch (selectorType) {
+      case "xpath":
+        element = await driver.findElement(By.xpath(selectorValue));
+        break;
+      case "id":
+        element = await driver.findElement(By.id(selectorValue));
+        break;
+      case "css":
+        element = await driver.findElement(By.css(selectorValue));
+        break;
+      case "name":
+        element = await driver.findElement(By.name(selectorValue));
+        break;
+      default:
+        throw new Error("Unsupported selector type: " + selectorType);
+    }
+
+    // Ensure the element is interactable
+    await driver.wait(async () => {
+      const isDisplayed = await element.isDisplayed();
+      const isEnabled = await element.isEnabled();
+      return isDisplayed && isEnabled;
+    }, 10000, `Element ${selectorValue} is not interactable`);
+
+    // Clear the element and write the text
+    await element.clear();
+    await element.sendKeys(text);
+
+    // Wait for the element's value to match the input text
+    await driver.wait(async () => {
+      const value = await element.getAttribute("value");
+      return value === text;
+    }, 5000, `Text '${text}' was not written within the timeout`);
+  } catch (error) {
+    console.error(`Error in clearAndWrite: ${error.message}`);
+    throw error;
   }
-
-  // Clear the element and write the text
-  await element.clear();
-  await element.sendKeys(text);
-
-  // Wait for the element's value to match the input text
-  await driver.wait(async () => {
-    const value = await element.getAttribute("value");
-    return value === text;
-  }, 50000, `Text '${text}' was not written within the timeout`);
 }
+
 
 
 async function dataDisplayedCheck(driver) {
@@ -2869,6 +2903,19 @@ async function uploadFile(driver, fileInputSelector, mode, fileName) {
   console.log(`File "${fileName}" successfully uploaded from mode: ${mode}`);
 }
 
+async function renameOrganizationButton1(driver) {
+    
+  await driver.wait(until.elementLocated(By.xpath("//flex-row-start-center[contains(.,'Rename Organization')]")), 30000).click();    
+}
+
+
+async function renameOrganizationButton2(driver) {
+
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Rename Organization')]")), 30000).click();
+
+  
+}
+
 
 
 
@@ -2946,12 +2993,15 @@ module.exports = {
   modalClose,
   previewButton,
   reloadPage,
+  renameOrganizationButton1,
+  renameOrganizationButton2,
   removeMemberButton,
   removeMemberButton2,
   removeOldMemberInvitationsRoothOrga,
   removeRegisteredUserNew,
   reports,
   reportActionsButton,
+  resetTOriginalNameOrganization,
   resetBillingAccountInformation,
   resetToOriginalUserNameInRoothOrganization,
   roleNameButton,

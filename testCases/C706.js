@@ -12,7 +12,6 @@ const {
  
 } = require('../utils/sharedFunctions');  // BS
 
-
 async function C706() {
   try {
     await testBase('C706_C707_Edit a billing account as an EDITOR not allowed', async (driver) => {
@@ -22,45 +21,35 @@ async function C706() {
       await loginEditor(driver,vars, until);
       await roothOrganizationTest(driver,vars,until);
       await activeOrganization(driver);
-      await settings(driver,until)
+      await settings(driver,until);
       await assertXpathNotPresent(driver,"//div[@class='content__tab ng-star-inserted'][contains(.,'Billing Information')]","xpath");
       await logout(driver);
 
-      //C707 Edit a billing account as an VIEWER not allowed
+      //C707 Edit a billing account as a VIEWER not allowed
 
-      
       await loginViewer(driver,vars, until);
       await roothOrganizationTest(driver,vars,until);
       await activeOrganization(driver);
-      await settings(driver,until)
+      await settings(driver,until);
       await assertXpathNotPresent(driver,"//div[@class='content__tab ng-star-inserted'][contains(.,'Billing Information')]","xpath");
       await logout(driver);
-
-
-
-
     });
   } catch (error) {
     throw new Error(`C706 failed: ${error.message}`);
   }
 }
 
-
-
-
-
 module.exports = C706;
-
 
 if (require.main === module) {
   (async () => {
     try {
-      console.log(`'🚀 Ejecutando el test `);
+      console.log(`'🚀 Running the test `);
       await C706();   // Change here the test name
       
-      console.log('✅ Test completado con éxito.');
+      console.log('✅ Test completed successfully.');
     } catch (error) {
-      console.error('❌ Error al ejecutar el test:', error.message);
+      console.error('❌ Error running the test:', error.message);
     }
   })();
 }
