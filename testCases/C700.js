@@ -24,6 +24,7 @@ const {
   eliminateExtraOrganizationsEditor,
   loginViewer,
   deleteAllEmails,
+  logOutFromProtonMail,
   
 
 } =   require('../utils/sharedFunctions'); // Reusable shared functions
@@ -78,8 +79,7 @@ async function C700() {
       await clickSecondMail(driver);
       await waitForXPathPresentTimeout(driver,"//h1[contains(@title,'organization Z Z')]//span[contains(text(),'You have been removed from the Proficloud.io')]",3000);
       await deleteAllEmails(driver);
-
-
+      await logOutFromProtonMail(driver);
 
     });
   } catch (error) {
