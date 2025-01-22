@@ -21,7 +21,7 @@ async function C874() {
       let vars = {}; // Initialize variables container
 
       // Step 1: Configure the browser window and login as admin
-      await windowConfiguration(driver);
+      await windowConfiguration(driver,"UMS");
       await loginAdmin(driver, vars);
 
       // Step 2: Ensure the organization and user name are set correctly

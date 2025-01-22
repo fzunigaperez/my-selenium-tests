@@ -20,14 +20,14 @@ async function C681() {
         let vars = {};
 
      
-        await windowConfiguration(driver);
+        await windowConfiguration(driver,"UMS");
         await loginEditor(driver, vars);
         await assertXpathNotPresent(driver,"//span[contains(.,'User Management Service')]");
      
     
         await logout(driver);
 
-        await windowConfiguration(driver);
+        await windowConfiguration(driver,"UMS");
         await loginViewer(driver, vars);
         await assertXpathNotPresent(driver,"//span[contains(.,'User Management Service')]");
         await logout(driver);

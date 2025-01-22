@@ -18,7 +18,7 @@ async function C706() {
     await testBase('C706_C707_Edit a billing account as an EDITOR not allowed', async (driver) => {
       let vars = {};
             
-      await windowConfiguration(driver);
+      await windowConfiguration(driver,"UMS");
       await loginEditor(driver,vars, until);
       await roothOrganizationTest(driver,vars,until);
       await activeOrganization(driver);

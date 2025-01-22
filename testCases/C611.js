@@ -39,7 +39,7 @@ async function C611() {
       let vars = {}; // Initialize variables container
 
       //Eliminate the leave organization for Registered user account in case a test may failed
-        await windowConfiguration(driver);
+      await windowConfiguration(driver,"UMS");
       await loginAdmin(driver, vars);
       await eliminateExtraOrganizationsAdmin(driver);
 
@@ -102,7 +102,7 @@ async function C611() {
       await logout(driver);
 
       //Log in as Admin 2 and leave the organization and check the email of the removal
-      await windowConfiguration(driver);
+      await windowConfiguration(driver,"UMS");
       await loginRegisteredUser(driver,vars);
       await activeOrganization(driver);
       await settings(driver);
@@ -136,7 +136,7 @@ async function C611() {
 
       // C643 It should not be possible to leave its root organization as admin if at least another admin is present.
 
-      await windowConfiguration(driver);
+      await windowConfiguration(driver,"UMS");
       await loginAdmin(driver,vars);
       await activeOrganization(driver);
       await settings(driver);

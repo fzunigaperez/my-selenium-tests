@@ -27,7 +27,7 @@ async function C624() {
   try {
     await testBase('C624_C677_Sorting users by first name, last name, email, invited, role. / ADMIN can access to USER MANAGEMENT', async (driver) => {
       let vars = {};
-      await windowConfiguration(driver);
+      await windowConfiguration(driver,"UMS");
       await loginAdmin(driver, vars);
       await resetToOriginalUserNameInRoothOrganization(driver);
       //C667 ADMIN can access to USER MANAGEMENT

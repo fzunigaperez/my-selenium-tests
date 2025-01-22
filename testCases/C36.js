@@ -15,9 +15,7 @@ async function C36() {
     async (driver) => {
       let vars = {}; // Inicializa vars como un objeto vacío
 
-      // Configuración de la ventana y cookies
-      console.log("Configurando la ventana...");
-      await windowConfiguration(driver);
+      await windowConfiguration(driver,"UMS");
 
       console.log("Aceptando cookies...");
       await acceptCookies(driver);

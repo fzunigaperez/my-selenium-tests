@@ -25,7 +25,7 @@ async function C911() {
       let vars = {}; // Initialize variables container
 
       // Step 1: Configure the browser window and login as admin
-      await windowConfiguration(driver);
+      await windowConfiguration(driver,"UMS");
       await loginAdmin(driver, vars);
       await activeOrganization(driver);
       await driver.findElement(By.xpath("//mat-label[contains(.,'Search for organizations')]"),10000).click();

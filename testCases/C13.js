@@ -22,13 +22,13 @@ async function C13() {
       async (driver) => {
         let vars = {};
 
-        await windowConfiguration(driver);
+        await windowConfiguration(driver,"UMS");
         await loginToProtonMail(driver, vars);
         await confirmLinkUrlToggleIsOff(driver);
         await logOutFromProtonMail(driver);
         await deleteUnregisteredUserInCaseOfExistence(driver, vars);
 
-        await windowConfiguration(driver);
+        await windowConfiguration(driver,"UMS");
         await driver.wait(until.elementLocated(By.id("registration-button")), 30000).click();
         await enterRegistrationData(driver, vars);
         

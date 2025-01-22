@@ -17,7 +17,7 @@ async function C614() {
         let vars = {};
 
         // Configurar ventana (entorno de pruebas)
-        await windowConfiguration(driver);
+        await windowConfiguration(driver,"UMS");
         await unregisteredUserCredentials(driver, vars);
 
         // Registrar usuario con contraseñas diferentes

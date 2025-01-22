@@ -37,7 +37,7 @@ async function C608() {
         let vars = {};
 
         // Configure the window and delete unregistered user if exists
-        await windowConfiguration(driver);
+        await windowConfiguration(driver,"UMS");
         await deleteUnregisteredUserInCaseOfExistence(driver, vars);
 
         // Log in as 'FerchoAlejandro86'
@@ -176,7 +176,7 @@ async function C608() {
         console.log('Switched to the latest window.');
 
         // Final cleanup
-        await windowConfiguration(driver);
+        await windowConfiguration(driver,"UMS");
         await deleteUnregisteredUserInCaseOfExistence(driver, vars);
 
         await loginToProtonMail(driver, vars);

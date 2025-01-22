@@ -35,7 +35,7 @@ async function C613() {
         let vars = {};
 
         // Configure the window
-        await windowConfiguration(driver);
+        await windowConfiguration(driver,"UMS");
 
         // Log in as Admin
         await loginAdmin(driver, vars);
@@ -107,7 +107,7 @@ async function C613() {
         await changeFrameAndClickonProficloudEmail(driver);
 
         //confirming that the user can access to Rooth Orga
-        await windowConfiguration(driver);
+        await windowConfiguration(driver,"UMS");
         await loginRegisteredUser(driver,vars);
         await logout(driver);
 
@@ -115,7 +115,7 @@ async function C613() {
         //C610 Remove member from organization as ADMIN
 
 
-        await windowConfiguration(driver);
+        await windowConfiguration(driver,"UMS");
         await loginAdmin(driver,vars);
         await userManagementMenu(driver);
         await removeOldMemberInvitationsRoothOrga(driver);

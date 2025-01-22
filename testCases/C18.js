@@ -12,7 +12,7 @@ const {
 async function C18() {
   await testBase('C18 Login with valid email but wrong password', async (driver) => {
     // Configure the initial URL and maximize window
-    await windowConfiguration(driver);
+    await windowConfiguration(driver,"UMS");
     // Accept cookies if the banner appears
     await acceptCookies(driver);
     // Navigate to the login button

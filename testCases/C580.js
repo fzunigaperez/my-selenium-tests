@@ -17,9 +17,9 @@ async function C580() {
     let vars = {}; // Inicializa vars como un objeto vacío
 
     // Configuración inicial
-    console.log('Configurando la ventana...');
-    await windowConfiguration(driver);
-    console.log("Aceptando cookies...");
+    
+    await windowConfiguration(driver,"UMS");
+   
     await acceptCookies(driver);
     await loginLandingPageButton(driver);
 

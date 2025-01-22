@@ -14,7 +14,7 @@ async function C16() {
     async (driver) => {
       // Configuración de la ventana y cookies
       console.log("Configurando la ventana...");
-      await windowConfiguration(driver);
+      await windowConfiguration(driver,"UMS");
 
       console.log("Aceptando cookies...");
       await acceptCookies(driver);

@@ -17,7 +17,7 @@ async function C84() {
       let vars = {};
 
       // Window configuration
-      await windowConfiguration(driver);
+      await windowConfiguration(driver,"UMS");
 
       // Log in as admin
       await loginAdmin(driver, vars);

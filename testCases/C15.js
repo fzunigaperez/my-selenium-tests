@@ -12,7 +12,7 @@ async function C15() {
   try {
     await testBase('C15_Login with right credentials as ADMIN', async (driver) => {
       let vars = {};
-      await windowConfiguration(driver);
+      await windowConfiguration(driver,"UMS");
       await loginAdmin(driver, vars);
       await logout(driver);
     });

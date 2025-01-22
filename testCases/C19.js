@@ -25,7 +25,7 @@ async function C19() {
         let vars = {};
 
         // Initial Configuration and Login
-        await windowConfiguration(driver);
+        await windowConfiguration(driver,"UMS");
         await loginChangeOrgaUserName(driver, vars);
         await resetToOriginalUserNameInRoothOrganization(driver, vars);
 
@@ -164,7 +164,7 @@ async function C19() {
 
         // Logout and Cleanup
         await logout(driver);
-        await windowConfiguration(driver);
+        await windowConfiguration(driver,"UMS");
         await loginChangeOrgaUserName(driver, vars);
         await loginToProtonMail(driver, vars);
         await deleteAllEmails(driver, vars);

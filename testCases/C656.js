@@ -15,7 +15,7 @@ async function C656() {
       let vars = {}; // Inicializa vars como un objeto vacío
 
       console.log("Configurando la ventana...");
-      await windowConfiguration(driver);
+      await windowConfiguration(driver,"UMS");
 
       console.log("Iniciando sesión como Viewer...");
       await loginViewer(driver, vars);

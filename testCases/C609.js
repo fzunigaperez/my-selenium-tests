@@ -30,7 +30,7 @@ async function C609() {
       let vars = {};
 
 
-      await windowConfiguration(driver);
+      await windowConfiguration(driver,"UMS");
       await loginAdmin(driver, vars);
       await resetToOriginalUserNameInRoothOrganization(driver, vars);
       await switchToPxcOrganization(driver);

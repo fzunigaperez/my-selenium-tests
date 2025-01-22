@@ -33,7 +33,7 @@ async function C714() {
         let vars = {}; // Initialize variables
 
         // Step 1: Configure window and log in as Admin
-        await windowConfiguration(driver);
+        await windowConfiguration(driver,"UMS");
         await loginAdmin(driver, vars);
 
         // Step 2: Check for extra users in the organization and remove if found
