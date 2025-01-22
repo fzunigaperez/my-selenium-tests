@@ -7,8 +7,38 @@ const os = require('os');
 require('dotenv').config(); // Cargar variables de entorno
 
 //const C714 = require('../testCases/C714');  NEVER NEVER NEVER DECLARE HERE A TEST CASE otherwhise couses a lot of problems
-// const { sendResultToTestRail } = require('../utils/sharedFunctions');
 
+
+/**
+ * Configura la ventana del navegador y navega al entorno adecuado.
+ * @param {WebDriver} driver - Instancia del controlador de Selenium WebDriver.
+ * @param {string} service - El servicio para el que se configurará el entorno (EMMA, UMS, etc.).
+ */
+async function windowConfiguration(driver, service = 'TEST_ENV') {
+  // Mapear los servicios a sus variables de entorno
+  const serviceEnvs = {
+    EMMA: process.env.EMMA_ENV || 'STG', // Default STG
+    UMS: process.env.UMS_ENV || 'PROD', // Default PROD
+    TEST_ENV: process.env.TEST_ENV || 'STG', // Default general
+  };
+
+  // Seleccionar el entorno según el servicio
+  const serviceEnv = serviceEnvs[service] || serviceEnvs.TEST_ENV;
+
+  // URLs por entorno
+  const urls = {
+    PROD: process.env.PROD_URL,
+    STG: process.env.STG_URL,
+    DEV: process.env.DEV_URL,
+  };
+
+  const targetUrl = urls[serviceEnv] || urls.PROD; // Default PROD si no coincide nada
+  console.log(`🌍 Executing in the environment: ${serviceEnv} (${targetUrl}) for service: ${service}`);
+
+  // Navegar al URL y maximizar la ventana
+  await driver.get(targetUrl);
+  await driver.manage().window().maximize();
+}
 
 // Function to create a Test Run in TestRail
 async function createTestRun(projectId, testRunName, testCaseIds = []) {
@@ -620,19 +650,6 @@ async function userMenu(driver) {
 
 
 
-async function windowConfiguration(driver, service = process.env.TEST_ENV) {
-  const urls = {
-    PROD: process.env.PROD_URL,
-    STG: process.env.STG_URL,
-    DEV: process.env.DEV_URL,
-  };
-
-  const targetUrl = urls[service] || urls.PROD; // PROD as default
-  console.log(`🌍Executing in the environment: ${service} (${targetUrl})`);
-
-  await driver.get(targetUrl); // Navegar al URL
-  await driver.manage().window().maximize(); // Maximizar la ventana del navegador
-}
 
 
 /**
