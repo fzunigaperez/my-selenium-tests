@@ -20,53 +20,50 @@ function safeRequire(path, key) {
 //
 //─── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ──
 
-// Sing Up
-const C13 = safeRequire('./testCases/C13');
-const C614 = safeRequire('./testCases/C614');
+// Sign Up
+const C13 = safeRequire('./testCases/C13', 'C13');
+const C614 = safeRequire('./testCases/C614', 'C614');
 // Login
-const C15 = safeRequire('./testCases/C15');
-const C655 = safeRequire('./testCases/C655');
-const C656 = safeRequire('./testCases/C656');
-const C16 = safeRequire('./testCases/C16');
-const C18 = safeRequire('./testCases/C18');
-const C36 = safeRequire('./testCases/C36');
-const C580 = safeRequire('./testCases/C580');
+const C15 = safeRequire('./testCases/C15', 'C15');
+const C655 = safeRequire('./testCases/C655', 'C655');
+const C656 = safeRequire('./testCases/C656', 'C656');
+const C16 = safeRequire('./testCases/C16', 'C16');
+const C18 = safeRequire('./testCases/C18', 'C18');
+const C36 = safeRequire('./testCases/C36', 'C36');
+const C580 = safeRequire('./testCases/C580', 'C580');
 // Log out
-const C90 = safeRequire('./testCases/C90');
+const C90 = safeRequire('./testCases/C90', 'C90');
 // Profile Settings
-const C19 = safeRequire('./testCases/C19');
-const C84 = safeRequire('./testCases/C84');
+const C19 = safeRequire('./testCases/C19', 'C19');
+const C84 = safeRequire('./testCases/C84', 'C84');
 // Billing account
-const C537 = safeRequire('./testCases/C537');
-const C706 = safeRequire('./testCases/C706');
+const C537 = safeRequire('./testCases/C537', 'C537');
+const C706 = safeRequire('./testCases/C706', 'C706');
 // User Management
-const C608 = safeRequire('./testCases/C608');
-const C613 = safeRequire('./testCases/C613');
-const C681 = safeRequire('./testCases/C681');
-const C609 = safeRequire('./testCases/C609');
-const C624 = safeRequire('./testCases/C624');
-const C874 = safeRequire('./testCases/C874');
-const C625 = safeRequire('./testCases/C625');
-const C714 = safeRequire('./testCases/C714');
+const C608 = safeRequire('./testCases/C608', 'C608');
+const C613 = safeRequire('./testCases/C613', 'C613');
+const C681 = safeRequire('./testCases/C681', 'C681');
+const C609 = safeRequire('./testCases/C609', 'C609');
+const C624 = safeRequire('./testCases/C624', 'C624');
+const C874 = safeRequire('./testCases/C874', 'C874');
+const C625 = safeRequire('./testCases/C625', 'C625');
+const C714 = safeRequire('./testCases/C714', 'C714');
 // Organization General
-const C611 = safeRequire('./testCases/C611');
-const C911 = safeRequire('./testCases/C911');
-// Organozation Menu
-const C700 = safeRequire('./testCases/C700');
-const C631 = safeRequire('./testCases/C631');
-
-
+const C611 = safeRequire('./testCases/C611', 'C611');
+const C911 = safeRequire('./testCases/C911', 'C911');
+// Organization Menu
+const C700 = safeRequire('./testCases/C700', 'C700');
+const C631 = safeRequire('./testCases/C631', 'C631');
 
 //─── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ──
 //
-//                                                                                     EMMA SERVICE
+//                                                                         EMMA SERVICE
 //
 //─── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ──
 
-const C178 = safeRequire('./testCases/C178');
-const C178 = safeRequire('./testCases/C178');
-const C620 = safeRequire('./testCases/C620');
-
+const C178 = safeRequire('./testCases/C178', 'C178');
+const C620 = safeRequire('./testCases/C620', 'C620');
+const C620 = safeRequire('./testCases/C620', 'C620');
 
 
 
