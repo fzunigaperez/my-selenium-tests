@@ -55,6 +55,9 @@ const C911 = safeRequire('./testCases/C911', 'C911');
 // Organization Menu
 const C700 = safeRequire('./testCases/C700', 'C700');
 const C631 = safeRequire('./testCases/C631', 'C631');
+const C641 = safeRequire('./testCases/C641', 'C641');
+const C630 = safeRequire('./testCases/C630', 'C630');
+
 
 //─── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ──
 //
@@ -115,6 +118,8 @@ const projectsTests = {
   //Organization menu
   { name: 'C700_C701 Create an organization as EDITOR/VIEWER', func: C700 },
   { name: 'C631_C702_C703_Rename organization as admin / Rename organization for EDITOR / VIEWER is not allowed', func: C631 },
+  { name: 'C641_C10090_Admin rights check / Users of other organization should not be visible if not Admin rights when switching organization', func: C641 },
+  { name: 'C630_C639_C627_628_User organization information is displayed correctly / Go to User Management Button redirect the user to User Management Service / Organization information is displayed correctly / Organization subscriptions are displayed correctly', func: C630 },
 
 
   ],

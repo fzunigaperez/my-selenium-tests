@@ -87,6 +87,18 @@ async function sendResultToTestRail(testCaseId, status, comment = '', testRunId)
   }
 }
 
+async function usersTab(driver) {
+
+  await driver.wait(until.elementLocated(By.xpath("//span[@class='mdc-tab__text-label'][contains(.,'Users')]")), 30000).click();
+  
+}
+
+async function subscriptionsTab(driver) {
+
+  await driver.wait(until.elementLocated(By.xpath("//span[@class='mdc-tab__text-label'][contains(.,'Subscriptions')]")), 30000).click();
+  
+}
+
 
 async function waitForUsersToLoad(driver) {
 
@@ -2916,6 +2928,28 @@ async function renameOrganizationButton2(driver) {
   
 }
 
+/**
+ * Waits for the title of the page to match the expected title within a timeout.
+ * @param {WebDriver} driver - The Selenium WebDriver instance.
+ * @param {string} expectedTitle - The expected title of the page.
+ * @param {number} timeoutInSeconds - Maximum time to wait in seconds (default is 600 seconds).
+ * @throws {Error} If the title does not match within the timeout.
+ */
+async function waitForTitle(driver, expectedTitle, timeoutInSeconds = 600) {
+  try {
+    await driver.wait(
+      until.titleIs(expectedTitle), // Condition: title matches the expectedTitle
+      timeoutInSeconds * 1000, // Convert seconds to milliseconds
+      `Title did not match '${expectedTitle}' within ${timeoutInSeconds} seconds`
+    );
+    console.log(`The title '${expectedTitle}' is now displayed.`);
+  } catch (error) {
+    console.error(`Failed to match the title '${expectedTitle}': ${error.message}`);
+    throw error;
+  }
+}
+
+
 
 
 
@@ -3017,15 +3051,18 @@ module.exports = {
   sortByLastName,
   sortByRole,
   sortByInvitedStatus,
+  subscriptionsTab,
   switchToExtraOrganization,
   switchToOriginalOrganization,
   switchToPxcOrganization,
   uploadFile,
+  usersTab,
   unregisteredUserCredentials,
   usersLeftMenu,
   userManagementMenu,
   userMenu,
   viewerRoleReset,
+  waitForTitle,
   waitForXPathPresentTimeout,
   waitForXPathPresentTimeoutNoStop,
   waitUntilXpathNotPresent,
