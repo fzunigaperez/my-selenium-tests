@@ -1,45 +1,59 @@
 const { sendResultToTestRail, createTestRun } = require('./utils/sharedFunctions'); // Import necessary functions
 const fs = require('fs'); // File system for creating report
 const nodemailer = require('nodemailer'); // For sending email
+
+
+const loadedModules = new Map();
+
+function safeRequire(path, key) {
+  if (loadedModules.has(key)) {
+    console.warn(`Warning: Module '${key}' is already loaded. Skipping duplicate declaration.`);
+    return loadedModules.get(key);
+  }
+  const module = safeRequire(path);
+  loadedModules.set(key, module);
+  return module;
+}
 //─── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ──
 //
 //                                                                                     USER MANAGEMENT SERVICE
 //
 //─── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ──
+
 // Sing Up
-const C13 = require('./testCases/C13');
-const C614 = require('./testCases/C614');
+const C13 = safeRequire('./testCases/C13');
+const C614 = safeRequire('./testCases/C614');
 // Login
-const C15 = require('./testCases/C15');
-const C655 = require('./testCases/C655');
-const C656 = require('./testCases/C656');
-const C16 = require('./testCases/C16');
-const C18 = require('./testCases/C18');
-const C36 = require('./testCases/C36');
-const C580 = require('./testCases/C580');
+const C15 = safeRequire('./testCases/C15');
+const C655 = safeRequire('./testCases/C655');
+const C656 = safeRequire('./testCases/C656');
+const C16 = safeRequire('./testCases/C16');
+const C18 = safeRequire('./testCases/C18');
+const C36 = safeRequire('./testCases/C36');
+const C580 = safeRequire('./testCases/C580');
 // Log out
-const C90 = require('./testCases/C90');
+const C90 = safeRequire('./testCases/C90');
 // Profile Settings
-const C19 = require('./testCases/C19');
-const C84 = require('./testCases/C84');
+const C19 = safeRequire('./testCases/C19');
+const C84 = safeRequire('./testCases/C84');
 // Billing account
-const C537 = require('./testCases/C537');
-const C706 = require('./testCases/C706');
+const C537 = safeRequire('./testCases/C537');
+const C706 = safeRequire('./testCases/C706');
 // User Management
-const C608 = require('./testCases/C608');
-const C613 = require('./testCases/C613');
-const C681 = require('./testCases/C681');
-const C609 = require('./testCases/C609');
-const C624 = require('./testCases/C624');
-const C874 = require('./testCases/C874');
-const C625 = require('./testCases/C625');
-const C714 = require('./testCases/C714');
+const C608 = safeRequire('./testCases/C608');
+const C613 = safeRequire('./testCases/C613');
+const C681 = safeRequire('./testCases/C681');
+const C609 = safeRequire('./testCases/C609');
+const C624 = safeRequire('./testCases/C624');
+const C874 = safeRequire('./testCases/C874');
+const C625 = safeRequire('./testCases/C625');
+const C714 = safeRequire('./testCases/C714');
 // Organization General
-const C611 = require('./testCases/C611');
-const C911 = require('./testCases/C911');
+const C611 = safeRequire('./testCases/C611');
+const C911 = safeRequire('./testCases/C911');
 // Organozation Menu
-const C700 = require('./testCases/C700');
-const C631 = require('./testCases/C631');
+const C700 = safeRequire('./testCases/C700');
+const C631 = safeRequire('./testCases/C631');
 
 
 
@@ -49,9 +63,9 @@ const C631 = require('./testCases/C631');
 //
 //─── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ──
 
-const C178 = require('./testCases/C178');
-const C178 = require('./testCases/C620');
-const C620 = require('./testCases/C620');
+const C178 = safeRequire('./testCases/C178');
+const C178 = safeRequire('./testCases/C178');
+const C620 = safeRequire('./testCases/C620');
 
 
 
