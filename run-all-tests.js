@@ -3,6 +3,7 @@ const fs = require('fs'); // File system for creating report
 const nodemailer = require('nodemailer'); // For sending email
 
 
+// Safe import utility
 const loadedModules = new Map();
 
 function safeRequire(path, key) {
@@ -10,7 +11,7 @@ function safeRequire(path, key) {
     console.warn(`Warning: Module '${key}' is already loaded. Skipping duplicate declaration.`);
     return loadedModules.get(key);
   }
-  const module = safeRequire(path);
+  const module = require(path); // Correct implementation to prevent self-referencing
   loadedModules.set(key, module);
   return module;
 }
