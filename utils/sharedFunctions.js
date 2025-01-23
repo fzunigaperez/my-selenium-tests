@@ -2183,6 +2183,12 @@ async function emmaDeleteButton(driver) {
   
 }
 
+async function serviceStoreMenu(driver) {
+
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Service Store')]")), 10000).click();
+  }
+
+  
 
 async function emmaMenu(driver) {
   
@@ -3045,6 +3051,7 @@ module.exports = {
   saveProfileDataButton,
   scrollToElementByXPath,
   sendResultToTestRail,
+  serviceStoreMenu,
   settings,
   sortByEmails,
   sortByFirstName,
