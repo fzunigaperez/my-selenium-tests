@@ -10,7 +10,7 @@ async function C90() {
             
       await windowConfiguration(driver,"UMS");
       await loginAdmin(driver, vars);
-      console.log("This message should be in BS");
+      await driver.executeScript('console.log("This message should be in BS");');
       await logout(driver);
     });
   } catch (error) {
