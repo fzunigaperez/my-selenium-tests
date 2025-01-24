@@ -6,7 +6,7 @@ module.exports = {
     'seleniumVersion': '4.21.0', // Asegúrate de usar una versión compatible
     'userName': process.env.BROWSERSTACK_USERNAME,
     'accessKey': process.env.BROWSERSTACK_ACCESS_KEY,
-    'idleTimeout': 300, // Establece el tiempo de espera a 300 segundos (5 minutos)
+    'idleTimeout': 90, // Establece el tiempo de espera a 300 segundos (5 minutos)
   },
   'browserName': 'Chrome',
   'browserVersion': 'latest',
