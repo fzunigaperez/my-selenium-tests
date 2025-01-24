@@ -6,19 +6,18 @@ module.exports = {
     'seleniumVersion': '4.21.0', // Asegúrate de usar una versión compatible
     'userName': process.env.BROWSERSTACK_USERNAME,
     'accessKey': process.env.BROWSERSTACK_ACCESS_KEY,
-    'idleTimeout': 90, // Establece el tiempo de espera a 300 segundos (5 minutos)
+    'idleTimeout': 90, // Tiempo de espera inactivo configurado a 90 segundos
+    'console': 'verbose', // Capturar todos los logs de la consola
+    'networkLogs': true, // Capturar logs de red
+    'debug': true, // Activar la grabación visual
   },
   'browserName': 'Chrome',
   'browserVersion': 'latest',
-  'browserstack.debug': true,      // Habilitar la grabación visual
-  'browserstack.console': 'verbose',  // Capturar logs de la consola del navegador
-  'browserstack.networkLogs': true, // Capturar logs de red
   'goog:chromeOptions': {
     prefs: {
-      'download.prompt_for_download': false,         // Deshabilitar los diálogos de descarga
-      'download.directory_upgrade': true,
-      'safebrowsing.enabled': true                   // Permitir descargas automáticas de archivos
+      'download.prompt_for_download': false, // Deshabilitar los diálogos de descarga
+      'download.directory_upgrade': true, // Permitir cambios automáticos en la carpeta de descarga
+      'safebrowsing.enabled': true, // Activar la protección contra contenido inseguro
     }
   }
 };
-
