@@ -11,7 +11,7 @@ module.exports = {
   'browserName': 'Chrome',
   'browserVersion': 'latest',
   'browserstack.debug': true,      // Habilitar la grabación visual
-  'browserstack.console': 'info',  // Capturar logs de la consola del navegador
+  'browserstack.console': 'verbose',  // Capturar logs de la consola del navegador
   'browserstack.networkLogs': true, // Capturar logs de red
   'goog:chromeOptions': {
     prefs: {
