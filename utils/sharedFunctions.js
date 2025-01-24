@@ -1200,7 +1200,7 @@ async function editBillingAccountButton(driver) {
 
 async function loginAsUnregisteredUserAndDeleteAccount(driver,vars) {
   
-  await windowConfiguration(driver, vars);
+  await windowConfiguration(driver, "UMS");
   await loginUnregisteredUser(driver,vars);
   await isTheOrganizationNameEmpty(driver, vars);
   await userMenu(driver);
