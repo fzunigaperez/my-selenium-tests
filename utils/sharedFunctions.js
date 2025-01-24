@@ -215,7 +215,7 @@ async function loginToProtonMail(driver,vars) {
     console.error("An error occurred:", err);
   }
   console.log("Waiting for Inbox to appear")
-  await driver.wait(until.elementLocated(By.xpath("//span[@class='text-ellipsis'][contains(.,'Inbox')]")), 30000);
+  await driver.wait(until.elementLocated(By.xpath("//span[@class='text-ellipsis'][contains(.,'Inbox')]")), 60000);
   console.log("Inbox to appeared we are indise of Proton Mail")
   
 
@@ -1512,7 +1512,7 @@ async function createOrganizationButton1(driver) {
     console.log("Deleting all emails...");
   
     // Wait until "Inbox" is located
-    await driver.wait(until.elementLocated(By.xpath("//span[contains(text(),'Inbox')]")), 30000);
+    await driver.wait(until.elementLocated(By.xpath("//span[contains(text(),'Inbox')]")), 60000);
   
     // Check if the "More" button exists
     const xpath = "//span[normalize-space()='More']";
