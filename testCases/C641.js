@@ -21,7 +21,7 @@ const {
 // Main test function for C641
 async function C641() {
   try {
-    await testBase('C641_C10090_Admin rights check / Users of other organization should not be visible if not Admin rights when switching organization', async (driver) => {
+    await testBase('C641_C1009_Admin rights check / Users of other organization should not be visible if not Admin rights when switching organization', async (driver) => {
       let vars = {}; // Initialize variables container
 
       

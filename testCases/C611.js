@@ -11,7 +11,7 @@ const { eliminateExtraOrganizationsAdmin,
   createOrganizationButton2,
   waitForXPathPresentTimeout,
   waitingLoadingRingProficloudToDissapear,
-  switchToExtraOrganizationAsAdmin,
+  switchToExtraOrganization,
   countElementsByXPath,
   inviteMember,
   loginToProtonMail,
@@ -62,7 +62,7 @@ async function C611() {
 
       //Inviting admin and editor to the new created organization / C626 Switch Organization
 
-      await switchToExtraOrganizationAsAdmin(driver);
+      await switchToExtraOrganization(driver,"Leave this Organization");
 
       await inviteMember(driver,"testingpxc@proton.me","Admin");
       await inviteMember(driver,"testingpxc_editor+1@proton.me","Editor");
