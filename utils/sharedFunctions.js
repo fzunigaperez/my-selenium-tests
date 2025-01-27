@@ -1981,7 +1981,62 @@ async function eliminateExtraOrganizationsEditor(driver) {
   
 
 
+/**
+ * Converts an ID or CSS selector to its equivalent XPath.
+ *
+ * @param {string} selector - The ID or CSS selector to convert.
+ * @param {string} type - The type of selector: "id" or "css".
+ * @returns {string} The equivalent XPath expression.
+ */
+function convertToXPath(selector, type) {
+  switch (type.toLowerCase()) {
+      case 'id':
+          return `//*[@id='${selector}']`; // ID to XPath
+      case 'css':
+          return cssToXPath(selector); // CSS to XPath
+      default:
+          throw new Error(`Unsupported selector type: ${type}`);
+  }
+}
 
+/**
+* Converts a CSS selector to its equivalent XPath.
+*
+* @param {string} css - The CSS selector to convert.
+* @returns {string} The equivalent XPath expression.
+*/
+function cssToXPath(css) {
+  let xpath = css.replace(/\./g, "[contains(@class,'");
+  xpath = xpath.replace(/(?=\[contains\(@class,'[^']*')/, "')");
+  xpath = xpath.replace(/\s+/g, "//");
+  xpath = xpath.replace(/>/g, "/");
+  xpath = xpath.replace(/\[([^\]]+)=([^\]]+)\]/g, "[@$1='$2']");
+  return `//${xpath}`;
+}
+
+/**
+* Master function to assert that an element is not present.
+*
+* @param {object} driver - The Selenium WebDriver instance.
+* @param {string} selector - The element selector (XPath, CSS, or ID).
+* @param {string} type - The type of selector: "xpath", "css", or "id".
+* @returns {Promise<void>} Resolves if the element is not present, otherwise throws an error.
+*/
+async function assertElementNotPresent(driver, selector, type = 'xpath') {
+  let xpath;
+
+  // If the selector is CSS or ID, convert it to XPath.
+  if (type.toLowerCase() === 'css' || type.toLowerCase() === 'id') {
+      xpath = convertToXPath(selector, type);
+  } else if (type.toLowerCase() === 'xpath') {
+      xpath = selector;
+  } else {
+      throw new Error(`Unsupported selector type: ${type}`);
+  }
+
+  // Use existing assertXpathNotPresent function with the generated XPath.
+  await assertXpathNotPresent(driver, xpath);
+}
 
 
   
