@@ -17,6 +17,7 @@ const {
   logout,
   sendMessageLogToBrowserStack,
   assertXpathNotPresent,
+  testEmpro3Name,
  
   
 } = require('../utils/sharedFunctions'); // Reusable shared functions
@@ -31,6 +32,7 @@ async function C734() {
       
       await windowConfiguration(driver,"UMS");
       await loginAdmin(driver, vars);
+      await testEmpro3Name(driver);
       await resetToOriginalUserNameInRoothOrganization(driver);
       await deviceManagementMenu(driver);
       

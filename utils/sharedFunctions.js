@@ -4,6 +4,8 @@ const axios = require('axios'); // Necessary to send test results
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
+const { allowedNodeEnvironmentFlags } = require('process');
+const { all } = require('axios');
 require('dotenv').config(); // Cargar variables de entorno
 
 //const C714 = require('../testCases/C714');  NEVER NEVER NEVER DECLARE HERE A TEST CASE otherwhise couses a lot of problems
@@ -1969,6 +1971,42 @@ async function eliminateExtraOrganizationsEditor(driver) {
     return elementCount;
   }
   
+async function testEmpro3Name(driver) {
+
+  editeName = await getTextByLocator(driver,"xpath","//div[@id='device-list-item-f8be7a9a-9212-4ad2-86ed-8fd383968e01']/app-device-item/div/flex-col[2]/flex-row-between-center/div") 
+  if (editeName === "empro 3") {
+    sendMessageLogToBrowserStack(driver,"The device has its original name");
+    
+
+  }
+  else
+  {
+    sendMessageLogToBrowserStack(driver,"The device has not its original name and thus has to be edited");
+    await clearAndWrite(driver,"id","mat-input-0","Testing Name");
+    await driver.wait(until.elementLocated(By.css("#f8be7a9a-9212-4ad2-86ed-8fd383968e01-more > .ng-star-inserted")), 30000).click();
+    await clearAndWrite(driver,"id","add-device-name","empro 3");
+    await saveChangesButton(driver);
+    await reloadPage(driver);
+
+
+  }
+}
+
+
+async function editDeviceButton(driver) {
+
+
+  await driver.wait(until.elementLocated(By.xpath("//div[normalize-space()='EDIT DEVICE']")), 30000).click();
+  
+}
+
+async function saveChangesButton(driver) {
+
+
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'save changes')]")), 30000).click();
+  
+}
+
 
 
   async function assertXpathNotPresent(driver, xpath) {
@@ -2089,14 +2127,15 @@ async function assertElementNotPresent(driver, type, selector) {
   }
 
   async function waitUntilXpathNotPresent(driver, xpathName) {
-    // Espera hasta que el elemento no esté presente
+    // Waits until the element is no longer present
     await driver.wait(async () => {
-      const elementCount = await countElementsByXPath(driver, xpathName); // Usa countElementsByXPath para contar los elementos
-      return elementCount === 0; // Si el número de elementos es 0, entonces no está presente
-    }, 15000); // Esperar hasta 15 segundos
+      const elementCount = await countElementsByXPath(driver, xpathName); // Uses countElementsByXPath to count the elements
+      return elementCount === 0; // If the number of elements is 0, it is no longer present
+    }, 15000); // Wait up to 15 seconds
   
-    console.log(`El elemento con XPath "${xpathName}" ya no está presente en la página.`);
+    console.log(`The element with XPath "${xpathName}" is no longer present on the page.`);
   }
+  
 
   async function waitingLoadingRingProficloudToDissapear(driver) {
 
@@ -3057,9 +3096,113 @@ async function waitForTitle(driver, expectedTitle, timeoutInSeconds = 600) {
   }
 }
 
+async function resetAssignedDevicesForEditorViewer(driver, role) {
+  console.log("Role: " + role);
+
+  // Check if the user 'rsylvester@phoenixcontact-sb.io' is open in the member list
+  const richardUserOpen = await countElementsByXPath(driver, "(//div[@class='member-list-content__value'][contains(.,'rsylvester@phoenixcontact-sb.io')])");
+  console.log(richardUserOpen);
+
+  if (richardUserOpen > 0) {
+    // Click on the 'rsylvester@phoenixcontact-sb.io' user if present
+    await driver.wait(until.elementLocated(By.xpath("//div[contains(text(),'rsylvester@phoenixcontact-sb.io')]")), 30000).click();
+  }
+
+  // Navigate based on the provided role
+  if (role === "editor") {
+    await driver.wait(until.elementLocated(By.xpath("//div[contains(text(),'Fernando Editor')]")), 30000).click();
+  } else if (role === "viewer") {
+    await driver.wait(until.elementLocated(By.xpath("//div[contains(text(),'Tester Viewer')]")), 30000).click();
+  }
+
+  // Open the device assignment section
+  await devicesByAssigment(driver);
+  await driver.sleep(1000);
+
+  // Check for assigned devices
+  const devicesAssigned1 = await countElementsByXPath(driver, "//div[@class='pc-table__item__column'][contains(.,'PH 1 Machine Park 1')]");
+  const devicesAssigned2 = await countElementsByXPath(driver, "//div[@class='pc-table__item__column'][contains(.,'PH 1 Machine Park 2')]");
+  const devicesAssigned3 = await countElementsByXPath(driver, "//div[@class='pc-table__item__column'][contains(.,'empro 3')]");
+
+  // If any devices are assigned, remove the assignments
+  if (devicesAssigned1 > 0 || devicesAssigned2 > 0 || devicesAssigned3 > 0) {
+    await assignDevicesButton(driver);
+
+    // Click the selection input twice to deselect all assigned devices
+    const selectionInput = By.id("rbac-assignment-selection-tall-input");
+    await driver.wait(until.elementLocated(selectionInput), 3000).click();
+    await driver.sleep(3000);
+    await driver.wait(until.elementLocated(selectionInput), 3000).click();
+
+    // Save the changes and wait for the process to finish
+    await saveAssigmentButton(driver);
+    await waitingLoadingRingProficloudToDissapear(driver);
+  }
+
+  // Re-select the user based on the role after resetting assignments
+  if (role === "editor") {
+    await driver.wait(until.elementLocated(By.xpath("//div[contains(text(),'Fernando Editor')]")), 30000).click();
+  } else if (role === "viewer") {
+    await driver.wait(until.elementLocated(By.xpath("//div[contains(text(),'Tester Viewer')]")), 30000).click();
+  }
+}
+
+
+async function assignDevicesForEditorViewer(driver, role) {
+  console.log("Role: " + role);
+
+  // Check if the user 'rsylvester@phoenixcontact-sb.io' is open in the member list
+  const richardUserOpen = await countElementsByXPath(driver, "(//div[@class='member-list-content__value'][contains(.,'rsylvester@phoenixcontact-sb.io')])");
+  console.log(richardUserOpen);
+
+    // Navigate based on the provided role
+    if (role === "editor") {
+      await driver.wait(until.elementLocated(By.xpath("//div[contains(text(),'Fernando Editor')]")), 30000).click();
+    } else if (role === "viewer") {
+      await driver.wait(until.elementLocated(By.xpath("//div[contains(text(),'Tester Viewer')]")), 30000).click();
+    }
+  
+    // Open the device assignment section
+    await devicesByAssigment(driver);
+    await assignDevicesButton(driver);
+    await driver.sleep(1000);
+    await driver.wait(until.elementLocated(By.xpath("//label[contains(.,'PH 1 Machine Park 1')]")), 30000).click();
+    await driver.wait(until.elementLocated(By.xpath("//label[contains(.,'PH 1 Machine Park 2')]")), 30000).click();
+    await driver.wait(until.elementLocated(By.xpath("//label[contains(.,'empro 3')]")), 30000).click();
+    await saveAssigmentButton(driver);
+    await waitingLoadingRingProficloudToDissapear(driver);
+
+    //Click on devices by editor
+
+    //await driver.wait(until.elementLocated(By.xpath("//div[2]/span[2]/span")), 30000).click();
+    await devicesByAssigment(driver);
+
+    await waitForXPathPresentTimeout(driver,"//div[normalize-space()='PH 1 Machine Park 1']",5000);
+    await waitForXPathPresentTimeout(driver,"//div[normalize-space()='PH 1 Machine Park 2']",5000);
+    await waitForXPathPresentTimeout(driver,"//div[normalize-space()='empro 3']",5000);
+
+    // Navigate based on the provided role
+    if (role === "editor") {
+      await driver.wait(until.elementLocated(By.xpath("//div[contains(text(),'Fernando Editor')]")), 30000).click();
+    } else if (role === "viewer") {
+      await driver.wait(until.elementLocated(By.xpath("//div[contains(text(),'Tester Viewer')]")), 30000).click();
+    }
 
 
 
+
+
+
+  
+
+}
+
+async function saveAssigmentButton(driver) {
+
+  await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'Save assignment')]")), 30000).click();
+  await waitForXPathPresentTimeout(driver,"//pc-list-item/div/div",5000);
+  
+}
 
 
 
@@ -3075,6 +3218,7 @@ module.exports = {
   assertElementNotPresent,
   assertText,
   assertXpathNotPresent,
+  assignDevicesForEditorViewer,
   assignDevicesButton,
   billingInformationTab,
   changeFrameAndClickonProficloudEmail,
@@ -3102,6 +3246,7 @@ module.exports = {
   deviceManagementMenu,
   downloadButton,
   editButton,
+  editDeviceButton,
   editBillingAccountButton,
   eliminateExtraOrganizationsEditor,
   eliminateExtraOrganizationsAdmin,
@@ -3148,6 +3293,7 @@ module.exports = {
   removeRegisteredUserNew,
   reports,
   reportActionsButton,
+  resetAssignedDevicesForEditorViewer,
   resetTOriginalNameOrganization,
   resetBillingAccountInformation,
   resetToOriginalUserNameInRoothOrganization,
@@ -3155,6 +3301,8 @@ module.exports = {
   roleSelectionDropDownMenu,
   roleSelectionField,
   roothOrganizationTest,
+  saveAssigmentButton,
+  saveChangesButton,
   saveProfileDataButton,
   scrollToElementByXPath,
   sendMessageLogToBrowserStack,
@@ -3170,6 +3318,7 @@ module.exports = {
   switchToExtraOrganization,
   switchToOriginalOrganization,
   switchToPxcOrganization,
+  testEmpro3Name,
   uploadFile,
   usersTab,
   unregisteredUserCredentials,

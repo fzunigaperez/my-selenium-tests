@@ -37,12 +37,19 @@ const C714 = require('./testCases/C714');
 // Organization General
 const C611 = require('./testCases/C611');
 const C911 = require('./testCases/C911');
-// Organozation Menu
+// Organization Menu
 const C700 = require('./testCases/C700');
 const C631 = require('./testCases/C631');
 const C630 = require('./testCases/C630');
 const C641 = require('./testCases/C641');
 const C725 = require('./testCases/C725');
+//RBAC
+const C734 = require('./testCases/C734');
+const C745 = require('./testCases/C745');
+
+
+
+
 
 
 
@@ -109,6 +116,9 @@ const projectsTests = {
   { name: 'C630_C639_C627_628_User organization information is displayed correctly / Go to User Management Button redirect the user to User Management Service / Organization information is displayed correctly / Organization subscriptions are displayed correctly', func: C630 },
   { name: 'C641_C1009_Admin rights check / Users of other organization should not be visible if not Admin rights when switching organization', func: C641 },
   { name: 'C725_C1023_Admin, Editor and Viewer can access to the store, but only admin role can book a service / Go to service button in service store redirects the user to User Management Service', func: C725 },
+  //RBAC
+  { name: 'C734_C751_C888_UUIDs & Names of Device Management and Assign devices to user have to be the same /  Admin cannot assign devices to another admin / Search bar in Assing devices work as intended', func: C734 },
+  { name: 'C745_C896_C925_Admins of an organization can assign / unassign devices to viewer and editor roles / Device persmission area by Invite Member, should be hidden in case the role ADMIN is selected  If the user open the window ASSIGN DEVICES and no other devices are added, then by clicking on SAVE ASSIGMENT does not lead to endless loading', func: C745 },
 
 
 
