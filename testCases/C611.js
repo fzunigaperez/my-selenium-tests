@@ -154,6 +154,7 @@ async function C611() {
       await logout(driver);
 
       await loginToProtonMail(driver,vars);
+      await waitForXPathPresentTimeout(driver,"//*[contains(text(),'You have been removed from the Proficloud.io organization Leave this Organization')]",60000)
       await clickFirstMail(driver);
       await waitForXPathPresentTimeout(driver,"//*[contains(text(),'You have been removed from the Proficloud.io organization Leave this Organization')]",10000);
       await deleteAllEmails(driver);
