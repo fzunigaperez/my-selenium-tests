@@ -2962,7 +2962,7 @@ async function waitForTitle(driver, expectedTitle, timeoutInSeconds = 600) {
 
 
 /**
- * Asserts that an element is not present on the page.
+ * Asserts that an element is not present on the page using findElements.
  *
  * @param {object} driver - Instance of the WebDriver.
  * @param {string} type - The type of selector: "css", "xpath", "id", "name", etc.
@@ -2990,21 +2990,15 @@ async function assertElementNotPresent(driver, type, selector) {
           throw new Error(`Unsupported selector type: ${type}`);
   }
 
-  try {
-    await driver.manage().setTimeouts({ implicit: 0 });
-      // Wait briefly to confirm the element's absence.
-      await driver.wait(until.elementLocated(locator), 1500);
-      throw new Error(`The element with selector '${selector}' (type: '${type}') is present on the page.`);
-  } catch (error) {
-      // If an error occurs while locating, it means the element is not present.
-      if (error.name === 'TimeoutError') {
-          console.log(`Success: The element with selector '${selector}' (type: '${type}') is not present.`);
-      } else {
-          throw error; // If it's another type of error, rethrow it.
-      }
-  }
-}
+  // Use findElements to check for the element's presence.
+  const elements = await driver.findElements(locator);
 
+  if (elements.length > 0) {
+      throw new Error(`The element with selector '${selector}' (type: '${type}') is present on the page.`);
+  }
+
+  console.log(`Success: The element with selector '${selector}' (type: '${type}') is not present.`);
+}
 
 
 
