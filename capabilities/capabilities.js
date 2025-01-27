@@ -2,7 +2,7 @@ module.exports = {
   'bstack:options': {
     'os': 'Windows',
     'osVersion': '10',
-    'local': 'false', // No habilitar BrowserStack Local
+    'local': 'true', // No habilitar BrowserStack Local
     'seleniumVersion': '4.21.0', // Versión compatible de Selenium
     'userName': process.env.BROWSERSTACK_USERNAME,
     'accessKey': process.env.BROWSERSTACK_ACCESS_KEY,
