@@ -6,17 +6,14 @@ const {
   loginAdmin,
   logout,
   loginEditor,
-  userMenu,
-  waitForXPathPresentTimeout,
-  switchToPxcOrganization,
-  switchToExtraOrganization,
-  accountSettingsMainMenu,
-  getTextByLocator,
-  usersTab,
+
   countElementsByXPath,
   serviceStoreMenu,
   waitForTitle,
   modalClose,
+  assertElementNotPresent,
+  loginViewer,
+  sendMessageLogToBrowserStack,
   
 } = require('../utils/sharedFunctions'); // Reusable shared functions
 
@@ -24,7 +21,7 @@ const {
 // Main test function for C725
 async function C725() {
   try {
-    await testBase('C725_Admin, Editor and Viewer can access to the store, but only admin role can book a service', async (driver) => {
+    await testBase('C725_C1023_Admin, Editor and Viewer can access to the store, but only admin role can book a service / Go to service button in service store redirects the user to User Management Service', async (driver) => {
       let vars = {}; // Initialize variables container
 
       
@@ -33,6 +30,7 @@ async function C725() {
       await serviceStoreMenu(driver);
 
       //C1023 Go to service button in service store redirects the user to User Management Service
+      await sendMessageLogToBrowserStack(driver,"C1023 Go to service button in service store redirects the user to User Management Service");
 
       await driver.wait(until.elementLocated(By.xpath("//flex-row-center[contains(.,'User Management Service')]")), 3000).click();
       await driver.wait(until.elementLocated(By.xpath("//button[@id='undefined']/span[2]/span")), 3000).click(); //Click on go to the service
@@ -48,7 +46,7 @@ async function C725() {
 
       if (planAlreadyBooked > 0 ) {
 
-        await driver.wait(until.elementLocated(By.xpath("(//flex-row-center[4]/pc-button/button/span[2]/div/span)[4]")), 10000).click();
+        await driver.wait(until.elementLocated(By.xpath("(//flex-row-center[4]/pc-button/button/span[2]/div/span)[1]")), 10000).click();
         
       }
       else{
@@ -59,80 +57,35 @@ async function C725() {
 
 
       await driver.wait(until.elementLocated(By.css(".pc-overlay__content")), 5000);
-      await driver.wait(until.elementLocated(By.id("termsCheck")), 3000).click();
+      await driver.wait(until.elementLocated(By.id("termsCheck")), 6000).click();
       await driver.wait(until.elementLocated(By.id("purchase-license")), 3000)
       await modalClose(driver);
       await logout(driver);
 
-      await windowConfiguration(driver,"UMS");
+     // await windowConfiguration(driver,"UMS");
       await loginEditor(driver, vars);
-
-
-
-
-
-      await driver.wait(until.elementLocated(By.id("termsCheck")), 3000).click();
-
-
-
-
-
-
-
-
-
-
-
-      await switchToExtraOrganization(driver,"No Devices Organization");
-      await userMenu(driver);
-      await accountSettingsMainMenu(driver);
-      await driver.wait(until.elementLocated(By.xpath("//span[@class='mdc-tab__text-label'][contains(.,'Organizations')]")), 3000).click();
-      await waitForXPathPresentTimeout(driver,"//td[contains(.,'1')]",5000);
-      await switchToPxcOrganization(driver);
-      await driver.sleep(2000); //Waiting time, since the loading of the righ number takes a bit
-      userNumber = await getTextByLocator(driver,"xpath","//tr[2]/td[2]");
+      await serviceStoreMenu(driver);
+      await driver.wait(until.elementLocated(By.xpath("//flex-row-center[contains(.,'Energy Management Service')]")), 3000).click();
+      await driver.sleep(1000);
       
-      console.log(userNumber);
-
-      if (userNumber > 1) {
-        console.log("Right user inforamtion is being displayed");
+     
+      await driver.wait(until.elementLocated(By.xpath("(//pc-button[contains(.,'book package')])[2]")), 3000).click();
         
-      }
+      await assertElementNotPresent(driver,"css",".pc-overlay__content");
+      await assertElementNotPresent(driver,"id","purchase-license");
+      await logout(driver);
 
-      else{
+
+      await loginViewer(driver, vars);
+      await serviceStoreMenu(driver);
+      await driver.wait(until.elementLocated(By.xpath("//flex-row-center[contains(.,'Energy Management Service')]")), 3000).click();
+      await driver.sleep(1000);
+      
+     
+      await driver.wait(until.elementLocated(By.xpath("(//pc-button[contains(.,'book package')])[2]")), 3000).click();
         
-        throw new Error(`Right user inforamtion is NOT being displayed`);
-      }
-
-      await usersTab(driver);
-      await waitForXPathPresentTimeout(driver,"//tr[2]//td[1]",5000); //We wait the user stable to be loaded
-      userNumberTable = await countElementsByXPath(driver,"//tr"); //We count the number of Xpath elements minus 1 since it is the table title.
-      if ((userNumberTable-1) == userNumber) { 
-
-        console.log("The user counting is right")
-        
-      }
-
-      else{
-        throw new Error(`The user counting is not right UserNumber:${userNumber} is different than userNumberTable:${userNumberTable-1}`);
-      }
-
-
-
-      await switchToExtraOrganization(driver,"No Devices Organization");
-      await waitForXPathPresentTimeout(driver,"//tr[2]//td[1]",5000); //We wait the user stable to be loaded
-      userNumberTable = await countElementsByXPath(driver,"//tr"); //We count the number of Xpath elements minus 1 since it is the table title.
-
-      if ((userNumberTable-1) == 1) {   //In case that this result is not equal to 1, means that other users are being displayed, and this should never happens
-
-        console.log("The user counting is right")
-        
-      }
-
-      else{
-        throw new Error(`More than 1 user is being displayed for this organization!!!!`);
-      }
-
+      await assertElementNotPresent(driver,"css",".pc-overlay__content");
+      await assertElementNotPresent(driver,"id","purchase-license");
       await logout(driver);
       
 

@@ -2097,17 +2097,8 @@ async function waitForXPathPresentTimeoutNoStop(driver, xpath, timeout) {
 
 async function sendMessageLogToBrowserStack(driver,message) {
 
-  await driver.executeScript(`
-    (function() {
-        const originalLog = console.log;
-        console.log = function(logMessage) {
-            originalLog(logMessage); // Mostrar en la consola local
-            document.body.setAttribute('log-output', logMessage); // Enviar a BrowserStack
-        };
-        console.log(\`${message}\`); // Enviar el mensaje especificado
-    })();
-  `);
-  console.log(message); // Includes also a message in the console
+  await driver.executeScript(`console.log("${message}")`);
+  console.log(`Mensaje enviado a BrowserStack: "${message}"`);
 }
 
 
@@ -2970,6 +2961,51 @@ async function waitForTitle(driver, expectedTitle, timeoutInSeconds = 600) {
 
 
 
+/**
+ * Asserts that an element is not present on the page.
+ *
+ * @param {object} driver - Instance of the WebDriver.
+ * @param {string} type - The type of selector: "css", "xpath", "id", "name", etc.
+ * @param {string} selector - The element identifier.
+ * @returns {Promise<void>} Throws an error if the element is present.
+ */
+async function assertElementNotPresent(driver, type, selector) {
+  let locator;
+
+  // Define the locator based on the provided selector type.
+  switch (type.toLowerCase()) {
+      case 'css':
+          locator = By.css(selector);
+          break;
+      case 'xpath':
+          locator = By.xpath(selector);
+          break;
+      case 'id':
+          locator = By.id(selector);
+          break;
+      case 'name':
+          locator = By.name(selector);
+          break;
+      default:
+          throw new Error(`Unsupported selector type: ${type}`);
+  }
+
+  try {
+      // Wait briefly to confirm the element's absence.
+      await driver.wait(until.elementLocated(locator), 1500);
+      throw new Error(`The element with selector '${selector}' (type: '${type}') is present on the page.`);
+  } catch (error) {
+      // If an error occurs while locating, it means the element is not present.
+      if (error.name === 'TimeoutError') {
+          console.log(`Success: The element with selector '${selector}' (type: '${type}') is not present.`);
+      } else {
+          throw error; // If it's another type of error, rethrow it.
+      }
+  }
+}
+
+
+
 
 
 module.exports = {
@@ -2981,6 +3017,7 @@ module.exports = {
   agreeTerms,
   arrowLeftSideMenu,
   arrowSortByButton,
+  assertElementNotPresent,
   assertText,
   assertXpathNotPresent,
   billingInformationTab,
