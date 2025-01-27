@@ -14,6 +14,7 @@ const {
   assertElementNotPresent,
   loginViewer,
   sendMessageLogToBrowserStack,
+  waitUntilXpathNotPresent,
   
 } = require('../utils/sharedFunctions'); // Reusable shared functions
 
@@ -57,6 +58,7 @@ async function C725() {
 
 
       await driver.wait(until.elementLocated(By.css(".pc-overlay__content")), 5000);
+      await driver.sleep(500);
       await driver.wait(until.elementLocated(By.id("termsCheck")), 6000).click();
       await driver.wait(until.elementLocated(By.id("purchase-license")), 3000)
       await modalClose(driver);
@@ -70,9 +72,9 @@ async function C725() {
       
      
       await driver.wait(until.elementLocated(By.xpath("(//pc-button[contains(.,'book package')])[2]")), 3000).click();
-        
-      await assertElementNotPresent(driver,"css",".pc-overlay__content");
-      await assertElementNotPresent(driver,"id","purchase-license");
+      await waitUntilXpathNotPresent(driver,'.//*[contains(concat(" ",normalize-space(@class)," ")," pc-overlay__content ")]');
+      await waitUntilXpathNotPresent(driver,"//*[@id='purchase-license']");
+
       await logout(driver);
 
 
@@ -84,8 +86,10 @@ async function C725() {
      
       await driver.wait(until.elementLocated(By.xpath("(//pc-button[contains(.,'book package')])[2]")), 3000).click();
         
-      await assertElementNotPresent(driver,"css",".pc-overlay__content");
-      await assertElementNotPresent(driver,"id","purchase-license");
+      await waitUntilXpathNotPresent(driver,'.//*[contains(concat(" ",normalize-space(@class)," ")," pc-overlay__content ")]');
+      await waitUntilXpathNotPresent(driver,"//*[@id='purchase-license']");
+
+
       await logout(driver);
       
 

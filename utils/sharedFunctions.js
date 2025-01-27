@@ -1982,50 +1982,82 @@ async function eliminateExtraOrganizationsEditor(driver) {
 
 
 /**
- * Converts an ID or CSS selector to its equivalent XPath.
+ * Converts a CSS selector to its equivalent XPath.
  *
- * @param {string} selector - The ID or CSS selector to convert.
- * @param {string} type - The type of selector: "id" or "css".
+ * @param {string} css - The CSS selector to convert.
  * @returns {string} The equivalent XPath expression.
  */
+/**
+ * Converts a CSS selector to its equivalent XPath.
+ *
+ * @param {string} css - The CSS selector to convert.
+ * @returns {string} The equivalent XPath expression.
+ */
+function cssToXPath(css) {
+  if (!css) {
+      throw new Error("The CSS selector cannot be empty.");
+  }
+
+  let xpath = css
+      // Replace class selectors (.class-name) with [contains(concat(" ", normalize-space(@class), " "), " class-name ")]
+      .replace(/\.(\w+)/g, '//*[contains(concat(" ", normalize-space(@class), " "), " $1 ")]')
+      // Replace ID selectors (#id) with [@id='id']
+      .replace(/#(\w+)/g, "//*[@id='$1']")
+      // Replace attribute selectors ([attr=value])
+      .replace(/\[([\w-]+)([*^$~|]?=)["']?([^\]"']+)["']?\]/g, (match, attr, operator, value) => {
+          switch (operator) {
+              case "=": return `//*[@${attr}='${value}']`;
+              case "*=": return `//*[contains(@${attr}, '${value}')]`;
+              case "^=": return `//*[starts-with(@${attr}, '${value}')]`;
+              case "$=": return `//*[substring(@${attr}, string-length(@${attr}) - string-length('${value}') + 1) = '${value}']`;
+              case "~=": return `//*[contains(concat(" ", @${attr}, " "), " ${value} ")]`;
+              case "|=": return `//*[starts-with(concat(@${attr}, '-'), '${value}-')]`;
+              default: return `//*[@${attr}]`;
+          }
+      })
+      // Replace descendant combinators (space) with //
+      .replace(/\s+/g, "//")
+      // Replace child combinators (>) with /
+      .replace(/>/g, "/");
+
+  // Ensure XPath starts with .
+  if (!xpath.startsWith(".")) {
+      xpath = `.${xpath}`;
+  }
+
+  return xpath;
+}
+
+/**
+* Converts an ID or CSS selector to its equivalent XPath.
+*
+* @param {string} selector - The ID or CSS selector to convert.
+* @param {string} type - The type of selector: "id" or "css".
+* @returns {string} The equivalent XPath expression.
+*/
 function convertToXPath(selector, type) {
   switch (type.toLowerCase()) {
       case 'id':
-          return `//*[@id='${selector}']`; // ID to XPath
+          return `//*[@id='${selector}']`; // Convert ID to XPath
       case 'css':
-          return cssToXPath(selector); // CSS to XPath
+          return cssToXPath(selector); // Convert CSS to XPath
       default:
           throw new Error(`Unsupported selector type: ${type}`);
   }
 }
 
 /**
-* Converts a CSS selector to its equivalent XPath.
-*
-* @param {string} css - The CSS selector to convert.
-* @returns {string} The equivalent XPath expression.
-*/
-function cssToXPath(css) {
-  let xpath = css.replace(/\./g, "[contains(@class,'");
-  xpath = xpath.replace(/(?=\[contains\(@class,'[^']*')/, "')");
-  xpath = xpath.replace(/\s+/g, "//");
-  xpath = xpath.replace(/>/g, "/");
-  xpath = xpath.replace(/\[([^\]]+)=([^\]]+)\]/g, "[@$1='$2']");
-  return `//${xpath}`;
-}
-
-/**
 * Master function to assert that an element is not present.
 *
 * @param {object} driver - The Selenium WebDriver instance.
-* @param {string} selector - The element selector (XPath, CSS, or ID).
 * @param {string} type - The type of selector: "xpath", "css", or "id".
+* @param {string} selector - The element selector.
 * @returns {Promise<void>} Resolves if the element is not present, otherwise throws an error.
 */
-async function assertElementNotPresent(driver, selector, type = 'xpath') {
+async function assertElementNotPresent(driver, type, selector) {
   let xpath;
 
-  // If the selector is CSS or ID, convert it to XPath.
+  // Convert selector if it is CSS or ID, otherwise use XPath directly.
   if (type.toLowerCase() === 'css' || type.toLowerCase() === 'id') {
       xpath = convertToXPath(selector, type);
   } else if (type.toLowerCase() === 'xpath') {
@@ -2034,10 +2066,9 @@ async function assertElementNotPresent(driver, selector, type = 'xpath') {
       throw new Error(`Unsupported selector type: ${type}`);
   }
 
-  // Use existing assertXpathNotPresent function with the generated XPath.
+  // Use the existing assertXpathNotPresent function with the generated XPath.
   await assertXpathNotPresent(driver, xpath);
 }
-
 
   
 
@@ -3016,44 +3047,6 @@ async function waitForTitle(driver, expectedTitle, timeoutInSeconds = 600) {
 
 
 
-/**
- * Asserts that an element is not present on the page using findElements.
- *
- * @param {object} driver - Instance of the WebDriver.
- * @param {string} type - The type of selector: "css", "xpath", "id", "name", etc.
- * @param {string} selector - The element identifier.
- * @returns {Promise<void>} Throws an error if the element is present.
- */
-async function assertElementNotPresent(driver, type, selector) {
-  let locator;
-
-  // Define the locator based on the provided selector type.
-  switch (type.toLowerCase()) {
-      case 'css':
-          locator = By.css(selector);
-          break;
-      case 'xpath':
-          locator = By.xpath(selector);
-          break;
-      case 'id':
-          locator = By.id(selector);
-          break;
-      case 'name':
-          locator = By.name(selector);
-          break;
-      default:
-          throw new Error(`Unsupported selector type: ${type}`);
-  }
-
-  // Use findElements to check for the element's presence.
-  const elements = await driver.findElements(locator);
-
-  if (elements.length > 0) {
-      throw new Error(`The element with selector '${selector}' (type: '${type}') is present on the page.`);
-  }
-
-  console.log(`Success: The element with selector '${selector}' (type: '${type}') is not present.`);
-}
 
 
 
