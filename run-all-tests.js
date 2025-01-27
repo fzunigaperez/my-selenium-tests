@@ -42,6 +42,7 @@ const C700 = require('./testCases/C700');
 const C631 = require('./testCases/C631');
 const C630 = require('./testCases/C630');
 const C641 = require('./testCases/C641');
+const C725 = require('./testCases/C725');
 
 
 
@@ -107,6 +108,7 @@ const projectsTests = {
   { name: 'C631_C702_C703_Rename organization as admin / Rename organization for EDITOR / VIEWER is not allowed', func: C631 },
   { name: 'C630_C639_C627_628_User organization information is displayed correctly / Go to User Management Button redirect the user to User Management Service / Organization information is displayed correctly / Organization subscriptions are displayed correctly', func: C630 },
   { name: 'C641_C1009_Admin rights check / Users of other organization should not be visible if not Admin rights when switching organization', func: C641 },
+  { name: 'C725_C1023_Admin, Editor and Viewer can access to the store, but only admin role can book a service / Go to service button in service store redirects the user to User Management Service', func: C725 },
 
 
 

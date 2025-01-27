@@ -99,6 +99,12 @@ async function subscriptionsTab(driver) {
   
 }
 
+async function assignDevicesButton(driver) {
+
+  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Assign Devices')]")), 30000).click();
+  
+}
+
 
 async function waitForUsersToLoad(driver) {
 
@@ -2259,6 +2265,12 @@ async function deviceManagementMenu(driver) {
 }
 
 
+async function devicesByAssigment(driver) {
+
+  await driver.wait(until.elementLocated(By.xpath("//span[@class='mdc-tab__text-label'][contains(.,'Devices')]")), 30000).click();
+  
+}
+
 
 async function userManagementMenu(driver) {
 
@@ -3063,6 +3075,7 @@ module.exports = {
   assertElementNotPresent,
   assertText,
   assertXpathNotPresent,
+  assignDevicesButton,
   billingInformationTab,
   changeFrameAndClickonProficloudEmail,
   changeInformationButton,
@@ -3085,6 +3098,7 @@ module.exports = {
   deleteManualReports,
   deleteRecurringReports,
   deleteUnregisteredUserInCaseOfExistence,
+  devicesByAssigment,
   deviceManagementMenu,
   downloadButton,
   editButton,
