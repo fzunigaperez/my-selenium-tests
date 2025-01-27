@@ -2095,7 +2095,20 @@ async function waitForXPathPresentTimeoutNoStop(driver, xpath, timeout) {
   //return false; // The element was not found within the defined time
 }
 
+async function sendMessageLogToBrowserStack(driver,message) {
 
+  await driver.executeScript(`
+    (function() {
+        const originalLog = console.log;
+        console.log = function(logMessage) {
+            originalLog(logMessage); // Mostrar en la consola local
+            document.body.setAttribute('log-output', logMessage); // Enviar a BrowserStack
+        };
+        console.log(\`${message}\`); // Enviar el mensaje especificado
+    })();
+  `);
+  console.log(message); // Includes also a message in the console
+}
 
 
 /**
@@ -3050,6 +3063,7 @@ module.exports = {
   roothOrganizationTest,
   saveProfileDataButton,
   scrollToElementByXPath,
+  sendMessageLogToBrowserStack,
   sendResultToTestRail,
   serviceStoreMenu,
   settings,

@@ -24,7 +24,8 @@ const {
   logout,
   handleBlobReportDownloadBs,
   modalClose,
-  getTextByLocator
+  getTextByLocator,
+  sendMessageLogToBrowserStack
 } = require('../utils/sharedFunctions'); // Reusable shared functions
 
 // Main test function for C620
@@ -138,7 +139,8 @@ async function C620() {
       const ocrStatus = await getTextByLocator(driver, "xpath", './/*[contains(concat(" ",normalize-space(@class)," ")," systems ")][(count(preceding-sibling::*)+1) = 3]//tr[(count(preceding-sibling::*)+1) = 1]/*[contains(concat(" ",normalize-space(@class)," ")," tb_b_right ")][(count(preceding-sibling::*)+1) = 3]');
 
       if (ocrStatus === "UP") {
-        console.log("The OCR service is available, the text can proceed for OCR identification.");
+        await sendMessageLogToBrowserStack(driver,"The OCR service is available, the text can proceed for OCR identification.");
+       // console.log("The OCR service is available, the text can proceed for OCR identification.");
 
         await driver.get("https://ocr.space/");
         await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Free Online OCR - Convert images and PDF to text (Powered by the OCR API)')]")), 30000);
