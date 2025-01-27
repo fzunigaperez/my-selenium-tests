@@ -36,12 +36,12 @@ async function C620() {
       // Downloading the report header to use later in reports
       await driver.get("https://drive.proton.me/urls/JYFCSERXA8#NjpWqhWe0J8q");
       await driver.wait(until.elementLocated(By.xpath("//button[@data-testid='scan-download-button']")), 30000).click();
-      await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Download finished') or contains(.,'Download abgeschlossen') ]")), 30000);
-
+      await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Download finished') or contains(.,'Download abgeschlossen') ]")), 60000);
+      await windowConfiguration(driver,"EMMA");
       // Downloading the report logo to use later in reports
       await driver.get("https://drive.proton.me/urls/Z4RYVB8HG8#4gJvRmcoqgN1");
       await driver.wait(until.elementLocated(By.xpath("//button[@data-testid='scan-download-button']")), 30000).click();
-      await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Download finished') or contains(.,'Download abgeschlossen') ]")), 30000);
+      await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Download finished') or contains(.,'Download abgeschlossen') ]")), 60000);
 
       await windowConfiguration(driver, "EMMA");
       await loginAdmin(driver, vars);
