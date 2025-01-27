@@ -429,8 +429,8 @@ async function acceptCookies(driver) {
     const acceptButtonXPath = "//button[@id='ga-opt-out-false']";
 
     // Wait up to 3 seconds for the cookies banner to appear
-    const timeout = 3000; // 3 seconds in milliseconds
-    const interval = 500; // 500 ms check interval
+    const timeout = 2000; // 2 seconds in milliseconds
+    const interval = 100; // 100 ms check interval
     let bannerFound = false;
     const startTime = Date.now();
 
