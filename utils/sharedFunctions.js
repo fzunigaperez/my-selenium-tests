@@ -2991,6 +2991,7 @@ async function assertElementNotPresent(driver, type, selector) {
   }
 
   try {
+    await driver.manage().setTimeouts({ implicit: 0 });
       // Wait briefly to confirm the element's absence.
       await driver.wait(until.elementLocated(locator), 1500);
       throw new Error(`The element with selector '${selector}' (type: '${type}') is present on the page.`);
