@@ -40,7 +40,7 @@ async function C725() {
 
       await serviceStoreMenu(driver);
       await driver.wait(until.elementLocated(By.xpath("//flex-row-center[contains(.,'Energy Management Service')]")), 3000).click();
-      await driver.sleep(1000);
+      await driver.sleep(2000);
       planAlreadyBooked = await countElementsByXPath(driver,"//*[contains(text(),'your plan')]");
 
       //This is case one ore more packages have been booked
