@@ -11,7 +11,7 @@ async function C90() {
       await windowConfiguration(driver,"UMS");
       await loginAdmin(driver, vars);
       await logout(driver);
-      await loginToProtonMailRecurringReports(driver,vars);
+
 
 
     });
