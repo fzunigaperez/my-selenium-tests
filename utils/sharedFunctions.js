@@ -966,7 +966,9 @@ async function resetTOriginalNameOrganization(driver) {
   if (resetOrganizationName !== 'Change Orga Name') {
       await activeOrganization(driver);
       await settings(driver);
-      await driver.wait(until.elementLocated(By.css("#settings-organization-settings-icon-245afd95-c3fb-442e-b27e-07238babc5d8 > .ng-star-inserted .ng-star-inserted")), 3000).click();
+      await driver.wait(until.elementLocated(By.css(".expandable-organization__subtitle")), 5000).click();
+      orgaID = await getTextByLocator(driver,"css",".expandable-organization__subtitle");
+      await driver.wait(until.elementLocated(By.xpath(`//app-icon[@id='settings-organization-settings-icon-${orgaID}']//*[name()='svg']`)), 3000).click();
       await renameOrganizationButton1(driver);
       await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'Organization Name')]")), 3000).click();
       await clearAndWrite(driver,"xpath","//input[@placeholder='Organization Name']","Rooth Organization");
