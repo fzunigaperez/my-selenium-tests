@@ -21,6 +21,7 @@ const {
   loginEditor,
   loginViewer,
   waitingLoadingRingProficloudToDissapear,
+  waitUntilXpathNotPresent,
   
 } = require('../utils/sharedFunctions'); // Reusable shared functions
 
@@ -28,7 +29,7 @@ const {
 // Main test function for C745
 async function C745() {
   try {
-    await testBase('C745_C896_C925_Admins of an organization can assign / unassign devices to viewer and editor roles / Device persmission area by Invite Member, should be hidden in case the role ADMIN is selected  If the user open the window ASSIGN DEVICES and no other devices are added, then by clicking on SAVE ASSIGMENT does not lead to endless loading', async (driver) => {
+    await testBase('C745_C896_C925_C746_Admins of an organization can assign / unassign devices to viewer and editor roles / Device persmission area by Invite Member, should be hidden in case the role ADMIN is selected  If the user open the window ASSIGN DEVICES and no other devices are added, then by clicking on SAVE ASSIGMENT does not lead to endless loading / Viewers and editors are not allowed to assign devices to other roles', async (driver) => {
       let vars = {}; // Initialize variables container
 
       
@@ -65,6 +66,9 @@ async function C745() {
       await waitForXPathPresentTimeout(driver,"//div[contains(text(),'PH 1 Machine Park 1')]",10000);
       await waitForXPathPresentTimeout(driver,"//div[contains(text(),'PH 1 Machine Park 2')]",10000);
       await waitForXPathPresentTimeout(driver,"//div[contains(text(),'empro 3')]",10000);
+
+      await sendMessageLogToBrowserStack(driver,"C746 Viewers and editors are not allowed to assign devices to other roles");
+      await waitUntilXpathNotPresent(driver,"//span[contains(.,'User Management')]");
       await logout(driver);
 
       //Verify the assigned devices for viewer
@@ -73,6 +77,9 @@ async function C745() {
       await waitForXPathPresentTimeout(driver,"//div[contains(text(),'PH 1 Machine Park 1')]",10000);
       await waitForXPathPresentTimeout(driver,"//div[contains(text(),'PH 1 Machine Park 2')]",10000);
       await waitForXPathPresentTimeout(driver,"//div[contains(text(),'empro 3')]",10000);
+
+      await sendMessageLogToBrowserStack(driver,"C746 Viewers and editors are not allowed to assign devices to other roles");
+      await waitUntilXpathNotPresent(driver,"//span[contains(.,'User Management')]");
       await logout(driver);
 
 

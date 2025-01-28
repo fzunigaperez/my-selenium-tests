@@ -1,6 +1,6 @@
 const { Builder, By, until } = require('selenium-webdriver');  // Localrun 
 const testBase = require('./testBase');  //Common
-const { windowConfiguration, loginAdmin, logout, loginToProtonMail, forceFailStatus, } = require('../utils/sharedFunctions');// BS.
+const { windowConfiguration, loginAdmin, logout,  } = require('../utils/sharedFunctions');// BS.
 
 
 async function C90() {
@@ -10,8 +10,8 @@ async function C90() {
             
       await windowConfiguration(driver,"UMS");
       await loginAdmin(driver, vars);
-      await driver.executeScript('console.log("This message should be in BS");');
       await logout(driver);
+      
     });
   } catch (error) {
     throw new Error(`C90 failed: ${error.message}`);

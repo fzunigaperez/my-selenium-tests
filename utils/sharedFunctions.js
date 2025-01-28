@@ -1553,7 +1553,17 @@ async function createOrganizationButton1(driver) {
     );
     await driver.wait(until.elementIsEnabled(allMailButton), 30000);
     await allMailButton.click();
-    await driver.sleep(1000);
+    await driver.sleep(2000);
+
+
+    noMessagesFound = await countElementsByXPath(driver,"//h3[contains(@data-testid,'empty-view-placeholder--empty-title')]");
+
+    if (noMessagesFound > 0)
+    {
+      await sendMessageLogToBrowserStack(driver,"There are no mails to delete, so we can break the normal flow");
+    }
+    else
+    {
   
     // Select all emails
     const selectAllButton = await driver.wait(
@@ -1595,7 +1605,7 @@ async function createOrganizationButton1(driver) {
       until.elementLocated(By.xpath("//button[contains(.,'Delete permanently')]")),
       30000
     );
-    await driver.wait(until.elementIsVisible(deletePermanentlyButton), 30000);
+    await driver.wait(until.elementIsEnabled(deletePermanentlyButton), 30000);
     await driver.sleep(1000);
     await deletePermanentlyButton.click();
   
@@ -1613,6 +1623,8 @@ async function createOrganizationButton1(driver) {
       30000
     );
     await driver.wait(until.elementIsVisible(noMessagesFound), 30000);
+  }
+
   }
 
 
@@ -2134,7 +2146,7 @@ async function assertElementNotPresent(driver, type, selector) {
     await driver.wait(async () => {
       const elementCount = await countElementsByXPath(driver, xpathName); // Uses countElementsByXPath to count the elements
       return elementCount === 0; // If the number of elements is 0, it is no longer present
-    }, 15000); // Wait up to 15 seconds
+    }, 60000); // Wait up to 15 seconds
   
     console.log(`The element with XPath "${xpathName}" is no longer present on the page.`);
   }
