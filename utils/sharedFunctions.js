@@ -12,35 +12,36 @@ require('dotenv').config(); // Cargar variables de entorno
 
 
 /**
- * Configura la ventana del navegador y navega al entorno adecuado.
- * @param {WebDriver} driver - Instancia del controlador de Selenium WebDriver.
- * @param {string} service - El servicio para el que se configurará el entorno (EMMA, UMS, etc.).
+ * Configures the browser window and navigates to the appropriate environment.
+ * @param {WebDriver} driver - Instance of the Selenium WebDriver.
+ * @param {string} service - The service for which the environment will be configured (EMMA, UMS, etc.).
  */
 async function windowConfiguration(driver, service = 'TEST_ENV') {
-  // Mapear los servicios a sus variables de entorno
+  // Map the services to their environment variables
   const serviceEnvs = {
     EMMA: process.env.EMMA_ENV || 'STG', // Default STG
     UMS: process.env.UMS_ENV || 'PROD', // Default PROD
     TEST_ENV: process.env.TEST_ENV || 'STG', // Default general
   };
 
-  // Seleccionar el entorno según el servicio
+  // Select the environment based on the service
   const serviceEnv = serviceEnvs[service] || serviceEnvs.TEST_ENV;
 
-  // URLs por entorno
+  // URLs by environment
   const urls = {
     PROD: process.env.PROD_URL,
     STG: process.env.STG_URL,
     DEV: process.env.DEV_URL,
   };
 
-  const targetUrl = urls[serviceEnv] || urls.PROD; // Default PROD si no coincide nada
+  const targetUrl = urls[serviceEnv] || urls.PROD; // Default PROD if nothing matches
   console.log(`🌍 Executing in the environment: ${serviceEnv} (${targetUrl}) for service: ${service}`);
 
-  // Navegar al URL y maximizar la ventana
+  // Navigate to the URL and maximize the window
   await driver.get(targetUrl);
   await driver.manage().window().maximize();
 }
+
 
 // Function to create a Test Run in TestRail
 async function createTestRun(projectId, testRunName, testCaseIds = []) {
