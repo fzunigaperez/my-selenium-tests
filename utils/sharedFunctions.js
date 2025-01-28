@@ -1553,6 +1553,7 @@ async function createOrganizationButton1(driver) {
     );
     await driver.wait(until.elementIsEnabled(allMailButton), 30000);
     await allMailButton.click();
+    await driver.sleep(1000);
   
     // Select all emails
     const selectAllButton = await driver.wait(
@@ -1562,6 +1563,7 @@ async function createOrganizationButton1(driver) {
     await driver.sleep(2000);
     await driver.wait(until.elementIsEnabled(selectAllButton), 30000);
     await selectAllButton.click();
+    await driver.sleep(1000);
   
     // Move to trash
     const moveToTrashButton = await driver.wait(
@@ -1593,7 +1595,8 @@ async function createOrganizationButton1(driver) {
       until.elementLocated(By.xpath("//button[contains(.,'Delete permanently')]")),
       30000
     );
-    await driver.wait(until.elementIsEnabled(deletePermanentlyButton), 30000);
+    await driver.wait(until.elementIsVisible(deletePermanentlyButton), 30000);
+    await driver.sleep(1000);
     await deletePermanentlyButton.click();
   
     // Confirm deletion
