@@ -53,8 +53,16 @@ async function C624() {
 
 
       await clearAndWrite(driver,"xpath","//input","Viewer");
+
+      if (serviceEnv ==='DEV') {
       await driver.wait(until.elementLocated(By.xpath("//*[@ng-reflect-name='more']")), 30000).click();
-      await driver.sleep(1000);
+      }
+      else{
+
+        await driver.wait(until.elementLocated(By.xpath("/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-user-management[1]/div[1]/app-members[1]/flex-col[1]/flex-col[1]/div[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/div[1]/pc-list-item[1]/div[1]/div[1]/div[4]/app-icon[1]/*[name()='svg'][1]")), 30000).click();
+      }
+      
+      await driver.sleep(2000);
       await driver.wait(until.elementLocated(By.xpath("//div[contains(text(),'change role')]")), 30000).click();
       await roleSelectionField(driver);
       await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Editor')]")), 30000).click();

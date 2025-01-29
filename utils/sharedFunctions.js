@@ -2595,7 +2595,7 @@ async function removeOldMemberInvitationsRoothOrga (driver) {
         // Check for any extra members in the organization
         let extraMember = await countElementsByXPath(
           driver,
-          "(//*[@ng-reflect-name='more'])[5]"
+          "/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-user-management[1]/div[1]/app-members[1]/flex-col[1]/flex-col[1]/div[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/div[5]/pc-list-item[1]/div[1]/div[1]/div[4]/app-icon[1]/*[name()='svg'][1]"
         );
         console.log('Extra member in the organization found?:', extraMember);
 
@@ -2630,7 +2630,7 @@ async function removeOldMemberInvitationsRoothOrga (driver) {
             await driver.wait(
               until.elementLocated(
                 By.xpath(
-                  "(//*[@ng-reflect-name='more'])[5]"
+                  "/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-user-management[1]/div[1]/app-members[1]/flex-col[1]/flex-col[1]/div[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/div[5]/pc-list-item[1]/div[1]/div[1]/div[4]/app-icon[1]/*[name()='svg'][1]"
                 )
               ),
               30000
@@ -2652,7 +2652,7 @@ async function removeOldMemberInvitationsRoothOrga (driver) {
           // Recheck if the extra member still exists
           extraMember = await countElementsByXPath(
             driver,
-            "(//*[@ng-reflect-name='more'])[5]"
+            "/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-user-management[1]/div[1]/app-members[1]/flex-col[1]/flex-col[1]/div[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/div[5]/pc-list-item[1]/div[1]/div[1]/div[4]/app-icon[1]/*[name()='svg'][1]"
           );
           console.log('Extra member in the organization found?:', extraMember);
 
