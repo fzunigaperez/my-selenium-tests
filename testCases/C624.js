@@ -13,6 +13,7 @@ const {
   arrowSortByButton,
   lastNameButton,
   removeOldMemberInvitationsRoothOrga,
+  removeOldMemberInvitationsRoothOrgaDev,
   roleSelectionField,
   assertText,
   loginToProtonMail,
@@ -20,6 +21,9 @@ const {
   logOutFromProtonMail,
   waitForXPathPresentTimeout,
   waitingLoadingRingProficloudToDissapear,
+  clearAndWrite,
+  deviceManagementMenu,
+  waitForUsersToLoad,
 
 } = require('../utils/sharedFunctions'); // Importación de funciones reutilizables
 
@@ -27,27 +31,50 @@ async function C624() {
   try {
     await testBase('C624_C677_Sorting users by first name, last name, email, invited, role. / ADMIN can access to USER MANAGEMENT', async (driver) => {
       let vars = {};
-      await windowConfiguration(driver,"UMS");
+      const serviceEnv = await windowConfiguration(driver,"UMS"); //This line is necessary for the flow in the program to know what to do depending on PROD or DEV
       await loginAdmin(driver, vars);
       await resetToOriginalUserNameInRoothOrganization(driver);
       //C667 ADMIN can access to USER MANAGEMENT
 
       await userManagementMenu(driver);
-      await removeOldMemberInvitationsRoothOrga(driver);
+      if (serviceEnv ==='DEV') {
+        await removeOldMemberInvitationsRoothOrgaDev(driver);  
+      }
+      else{
+        await removeOldMemberInvitationsRoothOrga(driver);
+      }
+
+      
       await arrowSortByButton(driver);
       await lastNameButton(driver);
       await viewerRoleReset(driver);
       
-      //Click on the hamburger menu from viewer 
-      await driver.wait(until.elementLocated(By.xpath("/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-user-management[1]/div[1]/app-members[1]/flex-col[1]/flex-col[1]/div[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/div[4]/pc-list-item[1]/div[1]/div[1]/div[4]/app-icon[1]/*[name()='svg'][1]")), 30000).click();
+      //Click on the hamburger menu from viewer
+
+
+      await clearAndWrite(driver,"xpath","//input","Viewer");
+      await driver.wait(until.elementLocated(By.xpath("//*[@ng-reflect-name='more']")), 30000).click();
       await driver.sleep(1000);
       await driver.wait(until.elementLocated(By.xpath("//div[contains(text(),'change role')]")), 30000).click();
       await roleSelectionField(driver);
       await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Editor')]")), 30000).click();
       await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Apply role')]")), 30000).click();
       await waitingLoadingRingProficloudToDissapear(driver);
-      await waitForXPathPresentTimeout(driver,"//div[@data-analytics='list-item- rsylvester@phoenixcontact-sb.io']",10000);
+
+      await driver.findElement(By.xpath("//input")).clear();
+        await deviceManagementMenu(driver);
+        await userManagementMenu(driver);
+        await waitForUsersToLoad(driver);
+
+      
+      await waitForXPathPresentTimeout(driver,"//*[contains(text(),'testingpxc_admin@proton.me')]",10000);
+      if (serviceEnv ==='DEV') {
+        await assertText(driver,"xpath","//div[@id='outlet']/app-user-management/div/app-members/flex-col/flex-col/div/ng-scrollbar/div/div/div/div/div[5]/pc-list-item/div/div/div[3]/div[2]","Editor");
+      }
+      else{
       await assertText(driver,"xpath","//div[@id='outlet']/app-user-management/div/app-members/flex-col/flex-col/div/ng-scrollbar/div/div/div/div/div[4]/pc-list-item/div/div/div[3]/div[2]","Editor");
+      }
+
       await viewerRoleReset(driver);
       await logout(driver);
       await loginToProtonMail(driver,vars);

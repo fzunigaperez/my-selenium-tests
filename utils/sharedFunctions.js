@@ -20,7 +20,7 @@ async function windowConfiguration(driver, service = 'TEST_ENV') {
   // Map the services to their environment variables
   const serviceEnvs = {
     EMMA: process.env.EMMA_ENV || 'STG', // Default STG
-    UMS: process.env.UMS_ENV || 'PROD', // Default PROD
+    UMS: process.env.UMS_ENV || 'DEV', // Default PROD
     TEST_ENV: process.env.TEST_ENV || 'STG', // Default general
   };
 
@@ -40,6 +40,8 @@ async function windowConfiguration(driver, service = 'TEST_ENV') {
   // Navigate to the URL and maximize the window
   await driver.get(targetUrl);
   await driver.manage().window().maximize();
+
+  return serviceEnv;  // 🔥 
 }
 
 
@@ -2593,7 +2595,7 @@ async function removeOldMemberInvitationsRoothOrga (driver) {
         // Check for any extra members in the organization
         let extraMember = await countElementsByXPath(
           driver,
-          "/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-user-management[1]/div[1]/app-members[1]/flex-col[1]/flex-col[1]/div[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/div[5]/pc-list-item[1]/div[1]/div[1]/div[4]/app-icon[1]/*[name()='svg'][1]"
+          "(//*[@ng-reflect-name='more'])[5]"
         );
         console.log('Extra member in the organization found?:', extraMember);
 
@@ -2628,7 +2630,7 @@ async function removeOldMemberInvitationsRoothOrga (driver) {
             await driver.wait(
               until.elementLocated(
                 By.xpath(
-                  "/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-user-management[1]/div[1]/app-members[1]/flex-col[1]/flex-col[1]/div[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/div[5]/pc-list-item[1]/div[1]/div[1]/div[4]/app-icon[1]/*[name()='svg'][1]"
+                  "(//*[@ng-reflect-name='more'])[5]"
                 )
               ),
               30000
@@ -2650,7 +2652,93 @@ async function removeOldMemberInvitationsRoothOrga (driver) {
           // Recheck if the extra member still exists
           extraMember = await countElementsByXPath(
             driver,
-            "/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/div[1]/app-user-management[1]/div[1]/app-members[1]/flex-col[1]/flex-col[1]/div[1]/ng-scrollbar[1]/div[1]/div[1]/div[1]/div[1]/div[5]/pc-list-item[1]/div[1]/div[1]/div[4]/app-icon[1]/*[name()='svg'][1]"
+            "(//*[@ng-reflect-name='more'])[5]"
+          );
+          console.log('Extra member in the organization found?:', extraMember);
+
+          retries++;
+        }
+
+        if (extraMember === 0) {
+          console.log("✅ Extra member successfully removed or no action was needed.");
+        } else {
+          console.log(`❌ Extra member removal failed after ${maxRetries} attempts.`);
+        }
+  
+}
+
+
+async function removeOldMemberInvitationsRoothOrgaDev (driver) {
+
+  await userManagementMenu(driver);
+        await arrowSortByButton(driver);
+        await lastNameButton(driver);
+
+        // Wait for the element with the name 'Fernando Admin' to load
+        await driver.wait(until.elementLocated(By.xpath("//div[contains(text(),'Fernando Zuniga')]")), 30000);
+        await driver.sleep(3000);
+
+        // Check for any extra members in the organization
+        let extraMember = await countElementsByXPath(
+          driver,
+          "(//*[@ng-reflect-name='more'])[6]"
+        );
+        console.log('Extra member in the organization found?:', extraMember);
+
+        let retries = 0;
+        const maxRetries = 50;
+
+        // Attempt to remove extra member
+        while (extraMember > 0 && retries < maxRetries) {
+          console.log(`Attempting to remove extra member (Attempt ${retries + 1}/${maxRetries})`);
+
+          try {
+            const emailOfExtraMember = await getTextByLocator(
+              driver,
+              "xpath",
+              "//div[6]/pc-list-item/div/div/div/div[2]"
+            );
+
+            const protectedEmails = [
+              "rsylvester@phoenixcontact-sb.io",
+              "testingpxc_viewer@proton.me",
+              "testingpxc_editor@proton.me",
+              "testingpxc_admin@proton.me"
+            ];
+
+            // Check if the email is protected
+            if (protectedEmails.includes(emailOfExtraMember)) {
+              console.log("❌ Email is protected. Stopping removal process.");
+              return; // Stops the process if email is protected
+            }
+
+            // Click to remove the member
+            await driver.wait(
+              until.elementLocated(
+                By.xpath(
+                  "(//*[@ng-reflect-name='more'])[6]"
+                )
+              ),
+              30000
+            ).click();
+
+            await removeMemberButton(driver);
+
+            // Clear the email input and enter the email of the extra member
+            await driver.wait(until.elementLocated(By.xpath("//input[contains(@placeholder,'email ')]")), 30000);
+            await driver.findElement(By.xpath("//input[contains(@placeholder,'email ')]")).clear();
+            await driver.findElement(By.xpath("//input[contains(@placeholder,'email ')]")).sendKeys(emailOfExtraMember);
+
+            await removeMemberButton2(driver);
+            await waitingLoadingRingProficloudToDissapear(driver);
+          } catch (error) {
+            console.error(`❌ Error while attempting to remove extra member: ${error.message}`);
+          }
+
+          // Recheck if the extra member still exists
+          extraMember = await countElementsByXPath(
+            driver,
+            "(//*[@ng-reflect-name='more'])[6]"
           );
           console.log('Extra member in the organization found?:', extraMember);
 
@@ -2704,8 +2792,8 @@ async function viewerRoleReset(driver) {
       await driver.sleep(1000);
       assert(await driver.findElement(By.css(".pc-overlay__title")).getText() == "Change members role");
       await roleSelectionField(driver);
-      await driver.findElement(By.xpath("//span[contains(.,\'Viewer\')]")).click();
-      await driver.findElement(By.xpath("//span[contains(.,\'Apply role\')]")).click();
+      await driver.findElement(By.xpath("//span[contains(.,\'Viewer\')]"),2000).click();
+      await driver.findElement(By.xpath("//span[contains(.,\'Apply role\')]"),2000).click();
       await waitingLoadingRingProficloudToDissapear(driver);
       await driver.sleep(1000);
       assert(await driver.findElement(By.css(".pc-list-item__type")).getText() == "Viewer");
@@ -3416,6 +3504,7 @@ module.exports = {
   removeMemberButton,
   removeMemberButton2,
   removeOldMemberInvitationsRoothOrga,
+  removeOldMemberInvitationsRoothOrgaDev,
   removeRegisteredUserNew,
   reports,
   reportActionsButton,
