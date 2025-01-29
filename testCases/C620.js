@@ -130,6 +130,9 @@ async function C620() {
       await handleBlobReportDownloadBs(driver, "recurringReport");
       await driver.sleep(3000);
       await modalClose(driver);
+      //We delete the reports, in order to do not cause undesired emails
+      await deleteManualReports(driver);
+      await deleteRecurringReports(driver);
 
       await logout(driver);
 
