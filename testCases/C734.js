@@ -18,6 +18,7 @@ const {
   sendMessageLogToBrowserStack,
   assertXpathNotPresent,
   testEmpro3Name,
+  waitForUsersToLoad,
  
   
 } = require('../utils/sharedFunctions'); // Reusable shared functions
@@ -30,19 +31,36 @@ async function C734() {
       let vars = {}; // Initialize variables container
 
       
-      await windowConfiguration(driver,"UMS");
+      const serviceEnv = await windowConfiguration(driver,"UMS"); //This line is necessary for the flow in the program to know what to do depending on PROD or DEV
       await loginAdmin(driver, vars);
-      await testEmpro3Name(driver);
+      await testEmpro3Name(driver,serviceEnv);
       await resetToOriginalUserNameInRoothOrganization(driver);
       await deviceManagementMenu(driver);
+
+      if (serviceEnv === "PROD") {
+        UUID1 = await getTextByLocator(driver,"xpath","//div[@id='device-list-item-a87a7563-3da3-41fe-b2f4-320d08159d1f']/app-device-item/div/flex-col[2]/flex-row-between-center[2]/div/div");
+        UUID2 = await getTextByLocator(driver,"xpath","//div[@id='device-list-item-a39b8382-bace-481e-936d-472793f31ae3']/app-device-item/div/flex-col[2]/flex-row-between-center[2]/div/div");
+        UUID3 = await getTextByLocator(driver,"xpath","//div[@id='device-list-item-f8be7a9a-9212-4ad2-86ed-8fd383968e01']/app-device-item/div/flex-col[2]/flex-row-between-center[2]/div/div");  
+      }
       
-      UUID1 = await getTextByLocator(driver,"xpath","//div[@id='device-list-item-a87a7563-3da3-41fe-b2f4-320d08159d1f']/app-device-item/div/flex-col[2]/flex-row-between-center[2]/div/div");
-      UUID2 = await getTextByLocator(driver,"xpath","//div[@id='device-list-item-a39b8382-bace-481e-936d-472793f31ae3']/app-device-item/div/flex-col[2]/flex-row-between-center[2]/div/div");
-      UUID3 = await getTextByLocator(driver,"xpath","//div[@id='device-list-item-f8be7a9a-9212-4ad2-86ed-8fd383968e01']/app-device-item/div/flex-col[2]/flex-row-between-center[2]/div/div");
+      else 
+      {
+
+      UUID1 = await getTextByLocator(driver,"xpath","//div[@id='device-list-item-68584532-d769-460b-99f1-52697ec2454e']/app-device-item/div/flex-col[2]/flex-row-between-center[2]/div/div");
+        UUID2 = await getTextByLocator(driver,"xpath","//div[@id='device-list-item-844bde27-6828-430c-9cc9-7c2ac5e00a63']/app-device-item/div/flex-col[2]/flex-row-between-center[2]/div/div");
+        UUID3 = await getTextByLocator(driver,"xpath","//div[@id='device-list-item-62c5c517-6ab0-400d-976b-90bb77fc8b85']/app-device-item/div/flex-col[2]/flex-row-between-center[2]/div/div");  
+
+      }
+      
 
       await userManagementMenu(driver);
-      await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),' rsylvester@phoenixcontact-sb.io')]")), 30000).click();
+      await waitForUsersToLoad(driver);
+      if(serviceEnv ==='PROD')
+      {
+      await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'rsylvester@phoenixcontact-sb.io')]")), 30000).click();
       await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'Fernando Editor')]")), 30000).click();
+      }
+
       await devicesByAssigment(driver);
       await assignDevicesButton(driver);
 
@@ -55,14 +73,14 @@ async function C734() {
 
       await sendMessageLogToBrowserStack(driver,"C751 Admin cannot assign devices to another admin");
       await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'Fernando Editor')]")), 30000).click();
-      await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),' rsylvester@phoenixcontact-sb.io')]")), 30000).click();
+      await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'rsylvester@phoenixcontact-sb.io')]")), 30000).click();
       await devicesByAssigment(driver);
       await assertXpathNotPresent(driver,"//*[contains(text(),'Assign devices to user')]");
       await waitForXPathPresentTimeout(driver,"//span[contains(.,'As an administrator you have access to all devices in this organization. This can not be changed in the admin role.')]",3000);
 
       await sendMessageLogToBrowserStack(driver,"C888 Search bar in Assing devices work as intended")
 
-      await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),' rsylvester@phoenixcontact-sb.io')]")), 30000).click();
+      await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'rsylvester@phoenixcontact-sb.io')]")), 30000).click();
       await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'Fernando Editor')]")), 30000).click();
       await devicesByAssigment(driver);
       await assignDevicesButton(driver);
@@ -72,7 +90,7 @@ async function C734() {
       await assertXpathNotPresent(driver,"//label[@class='mdc-label'][contains(.,'empro 4')]");
       await assertXpathNotPresent(driver,"//label[@class='mdc-label'][contains(.,'empro 5')]");
       await assertXpathNotPresent(driver,"//label[@class='mdc-label'][contains(.,'empro 6')]");
-      await clearAndWrite(driver,"xpath","//input[@placeholder='Search devices ']","f8be7a9a-9212-4ad2-86ed-8fd383968e01");
+      await clearAndWrite(driver,"xpath","//input[@placeholder='Search devices ']",UUID3);
       await waitForXPathPresentTimeout(driver,"//label[@class='mdc-label'][contains(.,'empro 3')]",3000);
       await modalClose(driver);
       await logout(driver);

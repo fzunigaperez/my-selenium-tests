@@ -20,7 +20,7 @@ async function windowConfiguration(driver, service = 'TEST_ENV') {
   // Map the services to their environment variables
   const serviceEnvs = {
     EMMA: process.env.EMMA_ENV || 'STG', // Default STG
-    UMS: process.env.UMS_ENV || 'DEV', // Default PROD
+    UMS: process.env.UMS_ENV || 'PROD', // Default PROD
     TEST_ENV: process.env.TEST_ENV || 'STG', // Default general
   };
 
@@ -2006,10 +2006,24 @@ async function createOrganizationButton1(driver) {
     return elementCount;
   }
   
-async function testEmpro3Name(driver) {
+async function testEmpro3Name(driver,serviceEnv) {
 
-  editeName = await getTextByLocator(driver,"xpath","//div[@id='device-list-item-f8be7a9a-9212-4ad2-86ed-8fd383968e01']/app-device-item/div/flex-col[2]/flex-row-between-center/div") 
-  if (editeName === "empro 3") {
+let deviceID;
+if (serviceEnv === 'PROD') {
+
+deviceID = "f8be7a9a-9212-4ad2-86ed-8fd383968e01";
+ 
+}
+
+else
+{
+deviceID = "62c5c517-6ab0-400d-976b-90bb77fc8b85";
+}
+console.log(deviceID);
+
+editedName = await getTextByLocator(driver,"xpath",`//div[@id='device-list-item-${deviceID}']/app-device-item/div/flex-col[2]/flex-row-between-center/div`);  
+ 
+  if (editedName === "empro 3") {
     sendMessageLogToBrowserStack(driver,"The device has its original name");
     
 
@@ -2018,7 +2032,7 @@ async function testEmpro3Name(driver) {
   {
     sendMessageLogToBrowserStack(driver,"The device has not its original name and thus has to be edited");
     await clearAndWrite(driver,"id","mat-input-0","Testing Name");
-    await driver.wait(until.elementLocated(By.css("#f8be7a9a-9212-4ad2-86ed-8fd383968e01-more > .ng-star-inserted")), 30000).click();
+    await driver.wait(until.elementLocated(By.css(`#${deviceID}-more > .ng-star-inserted`)), 30000).click();
     await clearAndWrite(driver,"id","add-device-name","empro 3");
     await saveChangesButton(driver);
     await reloadPage(driver);
