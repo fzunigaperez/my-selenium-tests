@@ -20,7 +20,7 @@ async function windowConfiguration(driver, service = 'TEST_ENV') {
   // Map the services to their environment variables
   const serviceEnvs = {
     EMMA: process.env.EMMA_ENV || 'STG', // Default STG
-    UMS: process.env.UMS_ENV || 'DEV', // Default PROD
+    UMS: process.env.UMS_ENV || 'PROD', // Default PROD
     TEST_ENV: process.env.TEST_ENV || 'STG', // Default general
   };
 
