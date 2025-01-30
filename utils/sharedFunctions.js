@@ -972,7 +972,7 @@ async function resetTOriginalNameOrganization(driver) {
       orgaID = await getTextByLocator(driver,"css",".expandable-organization__subtitle");
       await driver.wait(until.elementLocated(By.xpath(`//app-icon[@id='settings-organization-settings-icon-${orgaID}']//*[name()='svg']`)), 3000).click();
       await renameOrganizationButton1(driver);
-      await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'Organization Name')]")), 3000).click();
+      await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'Organization Name')]")), 6000).click();
       await clearAndWrite(driver,"xpath","//input[@placeholder='Organization Name']","Rooth Organization");
       await renameOrganizationButton2(driver);
       await waitingLoadingRingProficloudToDissapear(driver);
