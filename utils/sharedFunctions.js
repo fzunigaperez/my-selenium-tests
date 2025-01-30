@@ -1650,7 +1650,7 @@ async function createOrganizationButton1(driver) {
   }
   
   
-    async function eliminateExtraOrganizationsAdmin(driver) {
+    async function eliminateExtraOrganizationsAdmin(driver, serviceEnv) {
       await activeOrganization(driver);
       await driver.sleep(1000);
       extraOrganization = await countElementsByXPath(driver, "(//div[@class='profile-menu_icon-text__text'][contains(.,'Leave this Organization')])");
@@ -1687,7 +1687,14 @@ async function createOrganizationButton1(driver) {
           await leaveOrganizationButton1(driver);
           await leaveOrganizationButton2(driver);
           await waitingLoadingRingProficloudToDissapear(driver);
+          if(serviceEnv === 'PROD')
+          {
           await driver.get("https://app.proficloud.io/services/account/user-settings");
+          }
+          else
+          {
+            await driver.get("https://app.proficloud-dev.io/services/account/user-settings");
+          }
           await reloadPage(driver);
           await driver.sleep(4000);
           await activeOrganization(driver);
@@ -2454,9 +2461,11 @@ async function inviteMember(driver, mail, role) {
 
       // Select the role from the dropdown menu
       await roleSelectionDropDownMenu(driver);
-      const roleElement = await driver.findElement(By.xpath(`//span[contains(.,'${role}')]`));
+      const roleElement = await driver.findElement(By.xpath(`//mat-option[@role='option'][contains(.,'${role}')]`),2000);
       await driver.wait(until.elementIsVisible(roleElement), 2000);
+      
       await roleElement.click();
+   
 
       // Click the second button to send the invitation
       await inviteMemberButton2(driver);

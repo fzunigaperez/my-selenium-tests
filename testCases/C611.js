@@ -39,9 +39,9 @@ async function C611() {
       let vars = {}; // Initialize variables container
 
       //Eliminate the leave organization for Registered user account in case a test may failed
-      await windowConfiguration(driver,"UMS");
+      const serviceEnv = await windowConfiguration(driver,"UMS"); //This line is necessary for the flow in the program to know what to do depending on PROD or DEV
       await loginAdmin(driver, vars);
-      await eliminateExtraOrganizationsAdmin(driver);
+      await eliminateExtraOrganizationsAdmin(driver,serviceEnv);
 
       //Create organization as ADMIN C699
       await roothOrganizationTest(driver);
@@ -150,7 +150,7 @@ async function C611() {
       //Delete Editor from "Leave Organization"   ______ Admin now is able to leave the "Leave Organization" since is the last admin inside
 
       await userManagementMenu(driver);
-      await eliminateExtraOrganizationsAdmin(driver);
+      await eliminateExtraOrganizationsAdmin(driver,serviceEnv);
       await logout(driver);
 
       await loginToProtonMail(driver,vars);
