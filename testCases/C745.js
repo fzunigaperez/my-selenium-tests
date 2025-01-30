@@ -33,23 +33,31 @@ async function C745() {
       let vars = {}; // Initialize variables container
 
       
-      await windowConfiguration(driver,"UMS");
+      const serviceEnv = await windowConfiguration(driver,"UMS"); //This line is necessary for the flow in the program to know what to do depending on PROD or DEV
       await loginAdmin(driver, vars);
-      await testEmpro3Name(driver);
+      await testEmpro3Name(driver,serviceEnv);
       await resetToOriginalUserNameInRoothOrganization(driver);
       await userManagementMenu(driver);
 
       await sendMessageLogToBrowserStack(driver,"C896 Device persmission area by Invite Member, should be hidden in case the role ADMIN is selected.");
       await inviteMemberButton(driver);
       await roleSelectionDropDownMenu(driver);
-      await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Admin')]")), 30000).click();
-      await waitForXPathPresentTimeout(driver,"//div[@class='rbac-assignment__summery-value'][contains(.,'17 of 17')]",3000);
+      await driver.wait(until.elementLocated(By.xpath("//mat-option[@role='option'][contains(.,'Admin')]")), 30000).click();
+      if (serviceEnv === 'PROD') {
+      await waitForXPathPresentTimeout(driver,"//div[@class='rbac-assignment__summery-value'][contains(.,'17 of 17')]",3000);  
+      }
+      else
+      {
+      await waitForXPathPresentTimeout(driver,"//div[@class='rbac-assignment__summery-value'][contains(.,'9 of 9')]",3000);  
+
+      }
       await modalClose(driver);
-      await resetAssignedDevicesForEditorViewer(driver,"editor");
-      await resetAssignedDevicesForEditorViewer(driver,"viewer");
+      await resetAssignedDevicesForEditorViewer(driver,"editor",serviceEnv);
+      await resetAssignedDevicesForEditorViewer(driver,"viewer",serviceEnv);
 
       await assignDevicesForEditorViewer(driver,"editor");
       await assignDevicesForEditorViewer(driver,"viewer");
+      await driver.sleep(3000);
 
       await sendMessageLogToBrowserStack(driver,"C925 If the user open the window ASSIGN DEVICES and no other devices are added, then by clicking on SAVE ASSIGMENT does not lead to endless loading")
       await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'Fernando Editor')]")), 30000).click();

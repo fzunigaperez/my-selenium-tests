@@ -20,7 +20,7 @@ async function windowConfiguration(driver, service = 'TEST_ENV') {
   // Map the services to their environment variables
   const serviceEnvs = {
     EMMA: process.env.EMMA_ENV || 'STG', // Default STG
-    UMS: process.env.UMS_ENV || 'PROD', // Default PROD
+    UMS: process.env.UMS_ENV || 'DEV', // Default PROD
     TEST_ENV: process.env.TEST_ENV || 'STG', // Default general
   };
 
@@ -2189,7 +2189,7 @@ async function assertElementNotPresent(driver, type, selector) {
   async function waitingLoadingRingProficloudToDissapear(driver) {
 
     await waitUntilXpathNotPresent(driver, "//div[contains(@class,'pc-status-overlay__icon-container')]");  
-    await driver.sleep(2000);
+    await driver.sleep(2500);
   }
   
   async function waitForXPathPresentTimeout(driver, xpath, timeout) {
@@ -3233,7 +3233,7 @@ async function waitForTitle(driver, expectedTitle, timeoutInSeconds = 600) {
   }
 }
 
-async function resetAssignedDevicesForEditorViewer(driver, role) {
+async function resetAssignedDevicesForEditorViewer(driver, role,serviceEnv) {
   console.log("Role: " + role);
 
   // Check if the user 'rsylvester@phoenixcontact-sb.io' is open in the member list
@@ -3246,11 +3246,19 @@ async function resetAssignedDevicesForEditorViewer(driver, role) {
   }
 
   // Navigate based on the provided role
-  if (role === "editor") {
+  if (role === "editor" && serviceEnv ==="PROD") {
     await driver.wait(until.elementLocated(By.xpath("//div[contains(text(),'Fernando Editor')]")), 30000).click();
-  } else if (role === "viewer") {
+  } else if (role === "viewer" && serviceEnv === "PROD") {
     await driver.wait(until.elementLocated(By.xpath("//div[contains(text(),'Tester Viewer')]")), 30000).click();
   }
+  else if (role === "editor" && serviceEnv === "DEV") {
+  console.log("Since we are in DEV, Editor is open, so no further click necesary");
+  }
+  else if (role === "viewer" && serviceEnv === "DEV") {
+    await driver.wait(until.elementLocated(By.xpath("//div[contains(text(),'Fernando Editor')]")), 30000).click();
+    await driver.wait(until.elementLocated(By.xpath("//div[contains(text(),'Tester Viewer')]")), 30000).click();
+  }
+   
 
   // Open the device assignment section
   await devicesByAssigment(driver);
@@ -3260,6 +3268,7 @@ async function resetAssignedDevicesForEditorViewer(driver, role) {
   const devicesAssigned1 = await countElementsByXPath(driver, "//div[@class='pc-table__item__column'][contains(.,'PH 1 Machine Park 1')]");
   const devicesAssigned2 = await countElementsByXPath(driver, "//div[@class='pc-table__item__column'][contains(.,'PH 1 Machine Park 2')]");
   const devicesAssigned3 = await countElementsByXPath(driver, "//div[@class='pc-table__item__column'][contains(.,'empro 3')]");
+  await driver.sleep(1000);
 
   // If any devices are assigned, remove the assignments
   if (devicesAssigned1 > 0 || devicesAssigned2 > 0 || devicesAssigned3 > 0) {
@@ -3268,7 +3277,7 @@ async function resetAssignedDevicesForEditorViewer(driver, role) {
     // Click the selection input twice to deselect all assigned devices
     const selectionInput = By.id("rbac-assignment-selection-tall-input");
     await driver.wait(until.elementLocated(selectionInput), 3000).click();
-    await driver.sleep(3000);
+    await driver. sleep(3000);
     await driver.wait(until.elementLocated(selectionInput), 3000).click();
 
     // Save the changes and wait for the process to finish
@@ -3277,11 +3286,13 @@ async function resetAssignedDevicesForEditorViewer(driver, role) {
   }
 
   // Re-select the user based on the role after resetting assignments
-  if (role === "editor") {
+  if (role === "editor" && serviceEnv === 'PROD') {
     await driver.wait(until.elementLocated(By.xpath("//div[contains(text(),'Fernando Editor')]")), 30000).click();
-  } else if (role === "viewer") {
+  } else if (role === "viewer" && serviceEnv === "PROD") {
     await driver.wait(until.elementLocated(By.xpath("//div[contains(text(),'Tester Viewer')]")), 30000).click();
   }
+  else if (role === "editor" && serviceEnv === "DEV") {
+}
 }
 
 
