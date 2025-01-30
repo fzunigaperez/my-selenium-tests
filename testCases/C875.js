@@ -8,7 +8,6 @@ const {
   testEmpro3Name,
   resetToOriginalUserNameInRoothOrganization,
   userManagementMenu,
-  resetAssignedDevicesForEditorViewer,
   devicesByAssigment,
   assignDevicesButton,
   assertText,
@@ -17,66 +16,84 @@ const {
   sendMessageLogToBrowserStack,
   waitForXPathPresentTimeout,
   waitUntilXpathNotPresent,
-  arrowLeftSideMenu,
   waitForTitle,
-  
-  
 } = require('../utils/sharedFunctions'); // Reusable shared functions
-const { userInfo } = require('os');
 
 // Main test function for C875
 async function C875() {
   try {
-    await testBase('C875_C876_C893_Change device permissions  search and select devices fields work  as intended / Search bar in devices tab section works as intended / Left Side Menu works in the compact version', async (driver) => {
-      let vars = {}; // Initialize variables container
+    await testBase(
+      'C875_C876_C893_Change device permissions, search and select devices fields work as intended / Search bar in devices tab section works as intended / Left Side Menu works in the compact version',
+      async (driver) => {
+        let vars = {}; // Initialize variables container
 
-      // Step 1: Configure the browser window and login as admin
-      await windowConfiguration(driver,"UMS");
-      await loginAdmin(driver, vars);
-      await testEmpro3Name(driver);
-      await resetToOriginalUserNameInRoothOrganization(driver);
-      await userManagementMenu(driver);
-      await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),' rsylvester@phoenixcontact-sb.io')]")), 30000).click();
-      await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'Fernando Editor')]")), 30000).click();
-      await devicesByAssigment(driver);
-      await assignDevicesButton(driver);
-      await waitForXPathPresentTimeout(driver,"//div[@data-analytics='modal headline'][contains(.,'Change device permissions')]",5000);
-      await assertText(driver,"css",".rbac-assignment__selectable","(3 of 17 devices)");
-      await clearAndWrite(driver,"xpath","//input[@placeholder='Search devices ']","PH 1 Machine Park 2");
-      await assertText(driver,"css",".rbac-assignment__selectable","(1 of 1 devices)");
-      await modalClose(driver);
+        // Step 1: Configure the browser window and login as admin
+        const serviceEnv = await windowConfiguration(driver, 'UMS'); // Determine if in PROD or DEV
+        await loginAdmin(driver, vars);
+        await testEmpro3Name(driver, serviceEnv);
+        await resetToOriginalUserNameInRoothOrganization(driver);
+        await userManagementMenu(driver);
 
+        // Step 2: Handle environment-specific conditions
+        if (serviceEnv === 'PROD') {
+          await driver
+            .wait(until.elementLocated(By.xpath("//*[contains(text(),'rsylvester@phoenixcontact-sb.io')]")), 30000)
+            .click();
+          await driver
+            .wait(until.elementLocated(By.xpath("//*[contains(text(),'Fernando Editor')]")), 30000)
+            .click();
+        }
 
-      await sendMessageLogToBrowserStack(driver,"C876 Search bar in devices tab section works as intended");
-      await clearAndWrite(driver,"xpath","//input[@placeholder='Search']","empro 3");
-      await waitForXPathPresentTimeout(driver,"//div[@class='pc-table__item__column'][contains(.,'empro 3')]",5000);
-      await waitUntilXpathNotPresent(driver,"//div[@class='pc-table__item__column'][contains(.,'PH 1 Machine Park 1')]");
-      await waitUntilXpathNotPresent(driver,"//div[@class='pc-table__item__column'][contains(.,'PH 1 Machine Park 2')]");
+        // Step 3: Open device assignment section
+        await devicesByAssigment(driver);
+        await assignDevicesButton(driver);
+        await waitForXPathPresentTimeout(driver, "//div[@data-analytics='modal headline'][contains(.,'Change device permissions')]",5000);
 
-      await clearAndWrite(driver,"xpath","//input[@placeholder='Search']","a87a7563-3da3-41fe-b2f4-320d08159d1f");
-      await waitForXPathPresentTimeout(driver,"//div[@class='pc-table__item__column'][contains(.,'PH 1 Machine Park 1')]",5000);
-      await waitUntilXpathNotPresent(driver,"//div[@class='pc-table__item__column'][contains(.,'empro 3')]");
-      await waitUntilXpathNotPresent(driver,"//div[@class='pc-table__item__column'][contains(.,'PH 1 Machine Park 2')]");
+        // Step 4: Validate device count in assignment
+        const expectedDeviceText = serviceEnv === 'PROD' ? '(3 of 17 devices)' : '(3 of 9 devices)';
+        await assertText(driver, 'css', '.rbac-assignment__selectable', expectedDeviceText);
 
+        // Step 5: Test search functionality in the device assignment modal
+        await clearAndWrite(driver, 'xpath', "//input[@placeholder='Search devices ']", 'PH 1 Machine Park 2');
+        await assertText(driver, 'css', '.rbac-assignment__selectable', '(1 of 1 devices)');
+        await modalClose(driver);
 
-      await sendMessageLogToBrowserStack(driver,"C925 Left Side Menu works in the compact version");
-      //We click on the arrow to be sure the left panel got minimized
-      await driver.wait(until.elementLocated(By.xpath("/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/app-root[1]/app-proficloud-shell[1]/div[1]/div[2]/app-navigation[1]/div[1]/div[2]/flex-col-center[2]/div[1]/app-icon[1]/*[name()='svg'][1]/*[name()='g'][1]/*[name()='path'][1]")), 10000).click()  
-      await driver.wait(until.elementLocated(By.id("user-management-service")), 3000).click();
-      await driver.wait(until.elementLocated(By.xpath("//flex-row[@id='navigation-user-management-service-user-roles']")), 3000).click();
-      await waitForTitle(driver,"Proficloud.io | User Management Service | Roles",10000);
-      await driver.wait(until.elementLocated(By.id("user-management-service")), 3000).click();
-      await driver.wait(until.elementLocated(By.xpath("//flex-row[@id='navigation-user-management-service-users']")), 3000).click();
-      await waitForTitle(driver,"Proficloud.io | User Management Service | Users",10000);
-      await logout(driver);
+        // Step 6: Test search functionality in the devices tab
+        await sendMessageLogToBrowserStack(driver, 'C876 Search bar in devices tab section works as intended');
+        await clearAndWrite(driver, 'xpath', "//input[@placeholder='Search']", 'empro 3');
+        await waitForXPathPresentTimeout(driver, "//div[@class='pc-table__item__column'][contains(.,'empro 3')]",5000);
+        await waitUntilXpathNotPresent(driver, "//div[@class='pc-table__item__column'][contains(.,'PH 1 Machine Park 1')]");
+        await waitUntilXpathNotPresent(driver, "//div[@class='pc-table__item__column'][contains(.,'PH 1 Machine Park 2')]");
 
-    });
+        // Step 7: Test search functionality using UUID
+        const UUID = serviceEnv === 'PROD' ? 'a87a7563-3da3-41fe-b2f4-320d08159d1f' : '68584532-d769-460b-99f1-52697ec2454e';
+        await clearAndWrite(driver, 'xpath', "//input[@placeholder='Search']", UUID);
+        await waitForXPathPresentTimeout(driver, "//div[@class='pc-table__item__column'][contains(.,'PH 1 Machine Park 1')]", 5000);
+        await waitUntilXpathNotPresent(driver, "//div[@class='pc-table__item__column'][contains(.,'empro 3')]");
+        await waitUntilXpathNotPresent(driver, "//div[@class='pc-table__item__column'][contains(.,'PH 1 Machine Park 2')]");
+
+        // Step 8: Test compact menu navigation
+        await sendMessageLogToBrowserStack(driver, 'C925 Left Side Menu works in the compact version');
+        await driver
+          .wait(until.elementLocated(By.xpath("/html/body/app-root/div/div/div/app-root/app-proficloud-shell/div/div[2]/app-navigation/div/div[2]/flex-col-center[2]/div/app-icon/*[name()='svg']/*[name()='g']/*[name()='path']")), 10000)
+          .click(); // Click to minimize left panel
+
+        // Navigate through User Management options
+        await driver.wait(until.elementLocated(By.id('user-management-service')), 3000).click();
+        await driver.wait(until.elementLocated(By.xpath("//flex-row[@id='navigation-user-management-service-user-roles']")), 3000).click();
+        await waitForTitle(driver, 'Proficloud.io | User Management Service | Roles', 10000);
+
+        await driver.wait(until.elementLocated(By.id('user-management-service')), 3000).click();
+        await driver.wait(until.elementLocated(By.xpath("//flex-row[@id='navigation-user-management-service-users']")), 3000).click();
+        await waitForTitle(driver, 'Proficloud.io | User Management Service | Users', 10000);
+
+        await logout(driver);
+      }
+    );
   } catch (error) {
     throw new Error(`C875 failed: ${error.message}`);
   }
 }
-
-
 
 // Allow this file to be executed directly
 if (require.main === module) {
@@ -94,5 +111,3 @@ if (require.main === module) {
 
 // Export the test function for use in other modules
 module.exports = C875;
-
-
