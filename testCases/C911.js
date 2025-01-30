@@ -14,6 +14,7 @@ const {
   switchToPxcOrganization,
   reloadPage,
   switchToOriginalOrganization,
+  clearAndWrite,
   
 } = require('../utils/sharedFunctions'); // Reusable shared functions
 const { userInfo } = require('os');
@@ -25,14 +26,31 @@ async function C911() {
       let vars = {}; // Initialize variables container
 
       // Step 1: Configure the browser window and login as admin
-      await windowConfiguration(driver,"UMS");
+      const serviceEnv = await windowConfiguration(driver,"UMS"); //This line is necessary for the flow in the program to know what to do depending on PROD or DEV
       await loginAdmin(driver, vars);
       await activeOrganization(driver);
       await driver.findElement(By.xpath("//mat-label[contains(.,'Search for organizations')]"),10000).click();
 
-      
-      await driver.findElement(By.xpath("//*[@data-analytics='text-field']")).sendKeys("Richards organization");
-      await waitForXPathPresentTimeout(driver,"//div[@class='profile-menu_icon-text__text'][contains(.,'Richards organization')]",5000);
+      if (serviceEnv === "PROD") {
+
+        
+        await clearAndWrite(driver,"xpath","//*[@data-analytics='text-field']","Richards organization");
+        await waitForXPathPresentTimeout(driver,"//div[@class='profile-menu_icon-text__text'][contains(.,'Richards organization')]",5000);
+        await waitUntilXpathNotPresent(driver,"//div[@class='profile-menu_icon-text__text'][contains(.,'Phoenix Contact Smart Bus...')]");
+        await waitUntilXpathNotPresent(driver,"//div[normalize-space()='Available organizations']//following::div[contains(text(),'Rooth Organization')]");
+        await reloadPage(driver);
+        await driver.sleep(5000);
+  
+        await switchToPxcOrganization(driver);
+        await switchToOriginalOrganization(driver);
+  
+        
+      }
+
+      else
+      {
+      await clearAndWrite(driver,"xpath","//*[@data-analytics='text-field']","Stripe Organization");
+      await waitForXPathPresentTimeout(driver,"//div[@class='profile-menu_icon-text__text'][contains(.,'Stripe Organization')]",5000);
       await waitUntilXpathNotPresent(driver,"//div[@class='profile-menu_icon-text__text'][contains(.,'Phoenix Contact Smart Bus...')]");
       await waitUntilXpathNotPresent(driver,"//div[normalize-space()='Available organizations']//following::div[contains(text(),'Rooth Organization')]");
       await reloadPage(driver);
@@ -40,7 +58,13 @@ async function C911() {
 
       await switchToPxcOrganization(driver);
       await switchToOriginalOrganization(driver);
+
+      }
+
+
       await logout(driver);
+
+
 
     });
   } catch (error) {
