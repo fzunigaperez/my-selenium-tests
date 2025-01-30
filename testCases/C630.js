@@ -5,15 +5,8 @@ const {
   windowConfiguration,
   loginAdmin,
   logout,
-  userManagementMenu,
-  userMenu,
   waitForXPathPresentTimeout,
-  switchToPxcOrganization,
-  switchToExtraOrganization,
-  accountSettingsMainMenu,
-  getTextByLocator,
   usersTab,
-  countElementsByXPath,
   activeOrganization,
   settings,
   assertText,
@@ -30,7 +23,7 @@ async function C630() {
       let vars = {}; // Initialize variables container
 
       //630 User organization information is displayed correctly
-      await windowConfiguration(driver,"UMS");
+      const serviceEnv = await windowConfiguration(driver,"UMS"); //This line is necessary for the flow in the program to know what to do depending on PROD or DEV
       await loginAdmin(driver, vars);
       await activeOrganization(driver);
       await settings(driver);
@@ -43,12 +36,19 @@ async function C630() {
       //C627 Organization information is displayed correctly
 
       await driver.wait(until.elementLocated(By.xpath("//div[normalize-space()='Information']")), 3000).click();
-      await waitForXPathPresentTimeout(driver,"//td[contains(.,'Creator')]",5000);
+      await waitForXPathPresentTimeout(driver,"//td[contains(.,'Creator')]",10000);
       await waitForXPathPresentTimeout(driver,"//td[contains(.,'Fernando Zuniga')]",5000);
-      await waitForXPathPresentTimeout(driver,"//td[contains(.,'Members')]",5000);     
-      await waitForXPathPresentTimeout(driver,"//td[contains(.,'4')]",5000);
-
+      await waitForXPathPresentTimeout(driver,"//td[contains(.,'Members')]",5000);  
+      if (serviceEnv ==="PROD") {
+        await waitForXPathPresentTimeout(driver,"//td[contains(.,'4')]",5000);
+      }  
+      else
+      {
+      await waitForXPathPresentTimeout(driver,"//td[contains(.,'5')]",5000);
+      }
       //C628 Organization subscriptions are displayed correctly
+
+      if (serviceEnv ==="PROD") {
 
       await subscriptionsTab(driver);
       await driver.wait(until.elementLocated(By.xpath("//mat-panel-title[contains(.,'Energy Management Service')]")), 3000).click();
@@ -60,8 +60,22 @@ async function C630() {
       await assertText(driver,"xpath","//mat-expansion-panel[3]/div/div/app-subscription-information/mat-card/mat-tab-group/div/mat-tab-body/div/div/div/div[3]","FSJGL-SRLWN");
       await assertText(driver,"xpath","//mat-expansion-panel[3]/div/div/app-subscription-information/mat-card/mat-tab-group/div/mat-tab-body/div/div/div/span[4]","Booked at");
       await assertText(driver,"xpath","//mat-expansion-panel[3]/div/div/app-subscription-information/mat-card/mat-tab-group/div/mat-tab-body/div/div/div/div[4]","30.09.2024");
+      }  
+      else
+      {
 
+      await subscriptionsTab(driver);
+      await driver.wait(until.elementLocated(By.xpath("//mat-panel-title[contains(.,'Energy Management Service')]")), 3000).click();
+      await assertText(driver,"xpath","//mat-expansion-panel[2]/div/div/app-subscription-information/mat-card/mat-tab-group/div/mat-tab-body/div/div/div/span","Description");
+      await assertText(driver,"xpath","//mat-expansion-panel[2]/div/div/app-subscription-information/mat-card/mat-tab-group/div/mat-tab-body/div/div/div/div","Professional licence for Energy Management Service. Annual subscription. 100 metrics included. Once per customer. Extends EMS - Starter sub lic when ordered.");
+      await assertText(driver,"xpath","//mat-expansion-panel[2]/div/div/app-subscription-information/mat-card/mat-tab-group/div/mat-tab-body/div/div/div/span[2]","Subscription ID");
+      await assertText(driver,"xpath","//mat-expansion-panel[2]/div/div/app-subscription-information/mat-card/mat-tab-group/div/mat-tab-body/div/div/div/div[2]","1768807");
+      await assertText(driver,"xpath","//mat-expansion-panel[2]/div/div/app-subscription-information/mat-card/mat-tab-group/div/mat-tab-body/div/div/div/span[3]","Reference");
+      await assertText(driver,"xpath","//mat-expansion-panel[2]/div/div/app-subscription-information/mat-card/mat-tab-group/div/mat-tab-body/div/div/div/div[3]","NRTDF-LFSKJ");
+      await assertText(driver,"xpath","//mat-expansion-panel[2]/div/div/app-subscription-information/mat-card/mat-tab-group/div/mat-tab-body/div/div/div/span[4]","Booked at");
+      await assertText(driver,"xpath","//mat-expansion-panel[2]/div/div/app-subscription-information/mat-card/mat-tab-group/div/mat-tab-body/div/div/div/div[4]","30.01.2025");
 
+      }
       //C639 Go to User Management Button redirect the user to User Management Service
       await usersTab(driver);
       await driver.wait(until.elementLocated(By.xpath("//button[@id='undefined']/span[2]/div/span")), 3000).click();
