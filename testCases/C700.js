@@ -37,9 +37,9 @@ async function C700() {
       let vars = {}; // Initialize variables container
 
       //Eliminate the leave organization for Registered user account in case a test may failed
-      await windowConfiguration(driver,"UMS");
+      const serviceEnv = await windowConfiguration(driver,"UMS"); //This line is necessary for the flow in the program to know what to do depending on PROD or DEV
       await loginEditor(driver, vars);
-      await eliminateExtraOrganizationsEditor(driver);
+      await eliminateExtraOrganizationsEditor(driver,serviceEnv);
 
     
       await roothOrganizationTest(driver);
@@ -50,15 +50,15 @@ async function C700() {
       await createOrganizationButton2(driver);
       await waitingLoadingRingProficloudToDissapear(driver);
       await switchToExtraOrganization(driver,"Z Z");
-      await eliminateExtraOrganizationsEditor(driver);
+      await eliminateExtraOrganizationsEditor(driver,serviceEnv);
       await logout(driver);
 
       //C701 Create an organization as viewer
 
 
-      await windowConfiguration(driver,"UMS");
+      await windowConfiguration(driver,"UMS"); //This line is necessary for the flow in the program to know what to do depending on PROD or DEV
       await loginViewer(driver, vars);
-      await eliminateExtraOrganizationsEditor(driver); //For viewer also valid 
+      await eliminateExtraOrganizationsEditor(driver,serviceEnv); //For viewer also valid 
       await roothOrganizationTest(driver);
       await activeOrganization(driver);
       await createOrganizationButton1(driver);
@@ -67,7 +67,7 @@ async function C700() {
       await createOrganizationButton2(driver);
       await waitingLoadingRingProficloudToDissapear(driver);
       await switchToExtraOrganization(driver,"Z Z");
-      await eliminateExtraOrganizationsEditor(driver);
+      await eliminateExtraOrganizationsEditor(driver,serviceEnv);
       await logout(driver);
 
       //We verify that editor and viewer get an email when they leave the organization
