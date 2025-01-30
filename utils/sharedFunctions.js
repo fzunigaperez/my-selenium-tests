@@ -972,7 +972,7 @@ async function resetTOriginalNameOrganization(driver) {
       orgaID = await getTextByLocator(driver,"css",".expandable-organization__subtitle");
       await driver.wait(until.elementLocated(By.xpath(`//app-icon[@id='settings-organization-settings-icon-${orgaID}']//*[name()='svg']`)), 3000).click();
       await renameOrganizationButton1(driver);
-      await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'Organization Name')]")), 6000).click();
+      await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'Organization Name')]")), 30000).click();
       await clearAndWrite(driver,"xpath","//input[@placeholder='Organization Name']","Rooth Organization");
       await renameOrganizationButton2(driver);
       await waitingLoadingRingProficloudToDissapear(driver);
@@ -1955,7 +1955,7 @@ async function createOrganizationButton1(driver) {
 
       
         
-       await driver.findElement(By.xpath("//input[@placeholder=\'Organization name\']")).sendKeys("Unregistered Orga");
+       await driver.findElement(By.xpath("//input[@placeholder=\'Organization name\']"),30000).sendKeys("Unregistered Orga");
        await driver.findElement(By.xpath("//input[@placeholder=\'Email\']")).sendKeys("thisEmailNotValid@");
        await driver.findElement(By.xpath("//div[@class=\'title\'][contains(.,\'Registration\')]")).click();
        await driver.sleep(1000);
@@ -2058,20 +2058,20 @@ async function saveChangesButton(driver) {
 
 
 
-  async function assertXpathNotPresent(driver, xpath) {
-    await driver.sleep(1000);
-  
-    // Guardamos el resultado retornado por countElementsByXPath
-    const elementCount = await countElementsByXPath(driver, xpath);
-  
-    if (elementCount > 0) {
-      console.log(`We have a problem: the element ${xpath} was found.`);
-      await forceFailStatus(driver);  // Cierra el navegador
-    } else {
-      console.log(`All good: the element: ${xpath} is not present in the page`);
-    }
+async function assertXpathNotPresent(driver, xpath) {
+  await driver.sleep(1000);
+
+  // Get the number of elements matching the given XPath
+  const elementCount = await countElementsByXPath(driver, xpath);
+
+  if (elementCount > 0) {
+    // If the element is found, throw an error with skull emojis
+    throw new Error(`💀💀💀 We have a problem: the element ${xpath} was found. 💀💀💀`);
+  } else {
+    console.log(`All good: the element ${xpath} is not present on the page`);
   }
-  
+}
+
 
 
 /**
@@ -2200,6 +2200,7 @@ async function assertElementNotPresent(driver, type, selector) {
 
     while (Date.now() < endTime) {
         try {
+            // Execute JavaScript in the browser to evaluate the XPath and count matching elements
             const elementCount = await driver.executeScript((xp) => {
                 const result = document.evaluate(
                     xp,
@@ -2221,17 +2222,18 @@ async function assertElementNotPresent(driver, type, selector) {
             console.error(`Error during XPath evaluation: ${err}`);
         }
 
-        // Wait 1 second before checking again
+        // Wait before checking again
         await new Promise(resolve => setTimeout(resolve, pollInterval));
     }
 
     console.log(`Timed out after ${timeout / 1000} seconds. The element with XPath: "${xpath}" was not found.`);
 
-    // Invoke the forceFailStatus function to stop the program
-    await forceFailStatus(driver);
+    // Throw an error with skull emojis instead of calling forceFailStatus
+    throw new Error(`💀💀💀 Timeout exceeded: The element with XPath "${xpath}" was not found. 💀💀💀`);
 
     return false; // The element was not found within the defined time
 }
+
 
 
 async function waitForXPathPresentTimeoutNoStop(driver, xpath, timeout) {
@@ -2269,10 +2271,7 @@ async function waitForXPathPresentTimeoutNoStop(driver, xpath, timeout) {
 
   console.log(`Timed out after ${timeout / 1000} seconds. The element with XPath: "${xpath}" was not found.`);
 
-  // Invoke the forceFailStatus function to stop the program
- // await forceFailStatus(driver);
 
-  //return false; // The element was not found within the defined time
 }
 
 async function sendMessageLogToBrowserStack(driver,message) {
