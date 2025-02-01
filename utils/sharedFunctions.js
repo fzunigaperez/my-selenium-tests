@@ -1235,8 +1235,10 @@ async function loginAsUnregisteredUserAndDeleteAccount(driver,vars) {
   await driver.findElement(By.xpath("//input[contains(@placeholder,\'Email\')]")).sendKeys("thiIs@badMail");
   await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Delete account')]")), 30000);
   await driver.findElement(By.xpath("//span[contains(.,'Delete account')]")).click();
-  await driver.wait(until.elementLocated(By.xpath("//span[@class='pc-status-overlay__message'][contains(.,'It was not possible to delete your account. The email you provided was incorrect.')]")), 30000);
+  await driver.wait(until.elementIsVisible(driver.findElement(By.xpath("//span[@class='pc-status-overlay__message'][contains(.,'It was not possible to delete your account. The email you provided was incorrect.')]"))),30000);
+  
   //Closing the warning message
+  await driver.sleep(1000);
   const element = await driver.wait(until.elementLocated(By.xpath("/html[1]/body[1]/app-root[1]/div[1]/div[1]/div[1]/pc-status-overlay[1]/pc-overlay[1]/div[1]/div[2]/div[1]/div[1]/app-icon[1]/*[name()='svg'][1]")), 30000);
   await element.click();
 
