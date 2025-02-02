@@ -2515,31 +2515,45 @@ async function inviteMember(driver, mail, role) {
  * @param {string} locatorValue - The selector's value.
  * @returns {Promise<string>} - The text of the element.
  */
+const { By, until } = require('selenium-webdriver');
+
 async function getTextByLocator(driver, locatorType, locatorValue) {
   try {
-    let element;
+    let locator;
     switch (locatorType.toLowerCase()) {
       case 'xpath':
-        element = await driver.findElement(By.xpath(locatorValue));
+        locator = By.xpath(locatorValue);
         break;
       case 'css':
-        element = await driver.findElement(By.css(locatorValue));
+        locator = By.css(locatorValue);
         break;
       case 'id':
-        element = await driver.findElement(By.id(locatorValue));
+        locator = By.id(locatorValue);
         break;
       case 'name':
-        element = await driver.findElement(By.name(locatorValue));
+        locator = By.name(locatorValue);
         break;
       case 'class':
-        element = await driver.findElement(By.className(locatorValue));
+        locator = By.className(locatorValue);
         break;
       case 'tag':
-        element = await driver.findElement(By.tagName(locatorValue));
+        locator = By.tagName(locatorValue);
         break;
       default:
         throw new Error(`❌ Invalid locator type: "${locatorType}"`);
     }
+
+    // Wait up to 10 seconds for the element to be located in the DOM
+    await driver.wait(until.elementLocated(locator), 10000);
+
+    // Retrieve the element
+    const element = await driver.findElement(locator);
+
+    // Wait an additional 5 seconds for the element to become visible
+    await driver.wait(until.elementIsVisible(element), 5000);
+
+    // Ensure the element is enabled before getting its text
+    await driver.wait(until.elementIsEnabled(element), 5000);
 
     // Get the text of the element
     const text = await element.getText();
@@ -2550,6 +2564,7 @@ async function getTextByLocator(driver, locatorType, locatorValue) {
     throw error;
   }
 }
+
 
 async function clickFirstMail(driver){
 await driver.sleep(1000);
