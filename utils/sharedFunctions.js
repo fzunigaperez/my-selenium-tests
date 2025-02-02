@@ -2515,7 +2515,7 @@ async function inviteMember(driver, mail, role) {
  * @param {string} locatorValue - The selector's value.
  * @returns {Promise<string>} - The text of the element.
  */
-const { By, until } = require('selenium-webdriver');
+
 
 async function getTextByLocator(driver, locatorType, locatorValue) {
   try {
