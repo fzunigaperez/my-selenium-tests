@@ -4,6 +4,7 @@ const axios = require('axios'); // Necessary to send test results
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
+const moment = require('moment');
 const { allowedNodeEnvironmentFlags } = require('process');
 const { all } = require('axios');
 require('dotenv').config(); // Cargar variables de entorno
@@ -3477,6 +3478,48 @@ async function loginToProtonMailRecurringReports(driver,vars) {
 }
 
 
+async function checkReportsPresence(driver) {
+  const yesterday = moment().subtract(1, 'day');
+  const dayOfWeek = yesterday.isoWeekday(); // 1 = Lunes, 7 = Domingo
+  const formattedDate = yesterday.format('YYYY-MM-DD');
+  
+  const weeklyReportXPath = `//span[contains(.,'Recurring report - Weekly Recurring Report - ${formattedDate}')]`;
+  const activatedPausedXPath = `//span[contains(.,'Recurring report - Activated and Paused Recurring Report Daily - ${formattedDate}')]`;
+  const dailyReportXPath = `//span[contains(.,'Recurring report - Daily Recurring Report - ${formattedDate}')]`;
+  
+  let results = {
+      weeklyReport: false,
+      activatedPausedReport: false,
+      dailyReport: false
+  };
+
+  // Verificar el reporte semanal (lunes, miércoles y viernes)
+  if ([1, 3, 5].includes(dayOfWeek)) {
+      results.weeklyReport = await waitForXPathPresentTimeout(driver, weeklyReportXPath, 10000);
+      if (!results.weeklyReport) {
+          throw new Error(`Weekly report missing for ${formattedDate}`);
+      }
+  }
+
+  // Verificar el reporte activado y pausado
+  const isActiveWeek = Math.floor(yesterday.week() % 2) === 1; // Activo en semanas impares
+  if (isActiveWeek) {
+      results.activatedPausedReport = await waitForXPathPresentTimeout(driver, activatedPausedXPath, 10000);
+      if (!results.activatedPausedReport) {
+          throw new Error(`Activated and Paused Recurring Report missing for ${formattedDate}`);
+      }
+  }
+  
+  // Verificar el reporte diario
+  results.dailyReport = await waitForXPathPresentTimeout(driver, dailyReportXPath, 10000);
+  if (!results.dailyReport) {
+      throw new Error(`Daily Recurring Report missing for ${formattedDate}`);
+  }
+
+  return results;
+}
+
+
 module.exports = {
   acceptCookies,
   accountSettingsMainMenu,
@@ -3496,6 +3539,7 @@ module.exports = {
   changeInformationButton,
   changeOrgaUserNameCredentials,
   checkFailedLoginEmail,
+  checkReportsPresence,
   cleanDashboard,
   clearAndWrite,
   clickFirstMail,
