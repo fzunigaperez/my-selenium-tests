@@ -9,6 +9,7 @@ module.exports = {
     'seleniumVersion': '4.21.0', // Asegúrate de usar una versión compatible
     'userName': process.env.BROWSERSTACK_USERNAME,
     'accessKey': process.env.BROWSERSTACK_ACCESS_KEY,
+    'projectName':'Testing Name',
     'idleTimeout': 90, // Establece el tiempo de espera a 300 segundos (5 minutos)
     'networkLogs': true
   },
