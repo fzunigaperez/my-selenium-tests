@@ -3479,8 +3479,9 @@ async function loginToProtonMailRecurringReports(driver,vars) {
 
 
 async function checkReportsPresence(driver) {
-  const yesterday = moment().subtract(1, 'day');
-  const dayOfWeek = yesterday.isoWeekday(); // 1 = Lunes, 7 = Domingo
+  const today = moment().utc()
+  const yesterday = moment().utc().subtract(1, 'day');
+  const dayOfWeek = today.isoWeekday(); // 1 = Lunes, 7 = Domingo
   const formattedDate = yesterday.format('YYYY-MM-DD');
   
   const weeklyReportXPath = `//span[contains(.,'Recurring report - Weekly Recurring Report - ${formattedDate}')]`;
@@ -3493,8 +3494,13 @@ async function checkReportsPresence(driver) {
       dailyReport: false
   };
 
+  console.log(`Día de la semana: ${dayOfWeek}`);
+  console.log(`Número de semana del año: ${yesterday.week()}`);
+  console.log(`Es semana impar?: ${Math.floor(yesterday.week() % 2) === 1}`);
+
   // Verificar el reporte semanal (lunes, miércoles y viernes)
   if ([1, 3, 5].includes(dayOfWeek)) {
+      console.log(`Verificando Weekly Report XPath: ${weeklyReportXPath}`);
       results.weeklyReport = await waitForXPathPresentTimeout(driver, weeklyReportXPath, 10000);
       if (!results.weeklyReport) {
           throw new Error(`Weekly report missing for ${formattedDate}`);
@@ -3504,13 +3510,15 @@ async function checkReportsPresence(driver) {
   // Verificar el reporte activado y pausado
   const isActiveWeek = Math.floor(yesterday.week() % 2) === 1; // Activo en semanas impares
   if (isActiveWeek) {
+      console.log(`Verificando Activated/Pause Report XPath: ${activatedPausedXPath}`);
       results.activatedPausedReport = await waitForXPathPresentTimeout(driver, activatedPausedXPath, 10000);
       if (!results.activatedPausedReport) {
           throw new Error(`Activated and Paused Recurring Report missing for ${formattedDate}`);
       }
   }
-  
+
   // Verificar el reporte diario
+  console.log(`Verificando Daily Report XPath: ${dailyReportXPath}`);
   results.dailyReport = await waitForXPathPresentTimeout(driver, dailyReportXPath, 10000);
   if (!results.dailyReport) {
       throw new Error(`Daily Recurring Report missing for ${formattedDate}`);
@@ -3518,6 +3526,7 @@ async function checkReportsPresence(driver) {
 
   return results;
 }
+
 
 
 module.exports = {

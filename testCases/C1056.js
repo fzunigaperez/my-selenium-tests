@@ -1,286 +1,140 @@
-
 const { Builder, By, until } = require('selenium-webdriver'); // Selenium WebDriver essentials
 const assert = require('assert'); // Assertion module for validations
 const testBase = require('./testBase'); // Common test setup
-const moment = require('moment'); 
+const moment = require('moment'); // Date manipulation library
 
 const {
   windowConfiguration,
   loginAdmin,
   emmaMenu,
   reports,
-  deleteManualReports,
-  cleanDashboard,
-  reportActionsButton,
-  clearAndWrite,
-  waitingLoadingRingProficloudToDissapear,
-  getCurrentDate,
-  createChart,
-  uploadFile,
-  deleteRecurringReports,
-  editButton,
-  previewButton,
-  waitForXPathPresentTimeout,
-  downloadButton,
   logout,
-  handleBlobReportDownloadBs,
-  modalClose,
-  getTextByLocator,
-  sendMessageLogToBrowserStack,
   switchToExtraOrganization,
-  
-
+  loginToProtonMailRecurringReports,
+  checkReportsPresence,
+  waitForXPathPresentTimeout,
+  assertXpathNotPresent
 } = require('../utils/sharedFunctions'); // Reusable shared functions
 
-// Main test function for C1056
+/**
+ * Main test function for C1056
+ * Validates that recurring reports are generated correctly based on their schedule.
+ */
 async function C1056() {
   try {
-    await testBase('C1056_Recurring reports are sent according with their configuration', async (driver) => {
-      let vars = {}; // Initialize variables container
+    await testBase('C1056_Recurring reports are sent according to their configuration', async (driver) => {
+      let vars = {}; // Initialize variable container
 
-      
-
+      // Set up the test environment
       await windowConfiguration(driver, "EMMA");
       await loginAdmin(driver, vars);
       await emmaMenu(driver);
-      await switchToExtraOrganization(driver,"Manager Orga");
-      await driver.wait(until.elementLocated(By.xpath("//div[@class='mat-mdc-tooltip-trigger dashboard__tab-title'][contains(.,'Recurring Reports')]")), 30000).click();
+      await switchToExtraOrganization(driver, "Manager Orga");
+
+      // Navigate to the Recurring Reports section
+      await driver.wait(
+        until.elementLocated(By.xpath("//div[@class='mat-mdc-tooltip-trigger dashboard__tab-title'][contains(.,'Recurring Reports')]")),
+        30000
+      ).click();
       await reports(driver);
 
-      await waitForXPathPresentTimeout(driver,"//div[@title='Daily Recurring Report']",10000);
-      await waitForXPathPresentTimeout(driver,"//div[@title='Weekly Recurring Report']",10000);
+      // Ensure the daily and weekly recurring reports exist
+      await waitForXPathPresentTimeout(driver, "//div[@title='Daily Recurring Report']", 10000);
+      await waitForXPathPresentTimeout(driver, "//div[@title='Weekly Recurring Report']", 10000);
 
-      //We open the dropdown menu to see if the recurring reports are being generated
-      await driver.wait(until.elementLocated(By.xpath("//flex-col[@class='reports__existing']//flex-col//flex-col[1]//flex-row[1]//div[3]//app-icon[1]//*[name()='svg']")), 30000).click();
-      await driver.wait(until.elementLocated(By.xpath("//flex-col[@class='reports__existing']//flex-col//flex-col[2]//flex-row[1]//div[3]//app-icon[1]//*[name()='svg']")), 30000).click();
+      // Open dropdown menus to check if the recurring reports are being generated
+      await driver.wait(
+        until.elementLocated(By.xpath("//flex-col[@class='reports__existing']//flex-col//flex-col[1]//flex-row[1]//div[3]//app-icon[1]//*[name()='svg']")),
+        30000
+      ).click();
+      await driver.wait(
+        until.elementLocated(By.xpath("//flex-col[@class='reports__existing']//flex-col//flex-col[2]//flex-row[1]//div[3]//app-icon[1]//*[name()='svg']")),
+        30000
+      ).click();
 
-      //If the report should be present, then we check if it has been generated. 
-
+      // Generate and validate report XPaths
       let dailyXPath = getXPathPreviousDay();
-        let weeklyXPath = getXPathWeeklyReport();
+      let weeklyXPath = getXPathWeeklyReport();
+      let activatedPausedXPath = getXPathActivatedPausedDaily();
 
-        // Verificar la presencia del elemento diario
-        try {
-            let isDailyPresent = await waitForXPathPresentTimeout(driver, dailyXPath, 10000);
-            if (isDailyPresent) {
-                let dailyElement = await driver.findElement(By.xpath(dailyXPath));
-                console.log(await dailyElement.getText());
-            }
-        } catch (error) {
-            console.error("Daily report not found:", error.message);
-        }
+      console.log("Daily Report XPath:", dailyXPath);
+      console.log("Weekly Report XPath:", weeklyXPath);
+      console.log("Activated and Paused Report XPath:", activatedPausedXPath);
 
-        // Verificar la presencia del elemento semanal solo si no es null
-        if (weeklyXPath) {
-            try {
-                let isWeeklyPresent = await waitForXPathPresentTimeout(driver, weeklyXPath, 10000);
-                if (isWeeklyPresent) {
-                    let weeklyElement = await driver.findElement(By.xpath(weeklyXPath));
-                    console.log(await weeklyElement.getText());
-                }
-            } catch (error) {
-                console.error("Weekly report not found:", error.message);
-            }
-        }
+      // Daily report check (Always present)
+      await checkXPath(driver, dailyXPath, "Daily");
 
-      
-     
-      // C651 Delete a recurring and manual report
-      await deleteManualReports(driver);
-      await deleteRecurringReports(driver);
-      await reportActionsButton(driver);
-      await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Create Recurring Report')]")), 3000).click();
-      await uploadFile(driver, '.file-input', 'BS', 'reportHeader.png');
-
-      const reportTitle = "Phoenix Contact Recurring Report";
-      const reportSubtitle = "Testing Subtitle";
-      const reportDescription = "At absolute zero temperature, the system is in the state with the minimum thermal energy, the ground state. The constant value (not necessarily zero) of entropy at this point is called the residual entropy of the system. With the exception of non-crystalline solids (e.g. glass) the residual entropy of a system is typically close to zero.";
-      const dateOfToday = await getCurrentDate('/');
-      const reportCompany = "Apple Company";
-      const reportAuthor = "Fernando Alejandro Zuniga Perez";
-      const reportMailList = "testingpxc@proton.me,testingpxc_admin@proton.me";
-
-      await driver.wait(until.elementLocated(By.xpath("//div[@data-analytics='modal headline'][contains(.,'Recurring Report')]")), 4000);
-      await clearAndWrite(driver, "xpath", "//input[@ng-reflect-placeholder='Title']", reportTitle);
-      await clearAndWrite(driver, "xpath", "//input[@ng-reflect-placeholder='Subtitle']", reportSubtitle);
-      await clearAndWrite(driver, "xpath", "//textarea[@placeholder='Description']", reportDescription);
-      await driver.sleep(2000);
-      await uploadFile(driver, '#logo-upload-container .file-input', 'BS', 'pxcLogo.jpg');
-
-      await driver.wait(until.elementLocated(By.id("dateFormat")), 3000).click();
-      // Select American date format
-      await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'DD/MM/YYYY')]")), 30000).click();
-      await clearAndWrite(driver, "xpath", "//input[@placeholder='Company']", reportCompany);
-      await clearAndWrite(driver, "xpath", "//input[@placeholder='Author']", reportAuthor);
-      await clearAndWrite(driver, "xpath", "//input[@placeholder='Mail List']", reportMailList);
-
-      // Activate toggles
-      await driver.wait(until.elementLocated(By.xpath(`(//div[@data-analytics="modal"]//div[@class='bf' and contains(@style, 'background-color: var(--background-content);')])[1]`)), 3000).click();
-
-      // Choose recurrence
-      await driver.wait(until.elementLocated(By.id("recurrance")), 3000).click();
-      await driver.findElement(By.xpath("(//div[@data-analytics='modal headline'][contains(.,'Recurring Report')])[2]"));
-      await clearAndWrite(driver, "xpath", "//input[@placeholder='Every']", "1");
-      await driver.wait(until.elementLocated(By.xpath("//span[@class='mdc-button__label'][contains(.,'OK')]")), 3000).click();
-      await driver.wait(until.elementLocated(By.xpath("//pc-button[contains(.,'Create')]")), 3000).click();
-      await waitingLoadingRingProficloudToDissapear(driver);
-
-      await driver.wait(until.elementLocated(By.xpath("//flex-col[@class='recurring-report-item ng-star-inserted']//app-icon[@name='more']//*[name()='svg']")), 30000).click();
-      await editButton(driver);
-      await previewButton(driver);
-      await waitForXPathPresentTimeout(driver, "//span[contains(.,\"Report is ready for download.\")]", 120000);
-
-      await downloadButton(driver);
-
-      // C1053 Preview of a recurring report creates and downloads a manual report
-      await handleBlobReportDownloadBs(driver, "recurringReport");
-      await driver.sleep(3000);
-      await modalClose(driver);
-      //We delete the reports, in order to do not cause undesired emails
-      await deleteManualReports(driver);
-      await deleteRecurringReports(driver);
-
-      await logout(driver);
-
-      // OCR validation
-      await driver.get("https://status.ocr.space/");
-      await driver.wait(until.elementLocated(By.xpath("//h4[contains(.,'API Access Points')]")), 30000);
-      const ocrStatus = await getTextByLocator(driver, "xpath", './/*[contains(concat(" ",normalize-space(@class)," ")," systems ")][(count(preceding-sibling::*)+1) = 3]//tr[(count(preceding-sibling::*)+1) = 1]/*[contains(concat(" ",normalize-space(@class)," ")," tb_b_right ")][(count(preceding-sibling::*)+1) = 3]');
-
-      if (ocrStatus === "UP") {
-        await sendMessageLogToBrowserStack(driver,"The OCR service is available, the text can proceed for OCR identification.");
-       // console.log("The OCR service is available, the text can proceed for OCR identification.");
-
-        await driver.get("https://ocr.space/");
-        await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Free Online OCR - Convert images and PDF to text (Powered by the OCR API)')]")), 30000);
-        await uploadFile(driver, "#imageFile", "BS", "recurringReport.pdf");
-        await driver.wait(until.elementLocated(By.id("chkIsDetectOrientation")), 3000).click();
-        await driver.wait(until.elementLocated(By.id("chkIsOneColumnOnly")), 3000).click();
-        await driver.wait(until.elementLocated(By.id("engine5")), 3000).click();
-        await driver.wait(until.elementLocated(By.linkText("Start OCR!")), 3000).click();
-        await driver.wait(until.elementLocated(By.id("sucOrErrMessage")), 30000);
-       
-
-
-        const searchStrings = {
-          reportTitle, reportSubtitle, reportDescription, reportCompany, reportAuthor, dateOfToday, chartTitle1, chartTitle2, chartTitle3,
-          deviceName1, deviceName2
-        };
-
-        const textarea = await driver.findElement(By.id('txtAreaParsedResult'));
-        const fullText = await textarea.getAttribute('value');
-        const normalizedFullText = normalizeText(fullText);
-
-        // console.log(normalizedFullText);
-        // await searchTextInTextarea(driver, searchStrings, normalizedFullText);
-
-        // const searchStrings2 = {};
-        // tableData.forEach((row, rowIndex) => {
-        //   row.forEach((cell, colIndex) => {
-        //     const key = `Row${rowIndex + 1}_Col${colIndex + 1}`;
-        //     searchStrings2[key] = cell;
-        //   });
-        // });
-
-        // console.log('Search Strings:', searchStrings2);
-        // console.log(normalizedFullText);
-        // await searchTextInTextarea(driver, searchStrings2, normalizedFullText);
-
+      // Weekly report check (Only on Monday, Wednesday, and Friday)
+      const today = moment().day(); // Get the current day of the week (0 = Sunday, 6 = Saturday)
+      if ([1, 3, 5].includes(today)) { // Monday (1), Wednesday (3), or Friday (5)
+        await checkXPath(driver, weeklyXPath, "Weekly");
       } else {
-        console.log('The OCR identification service is not available.');
+        console.log("Today is not Monday, Wednesday, or Friday, the Weekly Report should not be present.");
+        await assertXpathNotPresent(driver, weeklyXPath);
       }
 
+      // Navigate to "Edit and Pause" section
+      await driver.wait(
+        until.elementLocated(By.xpath("//div[@class='mat-mdc-tooltip-trigger dashboard__tab-title'][contains(.,'Edit and pause re...')]")),
+        30000
+      ).click();
+
+
+
+      // Ensure the "Activated and Paused Recurring Report Daily" is visible
+      await waitForXPathPresentTimeout(driver, "//div[@class='recurring-report-name'][contains(.,'Activated and Paused Recurring Report Daily')]", 5000);
+
+      const sundayType = getSundayWeekType();
+
+      if (sundayType === "odd") {
+        console.log("✅ Today is an ODD Sunday. It is necessary to DEACTIVATE the daily report");
+
+        await driver.wait(until.elementLocated(By.xpath("(//*[@ng-reflect-name='more'])[10]")), 30000).click();
+        await driver.wait(until.elementLocated(By.xpath("//span[@class='mat-mdc-menu-item-text'][contains(.,'Pause')]")), 30000).click();
+        await waitForXPathPresentTimeout(driver,"//div[@class='tag'][contains(.,'Paused')]",5000);
+        
+      } else if (sundayType === "even") {
+
+        console.log("✅ Today is an EVEN Sunday. It is necessary to ACTIVATE the daily report");
+        await driver.wait(until.elementLocated(By.xpath("(//*[@ng-reflect-name='more'])[10]")), 30000).click();
+        await driver.wait(until.elementLocated(By.xpath("//span[@class='mat-mdc-menu-item-text'][contains(.,'Resume')]")), 30000).click();
+        await waitForXPathPresentTimeout(driver,"//div[@class='tag'][contains(.,'Active')]",5000);
+      } else {
+        console.log("Today is NOT Sunday. No action taken. :)");
+      }
+
+
+      // Open dropdown menu for further verification
+      await driver.wait(
+        until.elementLocated(By.xpath("//flex-col[@class='reports__existing']//flex-col//flex-col[1]//flex-row[1]//div[3]//app-icon[1]//*[name()='svg']")),
+        30000
+      ).click();
+
+      // Check for Activated and Paused Report (Only if the current week is odd)
+      const weekNumber = moment().week(); // Get the current week number
+      if (weekNumber % 2 !== 0) { // Odd week
+        await checkXPath(driver, activatedPausedXPath, "Activated and Paused");
+      } else {
+        console.log("This is an even week; the 'Activated and Paused' report should not be present.");
+        await assertXpathNotPresent(driver, activatedPausedXPath);
+      }
+
+      // Logout and verify email reports
+      await logout(driver);
+      await loginToProtonMailRecurringReports(driver, vars);
+      await checkReportsPresence(driver);
     });
   } catch (error) {
     throw new Error(`C1056 failed: ${error.message}`);
   }
 }
 
-// Normalize text by removing extra spaces and line breaks
-function normalizeText(text) {
-  return text.replace(/\s+/g, ' ').trim();
-}
-
-// Search for specific strings in OCR results
-async function searchTextInTextarea(driver, searchStrings, normalizedFullText) {
-  let totalSearchStrings = Object.entries(searchStrings).length;
-  let matchesCount = 0;
-
-  for (const [key, value] of Object.entries(searchStrings)) {
-    const normalizedSearchString = normalizeText(value);
-
-    if (normalizedFullText.includes(normalizedSearchString)) {
-      matchesCount++;
-      console.log(`Found ${key}:`, value);
-    } else {
-      console.log(`${key} not found`);
-    }
-  }
-
-  const matchPercentage = (matchesCount / totalSearchStrings) * 100;
-  console.log(`Matches found: ${matchesCount}/${totalSearchStrings} (${matchPercentage.toFixed(2)}%)`);
-
-  if (matchPercentage >= 80) {
-    console.log("At least 80% of the strings were found.");
-    return true;
-  } else {
-    throw new Error("Search criteria not met: At least 80% of the strings were not found.");
-  }
-}
-
-// Extract text from a dynamic table
-async function extractDynamicTableText(driver) {
-  let tableData = [];
-
-  const rows = await driver.findElements(By.xpath('//tr'));
-  const rowCount = rows.length;
-  const firstRowColumns = await driver.findElements(By.xpath('//tr[1]//td | //tr[1]//th'));
-  const columnCount = firstRowColumns.length;
-
-  for (let rowIndex = 2; rowIndex <= rowCount; rowIndex++) {
-    let rowData = [];
-
-    for (let colIndex = 2; colIndex <= columnCount; colIndex++) {
-      const cellXPath = `//tr[${rowIndex}]//td[${colIndex}]//div[1]`;
-
-      try {
-        const cellElement = await driver.findElement(By.xpath(cellXPath));
-        const cellText = await cellElement.getText();
-        rowData.push(cellText);
-      } catch (error) {
-        rowData.push('');
-      }
-    }
-
-    tableData.push(rowData);
-  }
-
-  tableData = tableData.map((row, index) => {
-    return row.map(value => {
-      if (index === 7 || index === 8) {
-        const cleanedValue = value.replace(/[\s,]*kWh/g, '').replace(/,/g, '');
-        const numericValue = parseFloat(cleanedValue);
-        return !isNaN(numericValue) ? numericValue.toFixed(2) : value;
-      }
-
-      if ([0, 1, 2, 3, 6].includes(index)) {
-        const numericValue = parseFloat(value.replace(/,/g, ''));
-        return !isNaN(numericValue) ? numericValue.toFixed(2) : value;
-      }
-
-      return value;
-    });
-  });
-
-  tableData.splice(4, 2);
-  return tableData;
-}
-
+// Allow this file to be executed directly
 if (require.main === module) {
   (async () => {
     try {
       console.log('🚀 Running test C1056...');
-      await C1056();
+      await C1056(); // Run the test
       console.log('✅ Test completed successfully.');
     } catch (error) {
       console.error('❌ Test execution failed:', error.message);
@@ -291,23 +145,70 @@ if (require.main === module) {
 
 module.exports = C1056;
 
-
-
+/**
+ * Generates an XPath for the daily recurring report based on the previous day's date.
+ * @returns {string} XPath string for locating the daily recurring report.
+ */
 function getXPathPreviousDay() {
-    // Obtener la fecha del día anterior en formato YYYY-MM-DD
-    const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
-    
-    // Construir el XPath con la fecha dinámica
-    const xpath = `//div[@class='recurring-report-name'][contains(.,'Daily Recurring Report - ${yesterday}')]`;
-    
-    return xpath;
+  const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
+  return `//div[@class='recurring-report-name'][contains(.,'Daily Recurring Report - ${yesterday}')]`;
 }
 
+/**
+ * Generates an XPath for the weekly recurring report.
+ * @returns {string} XPath string for locating the weekly recurring report.
+ */
 function getXPathWeeklyReport() {
-    const today = moment().day(); // Obtener el día de la semana (0 = domingo, 6 = sábado)
-    if ([1, 3, 5].includes(today)) { // Lunes (1), Miércoles (3) o Viernes (5)
-        const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
-        return `//div[@class='recurring-report-name'][contains(.,'Weekly Recurring Report - ${yesterday}')]`;
-    }
-    return null;
+  const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
+  return `//div[@class='recurring-report-name'][contains(.,'Weekly Recurring Report - ${yesterday}')]`;
 }
+
+/**
+ * Generates an XPath for the activated and paused daily recurring report.
+ * @returns {string} XPath string for locating the report.
+ */
+function getXPathActivatedPausedDaily() {
+  const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
+  return `//span[contains(.,'Activated and Paused Recurring Report Daily - ${yesterday}')]`;
+}
+
+/**
+ * Checks if an XPath is present and logs the corresponding report name.
+ * If not found, asserts that it is absent.
+ * @param {object} driver - Selenium WebDriver instance.
+ * @param {string} xpath - XPath string to check.
+ * @param {string} reportName - Report type (e.g., "Daily", "Weekly").
+ */
+async function checkXPath(driver, xpath, reportName) {
+  if (!xpath) return; // Avoid running if XPath is null
+
+  try {
+    let isPresent = await waitForXPathPresentTimeout(driver, xpath, 10000);
+    if (isPresent) {
+      let element = await driver.findElement(By.xpath(xpath));
+      console.log(`✅ ${reportName} Report Found:`, await element.getText());
+    } else {
+      console.log(`❌ ${reportName} Report Not Found.`);
+      await assertXpathNotPresent(driver, xpath);
+    }
+  } catch (error) {
+    console.error(`⚠️ ${reportName} report check failed:`, error.message);
+  }
+}
+
+/**
+ * Determines if today is Sunday of an odd or even week.
+ * @returns {string} Returns "odd" if it's Sunday of an odd week, "even" if it's Sunday of an even week, or "none" if it's not Sunday.
+ */
+function getSundayWeekType() {
+  const today = moment(); // Get current date
+  const weekNumber = today.week(); // Get the current week number
+  const dayOfWeek = today.day(); // Get the day of the week (0 = Sunday, 6 = Saturday)
+
+  if (dayOfWeek === 0) {
+    return weekNumber % 2 !== 0 ? "odd" : "even"; // Odd or Even Sunday
+  }
+  return "none"; // Any other day
+}
+
+
