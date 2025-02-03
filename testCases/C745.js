@@ -17,7 +17,7 @@ const {
   roleSelectionDropDownMenu,
   resetAssignedDevicesForEditorViewer,
   assignDevicesForEditorViewer,
-  saveAssigmentButton,
+  saveAssignmentButton,
   loginEditor,
   loginViewer,
   waitingLoadingRingProficloudToDissapear,
@@ -63,7 +63,7 @@ async function C745() {
       await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'Fernando Editor')]")), 30000).click();
       await devicesByAssigment(driver);
       await assignDevicesButton(driver);
-      await saveAssigmentButton(driver);
+      await saveAssignmentButton(driver);
       await waitingLoadingRingProficloudToDissapear(driver);
       //Here should not come any error message
       await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'Fernando Editor')]")), 30000).click();
@@ -92,7 +92,7 @@ async function C745() {
 
 
       
-    ;  
+    
 
 
     });

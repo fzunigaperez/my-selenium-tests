@@ -3298,7 +3298,7 @@ async function resetAssignedDevicesForEditorViewer(driver, role,serviceEnv) {
     await driver.wait(until.elementLocated(selectionInput), 3000).click();
 
     // Save the changes and wait for the process to finish
-    await saveAssigmentButton(driver);
+    await saveAssignmentButton(driver);
     await waitingLoadingRingProficloudToDissapear(driver);
   }
 
@@ -3334,7 +3334,7 @@ async function assignDevicesForEditorViewer(driver, role) {
     await driver.wait(until.elementLocated(By.xpath("//label[contains(.,'PH 1 Machine Park 1')]")), 30000).click();
     await driver.wait(until.elementLocated(By.xpath("//label[contains(.,'PH 1 Machine Park 2')]")), 30000).click();
     await driver.wait(until.elementLocated(By.xpath("//label[contains(.,'empro 3')]")), 30000).click();
-    await saveAssigmentButton(driver);
+    await saveAssignmentButton(driver);
     await waitingLoadingRingProficloudToDissapear(driver);
 
     //Click on devices by editor
@@ -3358,11 +3358,20 @@ async function assignDevicesForEditorViewer(driver, role) {
 
 }
 
-async function saveAssigmentButton(driver) {
+async function saveAssignmentButton(driver) {
+  let saveButton = await driver.wait(
+      until.elementLocated(By.xpath("//*[contains(text(),'Save assignment')]")),
+      30000
+  );
 
-  await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'Save assignment')]")), 30000).click();
-  await waitForXPathPresentTimeout(driver,"//pc-list-item/div/div",5000);
+  // Wait until the button is visible and enabled
+  await driver.wait(until.elementIsVisible(saveButton), 5000);
+  await driver.wait(until.elementIsEnabled(saveButton), 5000);
   
+  await saveButton.click();
+
+  // Wait for the next element to be present
+  await waitForXPathPresentTimeout(driver, "//pc-list-item/div/div", 5000);
 }
 
 
@@ -3627,7 +3636,7 @@ module.exports = {
   roleSelectionDropDownMenu,
   roleSelectionField,
   roothOrganizationTest,
-  saveAssigmentButton,
+  saveAssignmentButton,
   saveChangesButton,
   saveProfileDataButton,
   scrollToElementByXPath,
