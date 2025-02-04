@@ -10,13 +10,12 @@ module.exports = {
     'userName': process.env.BROWSERSTACK_USERNAME,
     'accessKey': process.env.BROWSERSTACK_ACCESS_KEY,
     'idleTimeout': 90, // Establece el tiempo de espera a 300 segundos (5 minutos)
-    'networkLogs': true,
   },
   'browserName': 'Chrome',
   'browserVersion': 'latest',
   'browserstack.debug': true,      // Habilitar la grabación visual
   'browserstack.console': 'info',  // Capturar logs de la consola del navegador
-  'networkLogs': true, // Capturar logs de red
+  'browserstack.networkLogs': true, // Capturar logs de red
   'goog:chromeOptions': {
     prefs: {
       'download.prompt_for_download': false,         // Deshabilitar los diálogos de descarga
