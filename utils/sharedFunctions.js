@@ -3538,6 +3538,94 @@ async function checkReportsPresence(driver) {
 
 
 
+
+/**
+ * Function to get the 'value' attribute of an input and compare it with an expected text.
+ * @param {WebDriver} driver - Selenium WebDriver instance.
+ * @param {string} selectorType - Type of selector ('id', 'xpath', 'css', etc.).
+ * @param {string} selectorValue - Selector value (e.g., 'mat-input-12' if using ID).
+ * @param {string} expectedText - Expected text to compare against the input's value.
+ * @returns {Promise<boolean>} - Returns true if they match, false otherwise.
+ */
+async function assertInputValue(driver, selectorType, selectorValue, expectedText) {
+    try {
+        let bySelector;
+        
+        // Determine the selector type
+        switch (selectorType.toLowerCase()) {
+            case 'id':
+                bySelector = By.id(selectorValue);
+                break;
+            case 'xpath':
+                bySelector = By.xpath(selectorValue);
+                break;
+            case 'css':
+                bySelector = By.css(selectorValue);
+                break;
+            case 'name':
+                bySelector = By.name(selectorValue);
+                break;
+            case 'class':
+                bySelector = By.className(selectorValue);
+                break;
+            default:
+                throw new Error(`Unsupported selector type: ${selectorType}`);
+        }
+
+        // Wait for the element to be present
+        let element = await driver.wait(until.elementLocated(bySelector), 10000);
+        
+        // Get the input value
+        let actualValue = await element.getAttribute('value');
+        
+        console.log(`Found input value: "${actualValue}"`);
+        console.log(`Comparing with: "${expectedText}"`);
+
+        // Compare with the expected text
+        return actualValue.trim() === expectedText.trim();
+
+    } catch (error) {
+        console.error(`Error in assertInputValue: ${error.message}`);
+        return false;
+    }
+}
+
+async function verifyReportCounters(driver) {
+
+  // Verify recurring Reports Counter
+  const recurringReportsXPath = "//div[contains(@class,'recurring-report-name')]";
+  const recurringCounterXPath = "(//div[@class='header-count'])[1]";
+
+  const numberOfRecurringReportsLeftPanel = await countElementsByXPath(driver, recurringReportsXPath);
+  const recurringReportsCounterText = await getTextByLocator(driver, "xpath", recurringCounterXPath);
+  const recurringReportsCounter = parseInt(recurringReportsCounterText, 10);
+
+  if (numberOfRecurringReportsLeftPanel === recurringReportsCounter) {
+    console.log("The recurring report counter works perfect :)");
+  } else {
+    console.log("The recurring report failed :)");
+    throw new Error("The test failed");
+  }
+
+  // Verify manual report counter
+  const manualReportsXPath = "//*[@class='manual-report-item']";
+  const manualCounterXPath = "(//div[@class='header-count'])[2]";
+
+  const numberOfManualReportsLeftPanel = await countElementsByXPath(driver, manualReportsXPath);
+  const manualReportsCounterText = await getTextByLocator(driver, "xpath", manualCounterXPath);
+  const manualReportsCounter = parseInt(manualReportsCounterText, 10);
+
+  if (numberOfManualReportsLeftPanel === manualReportsCounter) {
+    console.log("The manual report counter works perfect :)");
+  } else {
+    console.log("The manual report failed :(");
+    throw new Error("The test failed");
+  }
+}
+
+
+
+
 module.exports = {
   acceptCookies,
   accountSettingsMainMenu,
@@ -3548,6 +3636,7 @@ module.exports = {
   arrowLeftSideMenu,
   arrowSortByButton,
   assertElementNotPresent,
+  assertInputValue,
   assertText,
   assertXpathNotPresent,
   assignDevicesForEditorViewer,
@@ -3660,6 +3749,7 @@ module.exports = {
   usersLeftMenu,
   userManagementMenu,
   userMenu,
+  verifyReportCounters,
   viewerRoleReset,
   waitForTitle,
   waitForXPathPresentTimeout,
