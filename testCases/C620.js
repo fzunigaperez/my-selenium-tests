@@ -31,7 +31,7 @@ const {
 // Main test function for C620
 async function C620() {
   try {
-    await testBase('C620_C651_C1053_Create a recurring Report_Delete a recurring and manual report_Preview of a recurring report creates and downloads a manual report', async (driver) => {
+    await testBase('C620_C651_C1053_C1054_Create a recurring Report_Delete a recurring and manual report_Preview of a recurring report creates and downloads a manual report / Alert is trigered after report creation', async (driver) => {
       let vars = {}; // Initialize variables container
 
       // Downloading the report header to use later in reports
@@ -130,6 +130,11 @@ async function C620() {
       await handleBlobReportDownloadBs(driver, "recurringReport");
       await driver.sleep(3000);
       await modalClose(driver);
+
+      //Evaluate the triggered alert because of the report creation
+      await sendMessageLogToBrowserStack(driver,"C1054_Alert is trigered after report creation");
+      await waitForXPathPresentTimeout(driver,"//div[@class='service-content'][contains(.,'Report generation successful')]",20000);
+
       //We delete the reports, in order to do not cause undesired emails
       await deleteManualReports(driver);
       await deleteRecurringReports(driver);
