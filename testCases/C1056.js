@@ -13,7 +13,8 @@ const {
   loginToProtonMailRecurringReports,
   checkReportsPresence,
   waitForXPathPresentTimeout,
-  assertXpathNotPresent
+  assertXpathNotPresent,
+  sendMessageLogToBrowserStack
 } = require('../utils/sharedFunctions'); // Reusable shared functions
 
 /**
@@ -22,7 +23,7 @@ const {
  */
 async function C1056() {
   try {
-    await testBase('C1056_Recurring reports are sent according to their configuration', async (driver) => {
+    await testBase('C1056_C644_Recurring reports are sent according to their configuration Pause / Resume a recurring report', async (driver) => {
       let vars = {}; // Initialize variable container
 
       // Set up the test environment
@@ -72,6 +73,9 @@ async function C1056() {
         console.log("Today is not Monday, Wednesday, or Friday, the Weekly Report should not be present.");
         await assertXpathNotPresent(driver, weeklyXPath);
       }
+
+
+      await sendMessageLogToBrowserStack(driver,"C644 Pause / Resume a recurring report");
 
       // Navigate to "Edit and Pause" section
       await driver.wait(
