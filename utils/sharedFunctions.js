@@ -2969,11 +2969,13 @@ async function createChart(driver, initials) {
     await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'New Widget')]")), 30000).click();
 
     // Step 1: Select "Unit"
-    await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Unit')]")), 2000).click();
+    findUnit = await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Unit')]")), 4000);
+    await driver.wait(until.elementIsVisible(findUnit), 2000);
+    await findUnit.click();
     if (initials.startsWith('E')) {
-      await driver.wait(until.elementLocated(By.xpath("//mat-option[contains(.,'Energy')]")), 2000).click();
+      await driver.wait(until.elementLocated(By.xpath("//mat-option[contains(.,'Energy')]")), 4000).click();
     } else if (initials.startsWith('P')) {
-      await driver.wait(until.elementLocated(By.xpath("//mat-option[contains(.,'Power')]")), 2000).click();
+      await driver.wait(until.elementLocated(By.xpath("//mat-option[contains(.,'Power')]")), 4000).click();
     }
 
     // Step 2: Select "Graph Type"
