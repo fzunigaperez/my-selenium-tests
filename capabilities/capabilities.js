@@ -11,7 +11,10 @@ module.exports = {
     'userName': process.env.BROWSERSTACK_USERNAME,
     'accessKey': process.env.BROWSERSTACK_ACCESS_KEY,
     'idleTimeout': 90, // Establece el tiempo de espera a 300 segundos (5 minutos)
+<<<<<<< HEAD
     'resolution': '2048x1536'
+=======
+>>>>>>> 47f0a278e404fb02bd9742bfcfcbe774d6b0765c
   },
   'browserName': 'Chrome',
   'browserVersion': 'latest',
