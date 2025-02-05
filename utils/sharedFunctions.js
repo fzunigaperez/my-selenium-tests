@@ -2550,7 +2550,7 @@ async function getTextByLocator(driver, locatorType, locatorValue) {
     // Retrieve the element
     const element = await driver.findElement(locator);
 
-    // Wait an additional 5 seconds for the element to become visible
+    // Wait an additional 5 seconds for the element to become visible <-----problems with browser stack ? Resolution added
     await driver.wait(until.elementIsVisible(element), 5000);
 
     // Ensure the element is enabled before getting its text
