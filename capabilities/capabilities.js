@@ -1,3 +1,4 @@
+
 ////////////////////////////////////////////////////////////////////////////////
 // This configzration works fine with FILES DOWNLOAD
 ////////////////////////////////////////////////////////////////////////////////
@@ -9,15 +10,14 @@ module.exports = {
     'seleniumVersion': '4.21.0', // Asegúrate de usar una versión compatible
     'userName': process.env.BROWSERSTACK_USERNAME,
     'accessKey': process.env.BROWSERSTACK_ACCESS_KEY,
-    'projectName':'Testing Name',
     'idleTimeout': 90, // Establece el tiempo de espera a 300 segundos (5 minutos)
-    'networkLogs': true
+    'resolution': '2048x1536'
   },
   'browserName': 'Chrome',
   'browserVersion': 'latest',
   'browserstack.debug': true,      // Habilitar la grabación visual
   'browserstack.console': 'info',  // Capturar logs de la consola del navegador
-  'networkLogs': true, // Capturar logs de red
+  'browserstack.networkLogs': true, // Capturar logs de red
   'goog:chromeOptions': {
     prefs: {
       'download.prompt_for_download': false,         // Deshabilitar los diálogos de descarga
