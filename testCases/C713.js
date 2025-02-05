@@ -18,6 +18,9 @@ const { windowConfiguration,
   downloadButton,
   handleBlobReportDownloadBs,
   waitForXPathPresentTimeout,
+  sendMessageLogToBrowserStack,
+  countElementsByXPath,
+  modalClose,
 
 
   } = require('../utils/sharedFunctions');// BS.
@@ -34,6 +37,7 @@ async function C713() {
       await cleanDashboard(driver);
       
       await createChart(driver, 'EPCTPC'); // Energy Pie Chart Time Period Comparison
+      await createChart(driver, 'EBCDSC'); // Energy Bar Chart Data Source Comparison
 
 
       const reportTitle = "Phoenix Contact Single Report C713";
@@ -62,6 +66,7 @@ async function C713() {
       await driver.wait(until.elementLocated(By.xpath("//pc-button[contains(.,'Export')]")), 3000).click();
       //We wait until the report creatio message appears
       await waitForXPathPresentTimeout(driver,"//*[contains(text(),'Report is ready for download.')]", 60000);
+      await sendMessageLogToBrowserStack(driver,"C620 Download a manual report");
       await downloadButton(driver);
       await handleBlobReportDownloadBs(driver, reportTitle);
       //We check the generation alert
@@ -96,6 +101,40 @@ async function C713() {
       await waitForXPathPresentTimeout(driver,"//div[@class='recurring-report-name'][contains(.,'Second Report')]",10000);
       await deleteManualReports(driver);
       await deleteRecurringReports(driver);
+
+      //We count the number of existing widgets
+
+      numberOfWidgets = await countElementsByXPath(driver,"//*[@name='live']");
+
+      await reportActionsButton(driver);
+      await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Export Widgets')]")), 3000).click();
+      await waitForXPathPresentTimeout(driver,"//div[@data-analytics='modal headline'][contains(.,'Export Widgets')]",5000);
+
+      numberOfExportButtons = await countElementsByXPath(driver,"//*[@ng-reflect-message='Export']");
+
+      if (numberOfWidgets === numberOfExportButtons) {
+        console.log("Export Widget works as expected");
+      } else {
+        console.log("Export Widget DOES NOT work as expected");
+        throw new Error("Export Widget DOES NOT work as expected");
+        
+      }
+
+      await driver.wait(until.elementLocated(By.xpath("(//*[@ng-reflect-message='Export'])[1]")), 30000).click();
+      await driver.wait(until.elementLocated(By.xpath("(//*[@ng-reflect-message='Export'])[2]")), 30000).click();
+      await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'Export All')]")), 30000).click();
+      await modalClose(driver);
+      await logout(driver);
+
+
+
+
+
+
+
+
+
+
 
 
     
