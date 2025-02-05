@@ -86,7 +86,7 @@ async function C620() {
       await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Create Recurring Report')]")), 3000).click();
       await uploadFile(driver, '.file-input', 'BS', 'reportHeader.png');
 
-      const reportTitle = "Phoenix Contact Recurring Report";
+      const reportTitle = "Phoenix Contact Recurring Report C620";
       const reportSubtitle = "Testing Subtitle";
       const reportDescription = "At absolute zero temperature, the system is in the state with the minimum thermal energy, the ground state. The constant value (not necessarily zero) of entropy at this point is called the residual entropy of the system. With the exception of non-crystalline solids (e.g. glass) the residual entropy of a system is typically close to zero.";
       const dateOfToday = await getCurrentDate('/');

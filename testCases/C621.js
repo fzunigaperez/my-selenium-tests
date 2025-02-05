@@ -11,7 +11,6 @@ const {
   logout,
   switchToExtraOrganization,
   waitForXPathPresentTimeout,
-  assertXpathNotPresent,
   sendMessageLogToBrowserStack,
   deleteManualReports,
   deleteRecurringReports,
@@ -23,7 +22,6 @@ const {
   getTextByLocator,
   modalClose,
   assertInputValue,
-  countElementsByXPath,
   verifyReportCounters,
 } = require('../utils/sharedFunctions'); // Reusable shared functions
 const { verify } = require('crypto');
@@ -196,70 +194,5 @@ if (require.main === module) {
 
 module.exports = C621;
 
-/**
- * Generates an XPath for the daily recurring report based on the previous day's date.
- * @returns {string} XPath string for locating the daily recurring report.
- */
-function getXPathPreviousDay() {
-  const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
-  return `//div[@class='recurring-report-name'][contains(.,'Daily Recurring Report - ${yesterday}')]`;
-}
-
-/**
- * Generates an XPath for the weekly recurring report.
- * @returns {string} XPath string for locating the weekly recurring report.
- */
-function getXPathWeeklyReport() {
-  const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
-  return `//div[@class='recurring-report-name'][contains(.,'Weekly Recurring Report - ${yesterday}')]`;
-}
-
-/**
- * Generates an XPath for the activated and paused daily recurring report.
- * @returns {string} XPath string for locating the report.
- */
-function getXPathActivatedPausedDaily() {
-  const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
-  return `//span[contains(.,'Activated and Paused Recurring Report Daily - ${yesterday}')]`;
-}
-
-/**
- * Checks if an XPath is present and logs the corresponding report name.
- * If not found, asserts that it is absent.
- * @param {object} driver - Selenium WebDriver instance.
- * @param {string} xpath - XPath string to check.
- * @param {string} reportName - Report type (e.g., "Daily", "Weekly").
- */
-async function checkXPath(driver, xpath, reportName) {
-  if (!xpath) return; // Avoid running if XPath is null
-
-  try {
-    let isPresent = await waitForXPathPresentTimeout(driver, xpath, 10000);
-    if (isPresent) {
-      let element = await driver.findElement(By.xpath(xpath));
-      console.log(`✅ ${reportName} Report Found:`, await element.getText());
-    } else {
-      console.log(`❌ ${reportName} Report Not Found.`);
-      await assertXpathNotPresent(driver, xpath);
-    }
-  } catch (error) {
-    console.error(`⚠️ ${reportName} report check failed:`, error.message);
-  }
-}
-
-/**
- * Determines if today is Sunday of an odd or even week.
- * @returns {string} Returns "odd" if it's Sunday of an odd week, "even" if it's Sunday of an even week, or "none" if it's not Sunday.
- */
-function getSundayWeekType() {
-  const today = moment(); // Get current date
-  const weekNumber = today.week(); // Get the current week number
-  const dayOfWeek = today.day(); // Get the day of the week (0 = Sunday, 6 = Saturday)
-
-  if (dayOfWeek === 0) {
-    return weekNumber % 2 !== 0 ? "odd" : "even"; // Odd or Even Sunday
-  }
-  return "none"; // Any other day
-}
 
 

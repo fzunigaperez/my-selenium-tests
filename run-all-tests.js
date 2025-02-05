@@ -65,6 +65,7 @@ const C178 = require('./testCases/C178');
 //Reports
 const C620 = require('./testCases/C620');
 const C1056 = require('./testCases/C1056');
+const C621 = require('./testCases/C621');
 
 
 
@@ -137,8 +138,8 @@ const projectsTests = {
   { name: 'C178_C179_C180_C946_C181_C184_Introducing a Dashboard name / Maximize the whole Dashboard Editing a Dashboard name / Introducing a Dashboard name with a maximum length of 27 characters Introducing a Dashboard description / Editing a Dashboard description', func: C178 },
   // Reports
   { name: 'C620_C651_C1053_C1054_Create a recurring Report_Delete a recurring and manual report_Preview of a recurring report creates and downloads a manual report / Alert is trigered after report creation', func: C620 },
-  
-  { name: 'C621_C1057_C1051_Edit a recurring Report / Create a monthly recurring report / Report search bar and counter should work as intended', func: C1056 },
+  { name: 'C1056_C644_Recurring reports are sent according to their configuration Pause / Resume a recurring report', func: C1056 },
+  { name: 'C621_C1057_C1051_Edit a recurring Report / Create a monthly recurring report / Report search bar and counter should work as intended', func: C621 },
 
  
   
