@@ -66,6 +66,7 @@ const C178 = require('./testCases/C178');
 const C620 = require('./testCases/C620');
 const C1056 = require('./testCases/C1056');
 const C621 = require('./testCases/C621');
+const C713 = require('./testCases/C713');
 
 
 
@@ -140,6 +141,7 @@ const projectsTests = {
   { name: 'C620_C651_C1053_C1054_Create a recurring Report_Delete a recurring and manual report_Preview of a recurring report creates and downloads a manual report / Alert is trigered after report creation', func: C620 },
   { name: 'C1056_C644_Recurring reports are sent according to their configuration Pause / Resume a recurring report', func: C1056 },
   { name: 'C621_C1057_C1051_Edit a recurring Report / Create a monthly recurring report / Report search bar and counter should work as intended', func: C621 },
+  { name: 'C713_C720_C1052_Create a manual report / Downlaod a manual report / Export one or all widgets', func: C713 },
 
  
   

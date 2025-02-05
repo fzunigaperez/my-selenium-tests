@@ -12,7 +12,6 @@ const { windowConfiguration,
   reportActionsButton,
   clearAndWrite,
   assertXpathNotPresent,
-  waitingLoadingRingProficloudToDissapear,
   getCurrentDate,
   reports,
   downloadButton,
@@ -102,6 +101,8 @@ async function C713() {
       await deleteManualReports(driver);
       await deleteRecurringReports(driver);
 
+      await sendMessageLogToBrowserStack(driver,"C1052 Export one or all widgets")
+
       //We count the number of existing widgets
 
       numberOfWidgets = await countElementsByXPath(driver,"//*[@name='live']");
@@ -124,6 +125,7 @@ async function C713() {
       await driver.wait(until.elementLocated(By.xpath("(//*[@ng-reflect-message='Export'])[2]")), 30000).click();
       await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'Export All')]")), 30000).click();
       await modalClose(driver);
+      await cleanDashboard(driver);
       await logout(driver);
 
 
