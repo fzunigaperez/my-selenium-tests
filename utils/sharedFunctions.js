@@ -1001,7 +1001,7 @@ async function deleteManualReports(driver) {
   manualReportPresent = await countElementsByXPath(driver,"//div[@class='ng-star-inserted']//div[1]//flex-row[1]//div[2]//app-icon[1]//*[name()='svg']");
   while (manualReportPresent > 0){
 
-    console.log("There is at least one manualReport and therefore we need to delete them")
+    console.log("There is at least one manualReport and therefore we need to delete them");
     await driver.wait(until.elementLocated(By.xpath("//div[@class='ng-star-inserted']//div[1]//flex-row[1]//div[2]//app-icon[1]//*[name()='svg']")), 30000).click();
     await emmaDeleteButton(driver);
     await waitingLoadingRingProficloudToDissapear(driver);
