@@ -50,8 +50,16 @@ const C745 = require('./testCases/C745');
 const C875 = require('./testCases/C875');
 
 
+//─── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ──
+//
+//                                                                                     DMS SERVICE
+//
+//─── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ───── ⋆⋅☆⋅⋆ ──
 
-
+//External links
+const C26 = require('./testCases/C26');
+//Devices searching bar
+const C42 = require('./testCases/C42');
 
 
 
@@ -131,7 +139,11 @@ const projectsTests = {
 
   ],
   "Device Management Service": [
-    // Add specific test cases for this project if any
+    //External links
+    { name: 'C26_C28_C34_C581_External links', func: C26 },
+    //Devices seraching bar
+    { name: 'C42_C44_C45_Searching with capital/small letters / serach sensitivity', func: C42 },
+
   ],
   "Emma Service": [
 

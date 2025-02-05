@@ -9,7 +9,7 @@ const { windowConfiguration,
 
 async function C26() {
   try {
-    await testBase('C26_Log out successfully', async (driver) => {
+    await testBase('C26_C28_C34_C581_External links', async (driver) => {
       let vars = {};
             
       await windowConfiguration(driver,"DMS");
