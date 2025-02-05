@@ -3245,19 +3245,19 @@ async function renameOrganizationButton2(driver) {
  * Waits for the title of the page to match the expected title within a timeout.
  * @param {WebDriver} driver - The Selenium WebDriver instance.
  * @param {string} expectedTitle - The expected title of the page.
- * @param {number} timeoutInSeconds - Maximum time to wait in seconds (default is 600 seconds).
+ * @param {number} timeoutInMs - Maximum time to wait in milliseconds (default is 600,000 ms).
  * @throws {Error} If the title does not match within the timeout.
  */
-async function waitForTitle(driver, expectedTitle, timeoutInSeconds = 600) {
+async function waitForTitle(driver, expectedTitle, timeoutInMs = 600000) {
   try {
     await driver.wait(
       until.titleIs(expectedTitle), // Condition: title matches the expectedTitle
-      timeoutInSeconds * 1000, // Convert seconds to milliseconds
-      `Title did not match '${expectedTitle}' within ${timeoutInSeconds} seconds`
+      timeoutInMs, // Now using milliseconds directly
+      `Title did not match '${expectedTitle}' within ${timeoutInMs} milliseconds`
     );
-    console.log(`The title '${expectedTitle}' is now displayed.`);
+    console.log(`✅ The title '${expectedTitle}' is now displayed.`);
   } catch (error) {
-    console.error(`Failed to match the title '${expectedTitle}': ${error.message}`);
+    console.error(`❌ Failed to match the title '${expectedTitle}': ${error.message}`);
     throw error;
   }
 }
