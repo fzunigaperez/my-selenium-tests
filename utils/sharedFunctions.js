@@ -663,8 +663,18 @@ async function logout(driver) {
   await driver.sleep(1000);
 }
 
+
+
 async function confirmButton(driver) {
-  await driver.wait(until.elementLocated(By.xpath("//span[contains(.,'Confirm')]")), 30000).click();
+  const element = await driver.wait(
+    until.elementLocated(By.xpath("//span[contains(.,'Confirm')]")),
+    50000
+  );
+
+  await driver.wait(until.elementIsVisible(element), 5000); 
+  await driver.wait(until.elementIsEnabled(element), 5000); 
+  
+  await element.click();
 }
 
 async function userMenu(driver) {
