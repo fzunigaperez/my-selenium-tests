@@ -60,6 +60,10 @@ const C875 = require('./testCases/C875');
 const C26 = require('./testCases/C26');
 //Devices searching bar
 const C42 = require('./testCases/C42');
+//Device Menu Info
+const C46 = require('./testCases/C46');
+const C659 = require('./testCases/C659');
+const C660 = require('./testCases/C660');
 
 
 
@@ -143,6 +147,12 @@ const projectsTests = {
     { name: 'C26_C28_C31_C581_External links', func: C26 },
     //Devices seraching bar
     { name: 'C42_C44_C45_Searching with capital/small letters / serach sensitivity', func: C42 },
+    //Device Menu Info
+    { name: 'C46_C47_C48_Device health / general / service information is displayed correctly for an ADMIN', func: C46 },
+    { name: 'C659_C661_C663_Device health / general / service information is displayed correctly for an EDITOR', func: C659 },
+    { name: 'C660_C662_C664_Device health / general / service information is displayed correctly for an VIEWER', func: C660 },
+    
+
 
   ],
   "Emma Service": [
