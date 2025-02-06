@@ -6,11 +6,16 @@ const { windowConfiguration,
         logout,
         waitForXPathPresentTimeout,
         countElementsByXPath,
-        resetAssignedDevicesForEditorViewer, 
-        
-     
+       
         sendMessageLogToBrowserStack,
-        getTextByLocator,  } = require('../utils/sharedFunctions');// BS.
+        getTextByLocator,
+        loginFerchoAlejandro86,
+        switchToExtraOrganization,
+        deleteDevice,
+        addDeviceButton,
+        clearAndWrite,
+        addDeviceToProficloud,
+        waitingLoadingRingProficloudToDissapear,  } = require('../utils/sharedFunctions');// BS.
 
 
 async function C55() {
@@ -18,13 +23,43 @@ async function C55() {
     await testBase('C55_', async (driver) => {
       let vars = {};
 
-      const serviceEnv = await windowConfiguration(driver,"DMS");      
+      const serviceEnv = await windowConfiguration(driver,"DMS");     
+      await loginFerchoAlejandro86(driver,vars);
+      
+      areWeInEraseDeviceOrga = await countElementsByXPath(driver,"//h4[contains(.,'Erase device organization')]");
+      if (areWeInEraseDeviceOrga > 0) {
+        console.log("We started in the Erase Device Orga");
 
- 
+    }
+
+    else
+    {
+      await switchToExtraOrganization(driver,"Erase device organization");
+    }
+
+    validUuid = "774cddad-27b7-43db-ab83-b504fdaf988f";
+    
+    devicePresent = await countElementsByXPath(driver,"//app-device-item/div");
+    if(devicePresent > 0)
+    {
+    console.log(`There is/are: ${devicePresent} in the Organanization....Proceding to delete device(s)`);
+    await driver.wait(until.elementLocated(By.xpath("//*[@name='more']")), 3000).click();
+    await deleteDevice(driver);
+    await waitingLoadingRingProficloudToDissapear(driver);
+
+    }
+
+    await addDeviceButton(driver);
+    await clearAndWrite(driver,"id","add-device-uuid",validUuid);
+    await clearAndWrite(driver,"id","add-device-name","Testing Device");
+    await clearAndWrite(driver,"id","add-device-comment","Testing is cool");
+    await addDeviceToProficloud(driver);
+    await waitingLoadingRingProficloudToDissapear(driver);
+
     
 
-
-     
+  
+ 
       await driver.wait(until.elementLocated(By.xpath("//div[@title='PH 1 Machine Park 2']")), 10000).click();
 
 

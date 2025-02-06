@@ -22,7 +22,7 @@ async function windowConfiguration(driver, service = 'TEST_ENV') {
   const serviceEnvs = {
     EMMA: process.env.EMMA_ENV || 'STG', // Default STG
     UMS: process.env.UMS_ENV || 'PROD', // Default PROD
-    DMS: process.env.DMS_ENV || 'DEV', // Default PROD
+    DMS: process.env.DMS_ENV || 'PROD', // Default PROD
     CRS: process.env.CRS_ENV || 'DEV', // Default PROD
 
     TEST_ENV: process.env.TEST_ENV || 'STG', // Default general
@@ -3638,6 +3638,55 @@ async function verifyReportCounters(driver) {
   }
 }
 
+async function addDeviceButton(driver) {
+//Since the ID / Xpath of the button changes depending if is activated or not, it  is necessary to have 2 cases. 
+
+addDeviceButtonDeactivated = await countElementsByXPath(driver,"//pc-button[contains(.,'ADD DEVICE')]");
+
+if (addDeviceButtonDeactivated > 0) {
+
+  await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'ADD DEVICE')]")), 3000).click();  
+}
+else{
+  await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'ADD DEVICE')]")), 3000).click();  
+}
+ 
+  }
+
+  async function deleteDevice(driver) {
+    // Esperar a que el botón "Delete" sea visible y clickeable
+
+    await driver.wait(until.elementLocated(By.xpath("//div-grow[normalize-space()='DELETE DEVICE']")), 30000).click();
+    let deleteButton = await driver.wait(
+        until.elementLocated(By.xpath("//button[@data-analytics='button' and contains(.,'Delete')]")), 
+        5000
+    );
+
+    await driver.wait(until.elementIsVisible(deleteButton), 5000);
+    await deleteButton.click();
+}
+
+
+  async function addDeviceToProficloud(driver) {
+    // Wait for the button to be located
+    let addButton = await driver.wait(
+        until.elementLocated(By.xpath("//*[@data-analytics='add-device-modal-button-section']")), 
+        5000
+    );
+
+    // Wait for the button to be visible before clicking
+    await driver.wait(until.elementIsVisible(addButton), 5000);
+
+    // Click the button
+ //   await driver.sleep(000);
+    await addButton.click();
+    await addButton.click();
+}
+
+
+
+  
+
 
 
 
@@ -3646,6 +3695,8 @@ module.exports = {
   accountSettingsMainMenu,
   accountSettingsTab,
   activeOrganization,
+  addDeviceButton,	
+  addDeviceToProficloud,
   adminCredentials,
   agreeTerms,
   arrowLeftSideMenu,
@@ -3676,6 +3727,7 @@ module.exports = {
   dashboard,
   dataDisplayedCheck,
   deleteAllEmails,
+  deleteDevice,
   deleteManualReports,
   deleteRecurringReports,
   deleteUnregisteredUserInCaseOfExistence,
