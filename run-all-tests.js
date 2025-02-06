@@ -140,7 +140,7 @@ const projectsTests = {
   ],
   "Device Management Service": [
     //External links
-    { name: 'C26_C28_C34_C581_External links', func: C26 },
+    { name: 'C26_C28_C31_C581_External links', func: C26 },
     //Devices seraching bar
     { name: 'C42_C44_C45_Searching with capital/small letters / serach sensitivity', func: C42 },
 
