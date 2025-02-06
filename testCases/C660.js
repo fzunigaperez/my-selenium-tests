@@ -5,7 +5,6 @@ const { windowConfiguration,
         loginViewer, 
         logout,
         waitForXPathPresentTimeout, 
-        countElementsByXPath,
         sendMessageLogToBrowserStack,
         countElementsByXPath,
         getTextByLocator,  } = require('../utils/sharedFunctions');// BS.
