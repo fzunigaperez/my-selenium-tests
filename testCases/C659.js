@@ -1,10 +1,11 @@
 const { Builder, By, until } = require('selenium-webdriver');  // Localrun 
 const testBase = require('./testBase');  //Common
+const C745 = require('./C745');
 const { windowConfiguration,
         loginEditor, 
         logout,
         waitForXPathPresentTimeout, 
-     
+        countElementsByXPath,
         sendMessageLogToBrowserStack,
         getTextByLocator,  } = require('../utils/sharedFunctions');// BS.
 
@@ -24,7 +25,21 @@ async function C659() {
         uuid = "844bde27-6828-430c-9cc9-7c2ac5e00a63";
       }
 
-      await loginAdmin(driver, vars);
+      await loginEditor(driver, vars);
+
+      
+      thisDeviceShouldBePresentViewerEditor1 = await countElementsByXPath(driver,"//div[@title='PH 1 Machine Park 1']");
+      thisDeviceShouldBePresentViewerEditor2 = await countElementsByXPath(driver,"//div[@title='PH 1 Machine Park 2']");
+      thisDeviceShouldBePresentViewerEditor3 = await countElementsByXPath(driver,"//div[@title='empro 3']");
+
+      if (thisDeviceShouldBePresentViewerEditor1 == 1 && thisDeviceShouldBePresentViewerEditor2 == 1 && thisDeviceShouldBePresentViewerEditor3 == 1  ) {
+        console.log("The desired devices should be there")
+      }
+      else
+    {
+        await C745(); //We run this program in order to reset the 3 devices
+        await loginEditor(driver, vars);
+    }
      
       await driver.wait(until.elementLocated(By.xpath("//div[@title='PH 1 Machine Park 2']")), 10000).click();
       await waitForXPathPresentTimeout(driver,"//span[contains(.,'Connection status')]",5000);

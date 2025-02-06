@@ -1,48 +1,36 @@
 const { Builder, By, until } = require('selenium-webdriver');  // Localrun 
 const testBase = require('./testBase');  //Common
-const C745 = require('./C745');
+
 const { windowConfiguration,
-        loginViewer, 
+        loginEditor, 
         logout,
-        waitForXPathPresentTimeout, 
+        waitForXPathPresentTimeout,
         countElementsByXPath,
+        resetAssignedDevicesForEditorViewer, 
+        
+     
         sendMessageLogToBrowserStack,
-        countElementsByXPath,
         getTextByLocator,  } = require('../utils/sharedFunctions');// BS.
 
 
-async function C660() {
+async function C55() {
   try {
-    await testBase('C660_C662_C664_Device health / general / service information is displayed correctly for an VIEWER', async (driver) => {
+    await testBase('C55_', async (driver) => {
       let vars = {};
 
       const serviceEnv = await windowConfiguration(driver,"DMS");      
 
-      if (serviceEnv === "PROD") {
-        uuid = "a39b8382-bace-481e-936d-472793f31ae3";
-        
-      }
-      else{
-        uuid = "844bde27-6828-430c-9cc9-7c2ac5e00a63";
-      }
+ 
+    
 
-      await loginViewer(driver, vars);
 
-      
-      thisDeviceShouldBePresentViewerEditor1 = await countElementsByXPath(driver,"//div[@title='PH 1 Machine Park 1']");
-      thisDeviceShouldBePresentViewerEditor2 = await countElementsByXPath(driver,"//div[@title='PH 1 Machine Park 2']");
-      thisDeviceShouldBePresentViewerEditor3 = await countElementsByXPath(driver,"//div[@title='empro 3']");
-
-      if (thisDeviceShouldBePresentViewerEditor1 == 1 && thisDeviceShouldBePresentViewerEditor2 == 1 && thisDeviceShouldBePresentViewerEditor3 == 1  ) {
-        console.log("The desired devices should be there")
-      }
-      else
-    {
-        await C745(); //We run this program in order to reset the 3 devices
-        await loginViewer(driver, vars);
-    }
      
       await driver.wait(until.elementLocated(By.xpath("//div[@title='PH 1 Machine Park 2']")), 10000).click();
+
+
+
+
+
       await waitForXPathPresentTimeout(driver,"//span[contains(.,'Connection status')]",5000);
       await waitForXPathPresentTimeout(driver,"//div[@data-analytics='expandable-device-item-health-online-offline'][contains(.,'Online')]",5000);
       await waitForXPathPresentTimeout(driver,"//span[@data-analytics='expandable-device-item-health-device-status'][contains(.,'Device status')]",5000);
@@ -100,7 +88,7 @@ async function C660() {
 
     });
   } catch (error) {
-    throw new Error(`C660 failed: ${error.message}`);
+    throw new Error(`C55 failed: ${error.message}`);
   }
 }
 
@@ -108,14 +96,14 @@ async function C660() {
 
 
 
-module.exports = C660;
+module.exports = C55;
 
 
 if (require.main === module) {
   (async () => {
     try {
       console.log(`'🚀 Running the test `);
-      await C660();   // Change here the test name
+      await C55();   // Change here the test name
       
       console.log('✅ Test successfully completed.');
     } catch (error) {
