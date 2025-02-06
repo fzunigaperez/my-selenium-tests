@@ -12,7 +12,7 @@ const { windowConfiguration,
 
 async function C42() {
   try {
-    await testBase('C42_C44_C45_Searching with capital/small letters / serach sensitivity', async (driver) => {
+    await testBase('C42_C44_C45_Searching with capital/small letters / search sensitivity', async (driver) => {
       let vars = {};
 
       const serviceEnv = await windowConfiguration(driver,"DMS");      
