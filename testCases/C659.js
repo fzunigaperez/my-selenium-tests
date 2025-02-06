@@ -24,7 +24,7 @@ async function C659() {
         uuid = "844bde27-6828-430c-9cc9-7c2ac5e00a63";
       }
 
-      await loginEditor(driver, vars);
+      await loginAdmin(driver, vars);
      
       await driver.wait(until.elementLocated(By.xpath("//div[@title='PH 1 Machine Park 2']")), 10000).click();
       await waitForXPathPresentTimeout(driver,"//span[contains(.,'Connection status')]",5000);
