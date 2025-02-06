@@ -91,49 +91,49 @@ const projectIds = {
 const projectsTests = {
   "User Management Service": [
 
-  // //SignUp
-  // { name: 'C13_C575_C697_C22_C895_C1024 Sign up in the proficloud with valid email and password / Sign UP with an already existing E-Mail / Introduce a wrong password before user deletion / Delete user / If the user enter an invalid email, and correcte it later, it is should be possible to REGISTER to Proficloud or create Billing account / Check and uncheck the Terms and Licences Agreement should not alter the registered button', func:C13 },
-  // { name: 'C614_Sign UP if two passwords are not the same should not be possible', func: C614 },
-  // //Login
-  // { name: 'C15_Login with right credentials as ADMIN', func: C15 },
-  // { name: 'C655_Login with right credentials as EDITOR', func: C655 },
-  // { name: 'C656_Login with right credentials as VIEWER', func: C656 },
-  // { name: 'C16_Login with wrong credentials', func: C16 },
-  // { name: 'C18_Login with valid email but wrong password', func: C18 },
-  // { name: 'C36_Login with wrong credentials (10 wrong attempts)', func: C36 },
-  // { name: 'C580_Password forgotten', func: C580 },
-  // //LogOut
-  // { name: 'C90_Log out successfully', func: C90 },
-  // //Profile Settings
-  // { name: 'C19_C20_C21_C678 Add name and surname to the general information / Confirm email change in profile settings / Edit name and surname to the general information / Email change should not be possible if the email is already registered in proficloud', func: C19 },
-  // { name: 'C84_Download User CA certificate', func: C84 },
-  // //Billing Account
-  // { name: 'C537_Edit a billing account as an ADMIN', func: C537 },
-  // { name: 'C706_C707_Edit a billing account as an EDITOR not allowed / Edit a billing account as an VIEWER not allowed', func: C706},
-  // //User Management
-  // { name: 'C608_Invite a user to an organization that is not registered in proficloud and is not part of the same company', func: C608 },
-  // { name: 'C613_C610_C882_C871_Invite member to an organization that is already registered to proficloud as ADMIN / Remove member from orgnization / Members cannot be invited more than 1 time to Proficloud / Inviting user to an organization of the same domain should be possible without data security message', func: C613 },
-  // { name: 'C681_C682_C683_C684_C695_C696_C679_C680_C632_C633_Inviting an user to an organization as EDITOR/VIEWER is not allowed and User Management menu is hidden / Remove member from organization not allowed as EDITOR / Change user roles is not allowed for EDITOR/VIEWER / Editor/Viewer can NOT access to User Management / Viewer/Editor rights check', func: C681 },
-  // { name: 'C609_Sorting users by first name, last name, email, invited, role.', func: C609 },
-  // { name: 'C624_C677_Sorting users by first name, last name, email, invited, role. / ADMIN can access to USER MANAGEMENT', func: C624 },
-  // { name: 'C874_C646_Search for member works / Scroll Bars are present for users and roles', func: C874 },
-  // { name: 'C625_Roles page shows a summary of numbers of Admins, Editors and Viewers.', func: C625 },
-  // { name: 'C537_After deleting user invitation the invitation link should not be valid anymore NEW', func: C537 },
-  // { name: 'C714_After deleting user invitation the invitation link should not be valid anymore NEW', func: C714 },
-  // //Organization General
-  // { name: 'C611_643_C626_C699_C892_Leave organization / It should not be possible to leave its root organization as admin if at least another admin is present / Switch organization / Create orga as ADMIN / Message about what characters are allowed in the name of organization has to be displayed', func: C611 },
-  // { name: 'C911_Search field for organizations works as intended', func: C911 },
-  // //Organization menu
-  // { name: 'C700_C701 Create an organization as EDITOR/VIEWER', func: C700 },
-  // { name: 'C631_C702_C703_Rename organization as admin / Rename organization for EDITOR / VIEWER is not allowed', func: C631 },
-  // { name: 'C630_C639_C627_628_User organization information is displayed correctly / Go to User Management Button redirect the user to User Management Service / Organization information is displayed correctly / Organization subscriptions are displayed correctly', func: C630 },
-  // { name: 'C641_C1009_Admin rights check / Users of other organization should not be visible if not Admin rights when switching organization', func: C641 },
-  // //Service Store
-  // { name: 'C725_C1023_Admin, Editor and Viewer can access to the store, but only admin role can book a service / Go to service button in service store redirects the user to User Management Service', func: C725 },
-  // //RBAC
-  // { name: 'C734_C751_C888_UUIDs & Names of Device Management and Assign devices to user have to be the same /  Admin cannot assign devices to another admin / Search bar in Assing devices work as intended', func: C734 },
-  // { name: 'C745_C896_C925_C746_Admins of an organization can assign / unassign devices to viewer and editor roles / Device persmission area by Invite Member, should be hidden in case the role ADMIN is selected  If the user open the window ASSIGN DEVICES and no other devices are added, then by clicking on SAVE ASSIGMENT does not lead to endless loading / Viewers and editors are not allowed to assign devices to other roles', func: C745 },
-  // { name: 'C875_C876_C893_Change device permissions  search and select devices fields work  as intended / Search bar in devices tab section works as intended / Left Side Menu works in the compact version', func: C875 },
+  //SignUp
+  { name: 'C13_C575_C697_C22_C895_C1024 Sign up in the proficloud with valid email and password / Sign UP with an already existing E-Mail / Introduce a wrong password before user deletion / Delete user / If the user enter an invalid email, and correcte it later, it is should be possible to REGISTER to Proficloud or create Billing account / Check and uncheck the Terms and Licences Agreement should not alter the registered button', func:C13 },
+  { name: 'C614_Sign UP if two passwords are not the same should not be possible', func: C614 },
+  //Login
+  { name: 'C15_Login with right credentials as ADMIN', func: C15 },
+  { name: 'C655_Login with right credentials as EDITOR', func: C655 },
+  { name: 'C656_Login with right credentials as VIEWER', func: C656 },
+  { name: 'C16_Login with wrong credentials', func: C16 },
+  { name: 'C18_Login with valid email but wrong password', func: C18 },
+  { name: 'C36_Login with wrong credentials (10 wrong attempts)', func: C36 },
+  { name: 'C580_Password forgotten', func: C580 },
+  //LogOut
+  { name: 'C90_Log out successfully', func: C90 },
+  //Profile Settings
+  { name: 'C19_C20_C21_C678 Add name and surname to the general information / Confirm email change in profile settings / Edit name and surname to the general information / Email change should not be possible if the email is already registered in proficloud', func: C19 },
+  { name: 'C84_Download User CA certificate', func: C84 },
+  //Billing Account
+  { name: 'C537_Edit a billing account as an ADMIN', func: C537 },
+  { name: 'C706_C707_Edit a billing account as an EDITOR not allowed / Edit a billing account as an VIEWER not allowed', func: C706},
+  //User Management
+  { name: 'C608_Invite a user to an organization that is not registered in proficloud and is not part of the same company', func: C608 },
+  { name: 'C613_C610_C882_C871_Invite member to an organization that is already registered to proficloud as ADMIN / Remove member from orgnization / Members cannot be invited more than 1 time to Proficloud / Inviting user to an organization of the same domain should be possible without data security message', func: C613 },
+  { name: 'C681_C682_C683_C684_C695_C696_C679_C680_C632_C633_Inviting an user to an organization as EDITOR/VIEWER is not allowed and User Management menu is hidden / Remove member from organization not allowed as EDITOR / Change user roles is not allowed for EDITOR/VIEWER / Editor/Viewer can NOT access to User Management / Viewer/Editor rights check', func: C681 },
+  { name: 'C609_Sorting users by first name, last name, email, invited, role.', func: C609 },
+  { name: 'C624_C677_Sorting users by first name, last name, email, invited, role. / ADMIN can access to USER MANAGEMENT', func: C624 },
+  { name: 'C874_C646_Search for member works / Scroll Bars are present for users and roles', func: C874 },
+  { name: 'C625_Roles page shows a summary of numbers of Admins, Editors and Viewers.', func: C625 },
+  { name: 'C537_After deleting user invitation the invitation link should not be valid anymore NEW', func: C537 },
+  { name: 'C714_After deleting user invitation the invitation link should not be valid anymore NEW', func: C714 },
+  //Organization General
+  { name: 'C611_643_C626_C699_C892_Leave organization / It should not be possible to leave its root organization as admin if at least another admin is present / Switch organization / Create orga as ADMIN / Message about what characters are allowed in the name of organization has to be displayed', func: C611 },
+  { name: 'C911_Search field for organizations works as intended', func: C911 },
+  //Organization menu
+  { name: 'C700_C701 Create an organization as EDITOR/VIEWER', func: C700 },
+  { name: 'C631_C702_C703_Rename organization as admin / Rename organization for EDITOR / VIEWER is not allowed', func: C631 },
+  { name: 'C630_C639_C627_628_User organization information is displayed correctly / Go to User Management Button redirect the user to User Management Service / Organization information is displayed correctly / Organization subscriptions are displayed correctly', func: C630 },
+  { name: 'C641_C1009_Admin rights check / Users of other organization should not be visible if not Admin rights when switching organization', func: C641 },
+  //Service Store
+  { name: 'C725_C1023_Admin, Editor and Viewer can access to the store, but only admin role can book a service / Go to service button in service store redirects the user to User Management Service', func: C725 },
+  //RBAC
+  { name: 'C734_C751_C888_UUIDs & Names of Device Management and Assign devices to user have to be the same /  Admin cannot assign devices to another admin / Search bar in Assing devices work as intended', func: C734 },
+  { name: 'C745_C896_C925_C746_Admins of an organization can assign / unassign devices to viewer and editor roles / Device persmission area by Invite Member, should be hidden in case the role ADMIN is selected  If the user open the window ASSIGN DEVICES and no other devices are added, then by clicking on SAVE ASSIGMENT does not lead to endless loading / Viewers and editors are not allowed to assign devices to other roles', func: C745 },
+  { name: 'C875_C876_C893_Change device permissions  search and select devices fields work  as intended / Search bar in devices tab section works as intended / Left Side Menu works in the compact version', func: C875 },
 
 
 
@@ -147,13 +147,13 @@ const projectsTests = {
   ],
   "Emma Service": [
 
-  // // Dashboards
-  // { name: 'C178_C179_C180_C946_C181_C184_Introducing a Dashboard name / Maximize the whole Dashboard Editing a Dashboard name / Introducing a Dashboard name with a maximum length of 27 characters Introducing a Dashboard description / Editing a Dashboard description', func: C178 },
-  // // Reports
-  // { name: 'C620_C651_C1053_C1054_Create a recurring Report_Delete a recurring and manual report_Preview of a recurring report creates and downloads a manual report / Alert is trigered after report creation', func: C620 },
-  // { name: 'C1056_C644_Recurring reports are sent according to their configuration Pause / Resume a recurring report', func: C1056 },
-  // { name: 'C621_C1057_C1051_Edit a recurring Report / Create a monthly recurring report / Report search bar and counter should work as intended', func: C621 },
-  // { name: 'C713_C720_C1052_Create a manual report / Downlaod a manual report / Export one or all widgets', func: C713 },
+  // Dashboards
+  { name: 'C178_C179_C180_C946_C181_C184_Introducing a Dashboard name / Maximize the whole Dashboard Editing a Dashboard name / Introducing a Dashboard name with a maximum length of 27 characters Introducing a Dashboard description / Editing a Dashboard description', func: C178 },
+  // Reports
+  { name: 'C620_C651_C1053_C1054_Create a recurring Report_Delete a recurring and manual report_Preview of a recurring report creates and downloads a manual report / Alert is trigered after report creation', func: C620 },
+  { name: 'C1056_C644_Recurring reports are sent according to their configuration Pause / Resume a recurring report', func: C1056 },
+  { name: 'C621_C1057_C1051_Edit a recurring Report / Create a monthly recurring report / Report search bar and counter should work as intended', func: C621 },
+  { name: 'C713_C720_C1052_Create a manual report / Downlaod a manual report / Export one or all widgets', func: C713 },
 
  
   
