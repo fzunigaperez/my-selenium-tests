@@ -37,6 +37,8 @@ jobs:
           DEFAULT_ENV="STG"               # General default
           EMMA_DEFAULT_ENV="STG"         # EMMA's default environment
           UMS_DEFAULT_ENV="PROD"         # User Management Service default
+          DMS_DEFAULT_ENV="PROD"         # Device Management Service default
+          CRS_DEFAULT_ENV="DEV"         # Charger Repay Service default
 
           # Use input environment if specified; otherwise, use defaults
           if [[ -n "${{ github.event.inputs.environment }}" ]]; then
@@ -49,14 +51,20 @@ jobs:
           if [[ "${{ github.event.inputs.environment }}" != "" ]]; then
             EMMA_ENV="${{ github.event.inputs.environment }}"
             UMS_ENV="${{ github.event.inputs.environment }}"
+            DMS_ENV="${{ github.event.inputs.environment }}"
+            CRS_ENV="${{ github.event.inputs.environment }}"
           else
             EMMA_ENV=$EMMA_DEFAULT_ENV
             UMS_ENV=$UMS_DEFAULT_ENV
+            DMS_ENV=$DMS_DEFAULT_ENV
+            CRS_ENV=$CRS_DEFAULT_ENV
           fi
 
           echo "TEST_ENV=$TEST_ENV" >> $GITHUB_ENV
           echo "EMMA_ENV=$EMMA_ENV" >> $GITHUB_ENV
           echo "UMS_ENV=$UMS_ENV" >> $GITHUB_ENV
+          echo "DMS_ENV=$DMS_ENV" >> $GITHUB_ENV
+          echo "CRS_ENV=$CRS_ENV" >> $GITHUB_ENV
 
       - name: Run specified test cases
         env:
