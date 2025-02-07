@@ -3307,9 +3307,14 @@ async function resetAssignedDevicesForEditorViewer(driver, role,serviceEnv) {
     await assignDevicesButton(driver);
 
     // Click the selection input twice to deselect all assigned devices
+    let element = await driver.wait(
+      until.elementLocated(By.xpath("//div[@data-analytics='modal headline'][contains(.,'Change device permissions')]")),
+      10000);
+
+    await driver.wait(until.elementIsVisible(element), 5000);
     const selectionInput = By.id("rbac-assignment-selection-tall-input");
     await driver.wait(until.elementLocated(selectionInput), 3000).click();
-    await driver. sleep(3000);
+    await driver. sleep(2000);
     await driver.wait(until.elementLocated(selectionInput), 3000).click();
 
     // Save the changes and wait for the process to finish

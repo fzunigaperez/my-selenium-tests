@@ -25,6 +25,7 @@ const {
   loginViewer,
   deleteAllEmails,
   logOutFromProtonMail,
+  clearAndWrite,
   
 
 } =   require('../utils/sharedFunctions'); // Reusable shared functions
@@ -89,11 +90,9 @@ async function C700() {
 
 
 async function introduceOrganizationName(driver,orgaName) {
-
   await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'Organization Name')]")), 30000).click();
-  await driver.findElement(By.xpath("//input[@placeholder='Organization Name']"),5000).clear();
-  await driver.findElement(By.xpath("//input[@placeholder='Organization Name']")).sendKeys(orgaName);
- 
+  await clearAndWrite(driver,"xpath","//*[contains(text(),'Organization Name')]",orgaName)
+
   
 }
   
