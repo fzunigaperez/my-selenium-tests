@@ -154,7 +154,7 @@ module.exports = C1056;
  * @returns {string} XPath string for locating the daily recurring report.
  */
 function getXPathPreviousDay() {
-  const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
+  const yesterday = moment().subtract(1, 'days').format('DD.MM.YYYY');
   return `//div[@class='recurring-report-name'][contains(.,'Daily Recurring Report - ${yesterday}')]`;
 }
 
@@ -163,7 +163,7 @@ function getXPathPreviousDay() {
  * @returns {string} XPath string for locating the weekly recurring report.
  */
 function getXPathWeeklyReport() {
-  const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
+  const yesterday = moment().subtract(1, 'days').format('DD.MM.YYYY');
   return `//div[@class='recurring-report-name'][contains(.,'Weekly Recurring Report - ${yesterday}')]`;
 }
 
@@ -172,7 +172,7 @@ function getXPathWeeklyReport() {
  * @returns {string} XPath string for locating the report.
  */
 function getXPathActivatedPausedDaily() {
-  const yesterday = moment().subtract(1, 'days').format('YYYY-MM-DD');
+  const yesterday = moment().subtract(1, 'days').format('DD.MM.YYYY');
   return `//span[contains(.,'Activated and Paused Recurring Report Daily - ${yesterday}')]`;
 }
 
