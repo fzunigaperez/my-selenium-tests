@@ -15,6 +15,7 @@ const {
   loginToProtonMail,
   deleteAllEmails,
   logOutFromProtonMail,
+  clearAndWrite,
 } = require('../utils/sharedFunctions');  // BS
 
 async function C19() {
@@ -35,19 +36,15 @@ async function C19() {
         await accountSettingsTab(driver);
 
         // C19: Add Name and Surname
-        vars["Name"] = "Fercho";
-        vars["Surname"] = "Tester";
+        Name = "Fercho";
+        Surname = "Tester";
 
         await changeInformationButton(driver);
         await driver.sleep(1000);
 
         // Edit Name and Surname Fields
-        await driver.wait(until.elementLocated(By.xpath("//input[contains(@placeholder,'First name')]")), 30000);
-        await driver.findElement(By.xpath("//input[contains(@placeholder,'First name')]")).clear();
-        await driver.findElement(By.xpath("//input[contains(@placeholder,'First name')]")).sendKeys(vars["Name"]);
-        await driver.findElement(By.xpath("//input[contains(@placeholder,'Last name')]")).clear();
-        await driver.findElement(By.xpath("//input[contains(@placeholder,'Last name')]")).sendKeys(vars["Surname"]);
-
+        await clearAndWrite(driver,"xpath","//input[contains(@placeholder,'First name')]", Name);
+        await clearAndWrite(driver,"xpath","//input[contains(@placeholder,'Last name')]", Surname);
         await saveProfileDataButton(driver);
 
         // Verify Success Message
@@ -80,8 +77,7 @@ async function C19() {
         console.log(`The original user Email is: ${vars["originalEmail"]}`);
 
         await changeInformationButton(driver);
-        await driver.findElement(By.xpath("//input[@placeholder='Email']")).clear();
-        await driver.findElement(By.xpath("//input[@placeholder='Email']")).sendKeys("testingpxc_viewer@proton.me");
+        await clearAndWrite(driver,"xpath","//input[@placeholder='Email']","testingpxc_viewer@proton.me");
         await saveProfileDataButton(driver);
         await driver.sleep(2000);
         await confirmButton(driver);
@@ -107,10 +103,8 @@ async function C19() {
 
         // C20: Confirm Email Change in Profile Settings
         await changeInformationButton(driver);
-        vars["emailChanged"] = "testing_email_change@proton.me";
-
-        await driver.findElement(By.xpath("//input[@placeholder='Email']")).clear();
-        await driver.findElement(By.xpath("//input[@placeholder='Email']")).sendKeys(vars["emailChanged"]);
+        emailChanged = "testing_email_change@proton.me";
+        await clearAndWrite(driver,"xpath","//input[@placeholder='Email']", emailChanged);
         await saveProfileDataButton(driver);
         await driver.sleep(2000);
         await confirmButton(driver);
