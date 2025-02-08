@@ -144,7 +144,7 @@ async function C19() {
 
         // Log In with Updated Email
         await driver.wait(until.elementLocated(By.id("username")), 50000);
-        await driver.findElement(By.id("username")).sendKeys(vars["emailChanged"]);
+        await driver.findElement(By.id("username")).sendKeys(emailChanged);
         await driver.findElement(By.id("password")).sendKeys(vars["password"]);
         await driver.findElement(By.id("kc-login")).click();
 
