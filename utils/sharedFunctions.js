@@ -979,21 +979,22 @@ console.log('Cantidad de elementos encontrados para "Invalid username or passwor
 async function resetTOriginalNameOrganization(driver) {
 
   resetOrganizationName = await getTextByLocator(driver,"xpath","//div[@id='active-organization']/h4");
-  if (resetOrganizationName !== 'Change Orga Name') {
+  if (resetOrganizationName !== 'Rooth Organization') {
       await activeOrganization(driver);
       await settings(driver);
       await driver.wait(until.elementLocated(By.css(".expandable-organization__subtitle")), 5000).click();
       orgaID = await getTextByLocator(driver,"css",".expandable-organization__subtitle");
       await driver.wait(until.elementLocated(By.xpath(`//app-icon[@id='settings-organization-settings-icon-${orgaID}']//*[name()='svg']`)), 3000).click();
       await renameOrganizationButton1(driver);
-      await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'Organization Name')]")), 30000).click();
+      await driver.sleep(1000);
+      //await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'Organization Name')]")), 30000).click();
       await clearAndWrite(driver,"xpath","//input[@placeholder='Organization Name']","Rooth Organization");
       await renameOrganizationButton2(driver);
       await waitingLoadingRingProficloudToDissapear(driver);
 
   }
   else{
-      console.log("The name of the orga is Change Orga Name:) Verified");
+      console.log("The name of the orga is Rooth Orgaqnozation Name:) Verified");
 
   }
   await deviceManagementMenu(driver);
@@ -3511,7 +3512,7 @@ async function checkReportsPresence(driver) {
   const today = moment().utc()
   const yesterday = moment().utc().subtract(1, 'day');
   const dayOfWeek = today.isoWeekday(); // 1 = Lunes, 7 = Domingo
-  const formattedDate = yesterday.format('YYYY-MM-DD');
+  const formattedDate = yesterday.format('DD.MM.YYYY');
   
   const weeklyReportXPath = `//span[contains(.,'Recurring report - Weekly Recurring Report - ${formattedDate}')]`;
   const activatedPausedXPath = `//span[contains(.,'Recurring report - Activated and Paused Recurring Report Daily - ${formattedDate}')]`;

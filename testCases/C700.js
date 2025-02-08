@@ -90,8 +90,9 @@ async function C700() {
 
 
 async function introduceOrganizationName(driver,orgaName) {
-  await driver.wait(until.elementLocated(By.xpath("//*[contains(text(),'Organization Name')]")), 30000).click();
-  await clearAndWrite(driver,"xpath","//*[contains(text(),'Organization Name')]",orgaName)
+  await driver.wait(until.elementLocated(By.xpath("//div[@data-analytics='modal headline'][contains(.,'Your Organization')]")), 30000);
+  await driver.sleep(1000);
+  await clearAndWrite(driver,"xpath","//input[@placeholder='Organization Name']",orgaName);
 
   
 }
