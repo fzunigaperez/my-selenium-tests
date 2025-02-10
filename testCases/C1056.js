@@ -200,19 +200,13 @@ async function checkXPath(driver, xpath, reportName) {
   }
 }
 
-/**
- * Determines if today is Sunday of an odd or even week.
- * @returns {string} Returns "odd" if it's Sunday of an odd week, "even" if it's Sunday of an even week, or "none" if it's not Sunday.
- */
 function getSundayWeekType() {
-  const today = moment(); // Get current date
-  const weekNumber = today.week(); // Get the current week number
-  const dayOfWeek = today.day(); // Get the day of the week (0 = Sunday, 6 = Saturday)
+  const today = moment().startOf('day'); // Ensure we get a consistent day reference
+  const weekNumber = today.isoWeek(); // Get ISO week number (which starts on Monday)
+  const dayOfWeek = today.isoWeekday(); // Get ISO day of the week (1 = Monday, 7 = Sunday)
 
-  if (dayOfWeek === 0) {
+  if (dayOfWeek === 7) { // Check if it's Sunday
     return weekNumber % 2 !== 0 ? "odd" : "even"; // Odd or Even Sunday
   }
   return "none"; // Any other day
 }
-
-
